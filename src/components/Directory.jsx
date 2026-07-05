@@ -23,7 +23,6 @@ const GlobeIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
 );
 
-// Corazón que reacciona a la variable CSS del Acento
 const HeartIcon = ({ isSaved }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "var(--accent)" : "none"} stroke={isSaved ? "var(--accent)" : "currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -50,7 +49,8 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   return (
     <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] bg-black/20 dark:bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-white dark:bg-[#0f0f11] w-full max-w-2xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center px-5 py-5 border-b border-black/5 dark:border-white/5">
+        {/* Anillo de acento en el buscador de la paleta */}
+        <div className="flex items-center px-5 py-5 border-b border-black/5 dark:border-white/5 focus-within:bg-accent-muted/10 transition-colors">
           <SearchIcon />
           <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or type a command..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-4 text-xl font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-700" />
           <kbd className="hidden sm:inline-block font-mono text-[10px] font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
@@ -61,8 +61,8 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
             <div className="mb-4">
               <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Tools</div>
               {filteredTools.map(tool => (
-                <button key={tool.id} onClick={() => { window.open(tool.url, '_blank'); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between group transition-all">
-                  <span className="text-[15px] text-zinc-900 dark:text-white font-semibold">{tool.name}</span><span className="text-[12px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">Visit ↵</span>
+                <button key={tool.id} onClick={() => { window.open(tool.url, '_blank'); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover-bg-accent-muted flex items-center justify-between group transition-all">
+                  <span className="text-[15px] text-zinc-900 dark:text-white font-semibold group-hover:text-accent">{tool.name}</span><span className="text-[12px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Visit ↵</span>
                 </button>
               ))}
             </div>
@@ -71,8 +71,8 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
             <div>
               <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Commands</div>
               {(query ? filteredCommands : commands).map(cmd => (
-                <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between group transition-all">
-                  <span className="text-[15px] text-zinc-900 dark:text-white font-medium">{cmd.title}</span><span className="text-[12px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">Execute ↵</span>
+                <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover-bg-accent-muted flex items-center justify-between group transition-all border-l-2 border-transparent hover:border-accent">
+                  <span className="text-[15px] text-zinc-900 dark:text-white font-medium group-hover:text-accent">{cmd.title}</span><span className="text-[12px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Execute ↵</span>
                 </button>
               ))}
             </div>
@@ -117,9 +117,9 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   }, [isFocused, isSaved, user]);
 
   return (
-    <div ref={cardRef} className={`break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu ${isFocused ? 'border-black dark:border-white ring-4 ring-black/10 dark:ring-white/10 scale-[1.02] shadow-2xl z-10' : 'border-black/5 dark:border-white/5 hover:-translate-y-1'}`}>
+    // Borde y Halo (Ring) reaccionan al acento cuando está enfocada
+    <div ref={cardRef} className={`break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border p-1.5 rounded-[22px] transition-all duration-300 transform-gpu ${isFocused ? 'border-accent ring-4 ring-accent-muted scale-[1.02] shadow-accent z-10' : 'border-black/5 dark:border-white/5 hover:-translate-y-1 shadow-sm hover:shadow-xl'}`}>
 
-      {/* Botón flotante que hereda el Acento usando CSS */}
       <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none hover-accent-text ${
         isSaved ? 'bg-white border-black/5 shadow-sm dark:bg-[#111] dark:border-white/10 opacity-100'
         : isFocused ? 'bg-black text-white dark:bg-white dark:text-black border-transparent opacity-100'
@@ -128,7 +128,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
         {isSaving ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
       </button>
 
-      <div className={`absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-black/80 dark:bg-white/80 backdrop-blur-md text-white dark:text-black text-[10px] font-bold tracking-widest uppercase transition-opacity duration-300 pointer-events-none ${isFocused ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-black/80 dark:bg-white/80 backdrop-blur-md text-white dark:text-black text-[10px] font-bold tracking-widest uppercase transition-opacity duration-300 pointer-events-none shadow-xl ${isFocused ? 'opacity-100' : 'opacity-0'}`}>
         Press <kbd className="font-mono text-accent">F</kbd> to Save
       </div>
 
@@ -141,14 +141,13 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
           <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700 ease-out" loading="lazy" />
         </div>
       </div>
-      <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
+      <div className={`bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold transition-colors cursor-pointer ${isFocused ? 'text-accent bg-accent-muted/20' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white'}`} onClick={() => window.open(tool.url, '_blank')}>
         {isFocused ? <span className="font-mono">Press ENTER to Visit</span> : tool.actionText}
       </div>
     </div>
   );
 };
 
-// ... [AutoCaptureModal se mantiene exactamente igual, omitido por brevedad] ...
 const AutoCaptureModal = ({ isOpen, onClose, user }) => {
   const [name, setName] = useState(''); const [url, setUrl] = useState(''); const [category, setCategory] = useState('Design'); const [submitStatus, setSubmitStatus] = useState('idle');
   if (!isOpen) return null;
@@ -162,12 +161,15 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
         ) : (
           <form onSubmit={handleCapture}>
             <div className="flex flex-col gap-3 mb-5">
-              <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm text-black dark:text-white placeholder:text-zinc-400" />
-              <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-black dark:focus-within:ring-white"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" /></div>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm text-black dark:text-white"><option value="Design">Design</option><option value="Development">Development</option><option value="AI Tools">AI Tools</option><option value="Productivity">Productivity</option></select>
+              {/* Entradas con focus-within al Acento */}
+              <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 ring-accent transition-all text-sm text-black dark:text-white placeholder:text-zinc-400" />
+              <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" /></div>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-accent transition-all text-sm text-black dark:text-white"><option value="Design">Design</option><option value="Development">Development</option><option value="AI Tools">AI Tools</option><option value="Productivity">Productivity</option></select>
             </div>
             {submitStatus === 'error' && <p className="text-red-500 text-[12px] mb-3 text-center">Server error.</p>}
-            <button type="submit" disabled={submitStatus === 'loading'} className="w-full bg-black dark:bg-white text-white dark:text-black text-sm font-medium py-2.5 rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2">{submitStatus === 'loading' ? "Sending..." : "Submit to Directory"}</button>
+
+            {/* Botón Principal usando el Acento */}
+            <button type="submit" disabled={submitStatus === 'loading'} className="w-full bg-accent shadow-accent text-white dark:text-black text-sm font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all">{submitStatus === 'loading' ? "Sending..." : "Submit to Directory"}</button>
           </form>
         )}
       </div>
@@ -176,18 +178,14 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 };
 
 export default function App() {
-  // --- EL CEREBRO DEL SISTEMA DE ACENTOS ---
-  // Comprobamos si estamos en el navegador antes de usar localStorage
+  // Solución Vercel SSR para el Acento
   const [accentColor, setAccentColor] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('nexus-accent') || '#ff8787';
-    }
-    return '#ff8787'; // Color por defecto para el servidor de Vercel
+    if (typeof window !== 'undefined') return localStorage.getItem('nexus-accent') || '#ff8787';
+    return '#ff8787';
   });
 
   useEffect(() => {
     localStorage.setItem('nexus-accent', accentColor);
-    // Inyectamos el color mágico directo a la raíz del CSS de toda la página
     document.documentElement.style.setProperty('--accent', accentColor);
   }, [accentColor]);
 
@@ -276,12 +274,22 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 font-sans selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
 
-      {/* MAGIA CSS: Inyectamos estilos utilitarios universales para el color de acento */}
+      {/* MAGIA CSS: Variables de raíz para Selección, Sombras, Botones y Resplandores */}
       <style>{`
+        :root {
+          --accent: ${accentColor};
+          --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
+        }
+        ::selection { background-color: var(--accent); color: #fff; }
         .text-accent { color: var(--accent) !important; }
-        .bg-accent { background-color: var(--accent) !important; }
+        .bg-accent { background-color: var(--accent) !important; color: #fff !important; }
+        .bg-accent-muted { background-color: var(--accent-muted) !important; }
+        .border-accent { border-color: var(--accent) !important; }
+        .ring-accent { --tw-ring-color: var(--accent) !important; }
         .hover-accent-text:hover { color: var(--accent) !important; }
         .hover-bg-accent:hover { background-color: var(--accent) !important; color: white !important; }
+        .hover-bg-accent-muted:hover { background-color: var(--accent-muted) !important; }
+        .shadow-accent { box-shadow: 0 4px 20px var(--accent-muted) !important; }
       `}</style>
 
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-lg bg-white/80 dark:bg-[#111]/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-full shadow-lg flex items-center justify-between p-1.5 transition-all">
@@ -289,7 +297,7 @@ export default function App() {
           <div className="w-4 h-4 rounded bg-black dark:bg-white flex items-center justify-center"><div className="w-1 h-1 bg-white dark:bg-black rounded-full"></div></div>
         </div>
 
-        <button onClick={() => setIsCommandPaletteOpen(true)} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group">
+        <button onClick={() => setIsCommandPaletteOpen(true)} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
           <SearchIcon />
           <span className="ml-2 text-zinc-500 text-[12px] font-medium text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
           <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
@@ -302,20 +310,21 @@ export default function App() {
 
           {user ? (
             <button onClick={() => setIsProfileOpen(true)} className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 text-[11px] font-medium transition-all active:scale-95 cursor-pointer flex items-center gap-1.5">
-              {/* Conectamos el indicador del Navbar al Acento */}
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor }}></div>{user.nickname ? `@${user.nickname}` : user.email.split('@')[0]}
             </button>
           ) : (
             <button onClick={() => setIsAuthModalOpen(true)} className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"><UserIcon /></button>
           )}
-          <button onClick={() => setIsModalOpen(true)} className="w-8 h-8 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95 cursor-pointer"><PlusIcon /></button>
+
+          {/* Botón Principal Plus usando el Acento */}
+          <button onClick={() => setIsModalOpen(true)} className="w-8 h-8 rounded-full bg-accent shadow-accent text-white dark:text-black flex items-center justify-center hover:opacity-90 transition-all active:scale-95 cursor-pointer"><PlusIcon /></button>
         </div>
       </nav>
 
       <div className="pt-28 pb-8 flex justify-center w-full z-30 sticky top-0 bg-gradient-to-b from-[#fafafa] dark:from-[#050505] to-transparent pointer-events-none">
         <div className="flex gap-2 p-1.5 rounded-full bg-white/50 dark:bg-[#111]/50 backdrop-blur-md border border-black/5 dark:border-white/5 pointer-events-auto overflow-x-auto max-w-[95%] no-scrollbar">
           {["All", "Design", "Development", "AI Tools", "Productivity"].map(cat => (
-            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all whitespace-nowrap ${activeCategory === cat ? 'text-white shadow-sm bg-accent' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}>{cat}</button>
+            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all whitespace-nowrap ${activeCategory === cat ? 'text-white shadow-accent bg-accent' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}>{cat}</button>
           ))}
         </div>
       </div>
@@ -333,7 +342,6 @@ export default function App() {
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
-      {/* Pasamos los controles de acento al Perfil */}
       <UserProfile
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
