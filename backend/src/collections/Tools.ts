@@ -63,8 +63,12 @@ export const Tools: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, operation }) => {
-        // La barrera: SOLO se envía a Algolia si tú lo aprobase
+      // Añadimos 'req' a los argumentos para poder usar req.payload
+      async ({ doc, req, operation }) => {
+
+        // ----------------------------------------------------
+        // 1. LÓGICA DE ALGOLIA (Manejo del motor de búsqueda)
+        // ----------------------------------------------------
         if (doc.status === 'approved') {
           try {
             const algoliaRecord = {
@@ -84,6 +88,52 @@ export const Tools: CollectionConfig = {
             // Si por alguna razón te arrepientes y lo devuelves a pendiente, lo borra de la web
             try { await index.deleteObject(doc.id.toString()); } catch(e) {}
         }
+
+        // ----------------------------------------------------
+        // 2. LÓGICA DE GAMIFICACIÓN (Cálculo de niveles)
+        // ----------------------------------------------------
+        if (doc.status === 'approved' && doc.submittedBy) {
+          try {
+            // Extraemos el ID del usuario (puede venir poblado como objeto o solo el string)
+            const userId = typeof doc.submittedBy === 'object' ? doc.submittedBy.id : doc.submittedBy;
+
+            // Le pedimos a Payload que cuente cuántas herramientas "approved" tiene este usuario
+            const userTools = await req.payload.find({
+              collection: 'tools',
+              where: {
+                and: [
+                  { submittedBy: { equals: userId } },
+                  { status: { equals: 'approved' } }
+                ]
+              },
+              depth: 0,
+              limit: 1, // Solo necesitamos el totalDocs, esto lo hace ultrarrápido
+            });
+
+            // Calculamos el nuevo nivel basado en sus aportes aprobados
+            const totalApproved = userTools.totalDocs;
+            let newLevel: 'Explorer' | 'Contributor' | 'Expert Curator' = 'Explorer';
+
+            if (totalApproved >= 5) {
+              newLevel = 'Expert Curator';
+            } else if (totalApproved >= 1) {
+              newLevel = 'Contributor';
+            }
+
+            // Actualizamos el perfil del usuario silenciosamente en la base de datos
+            await req.payload.update({
+              collection: 'users',
+              id: userId,
+              data: { level: newLevel }
+            });
+
+            console.log(`🌟 Nivel del usuario ${userId} actualizado a: ${newLevel}`);
+
+          } catch (error) {
+            console.error("Error en gamificación:", error);
+          }
+        }
+
         return doc;
       },
     ],

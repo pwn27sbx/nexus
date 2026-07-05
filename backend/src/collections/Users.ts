@@ -13,6 +13,13 @@ export const Users: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
+    {
+      name: 'nickname',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+      }
+    },
     // La Bóveda: Guarda las IDs de las herramientas favoritas
     {
       name: 'bookmarks',
