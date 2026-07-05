@@ -2,19 +2,37 @@ import { CollectionConfig } from 'payload'
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  auth: true, // Esto activa mágicamente todo el sistema de login/signup
+  auth: true,
   admin: {
     useAsTitle: 'email',
   },
   access: {
     read: () => true,
-    // Permitimos que cualquiera pueda crear una cuenta (Signup)
     create: () => true,
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
-    // Email y password se añaden automáticamente por el "auth: true"
-    // Puedes añadir más campos aquí después (ej. nombre, avatar)
+    // La Bóveda: Guarda las IDs de las herramientas favoritas
+    {
+      name: 'bookmarks',
+      type: 'relationship',
+      relationTo: 'tools',
+      hasMany: true,
+      admin: {
+        position: 'sidebar',
+      }
+    },
+    // Gamificación: El título que se mostrará en su perfil
+    {
+      name: 'level',
+      type: 'select',
+      options: ['Explorer', 'Contributor', 'Expert Curator'],
+      defaultValue: 'Explorer',
+      admin: {
+        position: 'sidebar',
+        description: 'Nivel del usuario basado en sus contribuciones.'
+      }
+    }
   ],
 }

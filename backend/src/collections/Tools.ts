@@ -34,6 +34,16 @@ export const Tools: CollectionConfig = {
         description: 'Cambia a "approved" y guarda para publicarlo en la web.'
       }
     },
+    // NUEVO: Rastrear quién envió esta herramienta
+    {
+      name: 'submittedBy',
+      type: 'relationship',
+      relationTo: 'users',
+      hasMany: false,
+      admin: {
+        position: 'sidebar',
+      }
+    },
   ],
   hooks: {
     beforeChange: [
