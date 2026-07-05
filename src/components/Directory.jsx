@@ -44,8 +44,6 @@ const UserIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="no
 const PlusIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>);
 const GlobeIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>);
 const HeartIcon = ({ isSaved }) => (<svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "var(--accent)" : "none"} stroke={isSaved ? "var(--accent)" : "currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>);
-
-// ICONOS DE VISTA
 const GridIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>);
 const ListIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
 
@@ -156,7 +154,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   );
 };
 
-// --- TARJETA DE VISTA DENSA REDISEÑADA (CON LOGO) ---
+// --- TARJETA DE VISTA DENSA REDISEÑADA (THUMBNAIL + DESCRIPCIÓN) ---
 const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
@@ -189,7 +187,8 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   }, [isFocused, isSaved, user]);
 
   return (
-    <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_2fr_1fr_1fr_auto] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
+    // Nueva cuadrícula para acomodar la miniatura
+    <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_auto_2fr_1fr_auto] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
 
       {/* 1. Botón Guardar / Índice */}
       <div className="flex items-center justify-center w-8" onClick={(e) => { e.stopPropagation(); }}>
@@ -201,22 +200,23 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         </span>
       </div>
 
-      {/* 2. Logo + Nombre */}
-      <div className="flex flex-row items-center gap-3.5 truncate">
-        <div className="w-9 h-9 rounded-xl bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105">
-          <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`} alt="" className="w-5 h-5 object-contain" />
+      {/* 2. Miniatura de la Web (Oculta en móviles para ahorrar espacio) */}
+      <div className="hidden md:block w-[72px] h-[40px] rounded-lg overflow-hidden border border-black/5 dark:border-white/5 shadow-sm relative group-hover:shadow-md transition-all">
+        <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+      </div>
+
+      {/* 3. Favicon + Nombre + Descripción Inteligente */}
+      <div className="flex flex-col truncate justify-center">
+        <div className="flex items-center gap-2">
+          <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`} alt="" className="w-3.5 h-3.5 object-contain rounded-sm" />
+          <span className={`text-[14px] font-bold truncate transition-colors ${isFocused ? 'text-accent' : 'text-zinc-900 dark:text-white'}`}>{tool.name}</span>
         </div>
-        <span className={`text-[14px] font-bold truncate transition-colors ${isFocused ? 'text-accent' : 'text-zinc-900 dark:text-white'}`}>{tool.name}</span>
+        <span className="text-[12px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{tool.description}</span>
       </div>
 
-      {/* 3. Categoría */}
-      <div className="hidden md:block">
+      {/* 4. Categoría */}
+      <div className="hidden md:flex justify-end">
         <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{tool.category}</span>
-      </div>
-
-      {/* 4. Dominio */}
-      <div className="hidden md:block truncate text-[13px] text-zinc-500 font-medium">
-        {getDomain(tool.url)}
       </div>
 
       {/* 5. Acción interactiva */}
@@ -349,7 +349,24 @@ export default function App() {
         const fetchedTools = hits.map((tool, index) => {
           const heights = ["h-[200px]", "h-[240px]", "h-[220px]", "h-[260px]", "h-[280px]"];
           const assignedHeight = tool.gridHeight === 'tall' ? (index % 2 === 0 ? "h-[450px]" : "h-[500px]") : heights[index % heights.length];
-          return { id: tool.objectID, name: tool.name, category: tool.category, url: tool.url, imageUrl: tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop", heightClass: assignedHeight, actionText: "View Production" };
+
+          // GENERADOR DE DESCRIPCIÓN INTELIGENTE TEMPORAL
+          let smartDescription = `High-performance platform for creators.`;
+          if (tool.category === 'Design') smartDescription = `Professional UI/UX and visual design resource.`;
+          if (tool.category === 'Development') smartDescription = `Technical framework and coding utility.`;
+          if (tool.category === 'AI Tools') smartDescription = `Next-generation artificial intelligence model.`;
+          if (tool.category === 'Productivity') smartDescription = `Workflow optimization and management suite.`;
+
+          return {
+            id: tool.objectID,
+            name: tool.name,
+            category: tool.category,
+            url: tool.url,
+            imageUrl: tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop",
+            heightClass: assignedHeight,
+            actionText: "View Production",
+            description: smartDescription // <-- Añadido al objeto
+          };
         });
         setTools(fetchedTools);
       } catch (error) {} finally { setIsLoading(false); }
@@ -424,7 +441,7 @@ export default function App() {
         </div>
       </div>
 
-      <main className={`max-w-[1600px] mx-auto mt-2 ${viewMode === 'list' ? 'w-full px-4 lg:w-[800px]' : 'w-[95%]'}`}>
+      <main className={`max-w-[1600px] mx-auto mt-2 ${viewMode === 'list' ? 'w-full px-4 lg:w-[900px]' : 'w-[95%]'}`}>
         {isLoading ? ( <div className="flex justify-center items-center py-20 text-zinc-500"><svg className="animate-spin h-6 w-6 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>Loading...</div>
         ) : filteredTools.length > 0 ? (
           viewMode === 'grid' ? (
