@@ -53,7 +53,6 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
 
   if (!isOpen) return null;
 
-  // Lista de comandos mágicos
   const commands = [
     { id: 'suggest', title: 'Suggest a Tool', category: 'Actions', action: () => onAction('suggest') },
     { id: 'leaderboard', title: 'View Leaderboard', category: 'Actions', action: () => onAction('leaderboard') },
@@ -67,8 +66,6 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   return (
     <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] bg-black/20 dark:bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-white dark:bg-[#0f0f11] w-full max-w-2xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-
-        {/* Gran Buscador Central */}
         <div className="flex items-center px-5 py-5 border-b border-black/5 dark:border-white/5">
           <SearchIcon />
           <input
@@ -81,7 +78,6 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
           <kbd className="hidden sm:inline-block font-mono text-[10px] font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
         </div>
 
-        {/* Resultados en Vivo */}
         <div className="max-h-[50vh] overflow-y-auto p-3 no-scrollbar">
           {query && filteredTools.length > 0 && (
             <div className="mb-4">
@@ -118,16 +114,26 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   );
 };
 
-const MasonryCard = ({ tool, user, onRequireAuth }) => {
+// --- MASONRY CARD CON SOPORTE DE TECLADO ---
+const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
+  const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
+
   const [isSaved, setIsSaved] = useState(() => {
     if (!user || !user.bookmarks) return false;
     return user.bookmarks.some(b => (typeof b === 'object' ? b.id : b) === numericToolId);
   });
   const [isSaving, setIsSaving] = useState(false);
 
+  // Auto-scroll para seguir el elemento enfocado
+  useEffect(() => {
+    if (isFocused && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isFocused]);
+
   const handleToggleSave = async (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     if (!user) return onRequireAuth();
 
     setIsSaving(true);
@@ -147,11 +153,46 @@ const MasonryCard = ({ tool, user, onRequireAuth }) => {
     } catch (err) {} finally { setIsSaving(false); }
   };
 
+  // Escuchar la tecla "F" solo si esta tarjeta está enfocada
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // Ignorar si estamos escribiendo en la paleta o un formulario
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (isFocused && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        handleToggleSave(e);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isFocused, isSaved, user]);
+
   return (
-    <div className="break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1">
-      <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none ${isSaved ? 'bg-white text-[#ff8787] border-[#ff8787]/20 shadow-sm dark:bg-[#111] opacity-100' : 'bg-white/80 text-zinc-400 border-black/5 dark:bg-black/50 dark:text-zinc-500 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-[#ff8787] dark:hover:bg-[#111] dark:hover:text-[#ff8787]'}`}>
+    <div
+      ref={cardRef}
+      className={`break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu ${
+        isFocused
+          ? 'border-black dark:border-white ring-4 ring-black/10 dark:ring-white/10 scale-[1.02] shadow-2xl z-10'
+          : 'border-black/5 dark:border-white/5 hover:-translate-y-1'
+      }`}
+    >
+      <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none ${
+        isSaved
+          ? 'bg-white text-[#ff8787] border-[#ff8787]/20 shadow-sm dark:bg-[#111] opacity-100'
+          : isFocused
+            ? 'bg-black text-white dark:bg-white dark:text-black border-transparent opacity-100' // Contraste de alta gama al enfocar
+            : 'bg-white/80 text-zinc-400 border-black/5 dark:bg-black/50 dark:text-zinc-500 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-[#ff8787] dark:hover:bg-[#111] dark:hover:text-[#ff8787]'
+      }`}>
         {isSaving ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
       </button>
+
+      {/* Indicador de teclado elegante */}
+      <div className={`absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-black/80 dark:bg-white/80 backdrop-blur-md text-white dark:text-black text-[10px] font-bold tracking-widest uppercase transition-opacity duration-300 pointer-events-none ${isFocused ? 'opacity-100' : 'opacity-0'}`}>
+        Press <kbd className="font-mono text-amber-300 dark:text-amber-600">F</kbd> to Save
+      </div>
+
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
         <div className="flex justify-between items-center mb-3 px-1">
           <h3 className="text-zinc-900 dark:text-white text-[13px] font-medium tracking-tight truncate pr-8">{tool.name}</h3>
@@ -162,7 +203,7 @@ const MasonryCard = ({ tool, user, onRequireAuth }) => {
         </div>
       </div>
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
-        {tool.actionText}
+        {isFocused ? <span className="font-mono">Press ENTER to Visit</span> : tool.actionText}
       </div>
     </div>
   );
@@ -217,27 +258,64 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState("All");
 
-  // ESTADOS
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false); // NUEVO ESTADO PALETA
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  // --- NUEVO ESTADO DE NAVEGACIÓN ---
+  const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const [tools, setTools] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  // Escuchador Global para Cmd+K o Ctrl+K
+  // Resetear el foco si cambiamos de categoría o buscamos algo
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    setFocusedIndex(-1);
+  }, [searchQuery, activeCategory]);
+
+  // Cerebro de la Navegación por Teclado
+  useEffect(() => {
+    // Si hay un modal abierto, el teclado no controla la grilla
+    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen) return;
+
+    const handleGlobalKeyDown = (e) => {
+      // Ignorar si el usuario está usando un input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (tools.length === 0) return;
+
+      const currentTools = tools.filter(t => activeCategory === "All" || t.category === activeCategory);
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedIndex(prev => prev < currentTools.length - 1 ? prev + 1 : 0);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedIndex(prev => prev > 0 ? prev - 1 : currentTools.length - 1);
+      } else if (e.key === 'Enter' && focusedIndex >= 0) {
+        e.preventDefault();
+        window.open(currentTools[focusedIndex].url, '_blank');
+      } else if (e.key === 'Escape') {
+        setFocusedIndex(-1);
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen]);
+
+  // Atajo Cmd+K para la Paleta
+  useEffect(() => {
+    const handleCmdK = (e) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setIsCommandPaletteOpen((prev) => !prev);
       }
     };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleCmdK);
+    return () => document.removeEventListener('keydown', handleCmdK);
   }, []);
 
   useEffect(() => {
@@ -254,7 +332,6 @@ export default function App() {
 
   const handleLogout = () => { localStorage.removeItem('payload-token'); setUser(null); setIsProfileOpen(false); };
 
-  // Ejecutor de Comandos desde la Paleta
   const handlePaletteAction = (action) => {
     switch(action) {
       case 'suggest': setIsModalOpen(true); break;
@@ -302,7 +379,6 @@ export default function App() {
           <div className="w-4 h-4 rounded bg-black dark:bg-white flex items-center justify-center"><div className="w-1 h-1 bg-white dark:bg-black rounded-full"></div></div>
         </div>
 
-        {/* --- NUEVO BOTÓN DE BÚSQUEDA (Activa la Paleta) --- */}
         <button
           onClick={() => setIsCommandPaletteOpen(true)}
           className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group"
@@ -344,23 +420,22 @@ export default function App() {
           <div className="flex justify-center items-center py-20 text-zinc-500"><svg className="animate-spin h-6 w-6 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>Loading...</div>
         ) : filteredTools.length > 0 ? (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
-            {filteredTools.map(tool => <MasonryCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} />)}
+            {filteredTools.map((tool, index) => (
+              <MasonryCard
+                key={tool.id}
+                tool={tool}
+                user={user}
+                onRequireAuth={() => setIsAuthModalOpen(true)}
+                isFocused={focusedIndex === index}
+              />
+            ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-zinc-400"><SearchIcon /><p className="mt-4 text-sm">No tools found.</p></div>
         )}
       </main>
 
-      {/* --- MODALES GLOBALES --- */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        query={searchQuery}
-        setQuery={setSearchQuery}
-        tools={tools}
-        user={user}
-        onAction={handlePaletteAction}
-      />
+      <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={setSearchQuery} tools={tools} user={user} onAction={handlePaletteAction} />
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <UserProfile isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={handleLogout} />
