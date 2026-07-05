@@ -35,46 +35,59 @@ const GlobeIcon = () => (
     <circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
   </svg>
 );
-const BookmarkIcon = ({ isSaved }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+const HeartIcon = ({ isSaved }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill={isSaved ? "#ff8787" : "none"}
+    stroke={isSaved ? "#ff8787" : "currentColor"}
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="transition-all duration-300"
+  >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
   </svg>
 );
 
 const MasonryCard = ({ tool, user, onRequireAuth }) => {
-  // Verificamos si el usuario actual ya tiene esta herramienta guardada
+  // Convertimos el ID de Algolia (string) a Número para Postgres
+  const numericToolId = Number(tool.id);
+
   const [isSaved, setIsSaved] = useState(() => {
     if (!user || !user.bookmarks) return false;
-    // Payload puede devolver los bookmarks como IDs o como objetos completos
-    return user.bookmarks.some(b => b === tool.id || b.id === tool.id);
+    return user.bookmarks.some(b =>
+      (typeof b === 'object' ? b.id : b) === numericToolId
+    );
   });
+
   const [isSaving, setIsSaving] = useState(false);
 
   const handleToggleSave = async (e) => {
-    e.stopPropagation(); // Evitamos que el clic se propague
+    e.stopPropagation();
 
     if (!user) {
-      onRequireAuth(); // Abre el modal de login si no hay usuario
+      onRequireAuth();
       return;
     }
 
     setIsSaving(true);
     const token = localStorage.getItem('payload-token');
 
-    // Determinamos si vamos a agregar o quitar la herramienta
     let newBookmarks = [];
     if (user.bookmarks) {
       newBookmarks = user.bookmarks.map(b => typeof b === 'object' ? b.id : b);
     }
 
     if (isSaved) {
-      newBookmarks = newBookmarks.filter(id => id !== tool.id);
+      newBookmarks = newBookmarks.filter(id => id !== numericToolId);
     } else {
-      newBookmarks.push(tool.id);
+      newBookmarks.push(numericToolId);
     }
 
     try {
-      // Actualizamos el usuario en Payload
       const response = await fetch(`https://nexus-production-8dca.up.railway.app/api/users/${user.id}`, {
         method: 'PATCH',
         headers: {
@@ -86,8 +99,9 @@ const MasonryCard = ({ tool, user, onRequireAuth }) => {
 
       if (response.ok) {
         setIsSaved(!isSaved);
-        // Actualizamos silenciosamente el estado del usuario localmente
         user.bookmarks = newBookmarks;
+      } else {
+        console.error("Payload error:", await response.json());
       }
     } catch (error) {
       console.error("Error guardando herramienta:", error);
@@ -99,20 +113,20 @@ const MasonryCard = ({ tool, user, onRequireAuth }) => {
   return (
     <div className="break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1">
 
-      {/* Botón Flotante de Guardar (Visible en hover o si ya está guardado) */}
+      {/* Botón Flotante con el Corazón Centrado */}
       <button
         onClick={handleToggleSave}
         disabled={isSaving}
-        className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+        className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none ${
           isSaved
-            ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white opacity-100'
-            : 'bg-white/80 text-zinc-500 border-black/10 dark:bg-black/50 dark:text-zinc-400 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black'
+            ? 'bg-white text-[#ff8787] border-[#ff8787]/20 shadow-sm dark:bg-[#111] opacity-100'
+            : 'bg-white/80 text-zinc-400 border-black/5 dark:bg-black/50 dark:text-zinc-500 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-[#ff8787] dark:hover:bg-[#111] dark:hover:text-[#ff8787]'
         }`}
       >
         {isSaving ? (
           <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>
         ) : (
-          <BookmarkIcon isSaved={isSaved} />
+          <HeartIcon isSaved={isSaved} />
         )}
       </button>
 
