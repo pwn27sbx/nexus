@@ -7,7 +7,6 @@ import LeaderboardModal from './LeaderboardModal';
 const searchClient = algoliasearch("P34W7YOD99", "0d8c3e7f27ab2d9f69f63b96b064a2a4");
 const index = searchClient.initIndex('tools');
 
-// SINTETIZADOR DE AUDIO GLOBAL
 let audioCtx = null;
 const playSound = (type) => {
   try {
@@ -17,7 +16,6 @@ const playSound = (type) => {
       audioCtx = new AudioContext();
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
-
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
@@ -46,6 +44,7 @@ const GlobeIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="n
 const HeartIcon = ({ isSaved }) => (<svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "var(--accent)" : "none"} stroke={isSaved ? "var(--accent)" : "currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>);
 const GridIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>);
 const ListIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
+const DescIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>);
 
 const getDomain = (url) => { try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; } };
 
@@ -154,7 +153,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   );
 };
 
-// --- TARJETA DE VISTA DENSA REDISEÑADA (THUMBNAIL + DESCRIPCIÓN) ---
+// --- LIST CARD REFINADA (IMAGEN A LA DERECHA) ---
 const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
@@ -187,8 +186,8 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   }, [isFocused, isSaved, user]);
 
   return (
-    // Nueva cuadrícula para acomodar la miniatura
-    <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_auto_2fr_1fr_auto] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
+    // Nueva cuadrícula perfecta con la imagen al final
+    <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_2.5fr_1fr_1.5fr_80px] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
 
       {/* 1. Botón Guardar / Índice */}
       <div className="flex items-center justify-center w-8" onClick={(e) => { e.stopPropagation(); }}>
@@ -200,12 +199,7 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         </span>
       </div>
 
-      {/* 2. Miniatura de la Web (Oculta en móviles para ahorrar espacio) */}
-      <div className="hidden md:block w-[72px] h-[40px] rounded-lg overflow-hidden border border-black/5 dark:border-white/5 shadow-sm relative group-hover:shadow-md transition-all">
-        <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
-      </div>
-
-      {/* 3. Favicon + Nombre + Descripción Inteligente */}
+      {/* 2. Favicon + Nombre + Descripción Real */}
       <div className="flex flex-col truncate justify-center">
         <div className="flex items-center gap-2">
           <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`} alt="" className="w-3.5 h-3.5 object-contain rounded-sm" />
@@ -214,23 +208,53 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         <span className="text-[12px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{tool.description}</span>
       </div>
 
-      {/* 4. Categoría */}
-      <div className="hidden md:flex justify-end">
+      {/* 3. Categoría */}
+      <div className="hidden md:flex items-center">
         <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{tool.category}</span>
       </div>
 
-      {/* 5. Acción interactiva */}
-      <div className="flex items-center justify-end font-mono text-[11px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-        {isFocused ? <span className="text-accent">PRESS ENTER ↵</span> : 'VISIT ↗'}
+      {/* 4. Dominio / Visitar */}
+      <div className="hidden md:flex flex-col items-end justify-center pr-2">
+        <span className="truncate text-[13px] text-zinc-500 font-medium">{getDomain(tool.url)}</span>
+        <div className="font-mono text-[10px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+          {isFocused ? <span className="text-accent">PRESS ENTER ↵</span> : 'VISIT ↗'}
+        </div>
+      </div>
+
+      {/* 5. Miniatura a la extrema derecha */}
+      <div className="hidden md:flex justify-end">
+        <div className="w-[72px] h-[40px] rounded-lg overflow-hidden border border-black/5 dark:border-white/5 shadow-sm relative group-hover:shadow-md transition-all">
+          <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+        </div>
       </div>
     </div>
   );
 };
 
 const AutoCaptureModal = ({ isOpen, onClose, user }) => {
-  const [name, setName] = useState(''); const [url, setUrl] = useState(''); const [category, setCategory] = useState('Design'); const [submitStatus, setSubmitStatus] = useState('idle');
+  const [name, setName] = useState('');
+  const [url, setUrl] = useState('');
+  const [category, setCategory] = useState('Design');
+  const [description, setDescription] = useState(''); // <-- NUEVO ESTADO DE DESCRIPCIÓN
+  const [submitStatus, setSubmitStatus] = useState('idle');
+
   if (!isOpen) return null;
-  const handleCapture = async (e) => { e.preventDefault(); setSubmitStatus('loading'); try { const res = await fetch('https://nexus-production-8dca.up.railway.app/api/tools', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, url, category, submittedBy: user ? user.id : null }), }); if (res.ok) { setSubmitStatus('success'); setTimeout(() => { onClose(); setName(''); setUrl(''); setCategory('Design'); setSubmitStatus('idle'); }, 3000); } else setSubmitStatus('error'); } catch (err) { setSubmitStatus('error'); } };
+
+  const handleCapture = async (e) => {
+    e.preventDefault(); setSubmitStatus('loading');
+    try {
+      const res = await fetch('https://nexus-production-8dca.up.railway.app/api/tools', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, url, category, description, submittedBy: user ? user.id : null }),
+      });
+      if (res.ok) {
+        setSubmitStatus('success');
+        setTimeout(() => { onClose(); setName(''); setUrl(''); setDescription(''); setCategory('Design'); setSubmitStatus('idle'); }, 3000);
+      } else setSubmitStatus('error');
+    } catch (err) { setSubmitStatus('error'); }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/10 dark:bg-black/40 backdrop-blur-md transition-opacity">
       <div className="bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 w-[90%] max-w-md rounded-2xl p-6 shadow-2xl relative">
@@ -242,6 +266,13 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
             <div className="flex flex-col gap-3 mb-5">
               <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 ring-accent transition-all text-sm text-black dark:text-white placeholder:text-zinc-400" />
               <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" /></div>
+
+              {/* NUEVO INPUT DE DESCRIPCIÓN */}
+              <div className="flex items-start gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all">
+                <DescIcon />
+                <input type="text" required maxLength={100} placeholder="Short description (Max 100 chars)" value={description} onChange={(e) => setDescription(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" />
+              </div>
+
               <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-accent transition-all text-sm text-black dark:text-white"><option value="Design">Design</option><option value="Development">Development</option><option value="AI Tools">AI Tools</option><option value="Productivity">Productivity</option></select>
             </div>
             {submitStatus === 'error' && <p className="text-red-500 text-[12px] mb-3 text-center">Server error.</p>}
@@ -350,13 +381,6 @@ export default function App() {
           const heights = ["h-[200px]", "h-[240px]", "h-[220px]", "h-[260px]", "h-[280px]"];
           const assignedHeight = tool.gridHeight === 'tall' ? (index % 2 === 0 ? "h-[450px]" : "h-[500px]") : heights[index % heights.length];
 
-          // GENERADOR DE DESCRIPCIÓN INTELIGENTE TEMPORAL
-          let smartDescription = `High-performance platform for creators.`;
-          if (tool.category === 'Design') smartDescription = `Professional UI/UX and visual design resource.`;
-          if (tool.category === 'Development') smartDescription = `Technical framework and coding utility.`;
-          if (tool.category === 'AI Tools') smartDescription = `Next-generation artificial intelligence model.`;
-          if (tool.category === 'Productivity') smartDescription = `Workflow optimization and management suite.`;
-
           return {
             id: tool.objectID,
             name: tool.name,
@@ -365,7 +389,8 @@ export default function App() {
             imageUrl: tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop",
             heightClass: assignedHeight,
             actionText: "View Production",
-            description: smartDescription // <-- Añadido al objeto
+            // MAPEAMOS LA DESCRIPCIÓN DESDE ALGOLIA (o un fallback si es una herramienta antigua)
+            description: tool.description || "High-performance platform for creators."
           };
         });
         setTools(fetchedTools);
@@ -407,10 +432,7 @@ export default function App() {
 
         <div className="flex gap-1 pr-1">
           <button
-            onClick={() => {
-              playSound('snap');
-              setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
-            }}
+            onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }}
             className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer mr-1 focus:outline-none focus:ring-2 ring-accent"
             title={`Switch to ${viewMode === 'grid' ? 'List' : 'Grid'} View`}
           >

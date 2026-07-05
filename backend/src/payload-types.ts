@@ -159,6 +159,10 @@ export interface Tool {
   id: number;
   name: string;
   url: string;
+  /**
+   * Breve descripción de la herramienta (Máx 100 caracteres).
+   */
+  description: string;
   category: 'Design' | 'Development' | 'AI Tools' | 'Productivity';
   gridHeight?: ('normal' | 'tall') | null;
   screenshotUrl?: string | null;
@@ -318,6 +322,7 @@ export interface MediaSelect<T extends boolean = true> {
 export interface ToolsSelect<T extends boolean = true> {
   name?: T;
   url?: T;
+  description?: T;
   category?: T;
   gridHeight?: T;
   screenshotUrl?: T;
