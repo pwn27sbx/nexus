@@ -402,10 +402,19 @@ export default function App() {
   const filteredTools = useMemo(() => tools.filter(tool => activeCategory === "All" || tool.category === activeCategory), [activeCategory, tools]);
 
   return (
-    <div className={`min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 ${fontType === 'mono' ? 'font-mono' : 'font-sans'} selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32`}>
+    <div className={`min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 ${fontType === 'mono' ? 'font-mono-custom' : 'font-sans'} selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32`}>
 
       <style>{`
-        :root { --accent: ${accentColor}; --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent); }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+
+        :root {
+            --accent: ${accentColor};
+            --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
+        }
+
+        /* Aplicar Mono solo cuando el estado fontType sea 'mono' */
+        .font-mono-custom { font-family: 'Roboto Mono', monospace !important; }
+
         ::selection { background-color: var(--accent); color: #fff; }
         .text-accent { color: var(--accent) !important; }
         .bg-accent { background-color: var(--accent) !important; color: #fff !important; }
