@@ -13,6 +13,8 @@ export const Tools: CollectionConfig = {
   access: {
     read: () => true,
     create: () => true, // Permite que el formulario público envíe datos
+    update: ({ req: { user } }) => Boolean(user), // Solo usuarios logueados pueden aprobar
+    delete: ({ req: { user } }) => Boolean(user), // Solo usuarios logueados pueden borrar
   },
   fields: [
     { name: 'name', type: 'text', required: true },
