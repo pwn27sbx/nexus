@@ -101,7 +101,6 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   );
 };
 
-// --- TARJETA DE VISTA: GRID (MASONRY) ---
 const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
@@ -157,7 +156,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   );
 };
 
-// --- NUEVO: TARJETA DE VISTA DENSA (TERMINAL) ---
+// --- TARJETA DE VISTA DENSA REDISEÑADA (CON LOGO) ---
 const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
@@ -192,7 +191,7 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   return (
     <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_2fr_1fr_1fr_auto] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
 
-      {/* Botón Guardar / Índice */}
+      {/* 1. Botón Guardar / Índice */}
       <div className="flex items-center justify-center w-8" onClick={(e) => { e.stopPropagation(); }}>
         <button onClick={handleToggleSave} disabled={isSaving} className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${isSaved ? 'text-accent bg-accent-muted opacity-100' : isFocused ? 'text-accent opacity-100' : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-accent hover:bg-accent-muted'}`}>
           {isSaving ? <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
@@ -202,18 +201,25 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         </span>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 truncate">
+      {/* 2. Logo + Nombre */}
+      <div className="flex flex-row items-center gap-3.5 truncate">
+        <div className="w-9 h-9 rounded-xl bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105">
+          <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`} alt="" className="w-5 h-5 object-contain" />
+        </div>
         <span className={`text-[14px] font-bold truncate transition-colors ${isFocused ? 'text-accent' : 'text-zinc-900 dark:text-white'}`}>{tool.name}</span>
       </div>
 
+      {/* 3. Categoría */}
       <div className="hidden md:block">
-        <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{tool.category}</span>
+        <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{tool.category}</span>
       </div>
 
+      {/* 4. Dominio */}
       <div className="hidden md:block truncate text-[13px] text-zinc-500 font-medium">
         {getDomain(tool.url)}
       </div>
 
+      {/* 5. Acción interactiva */}
       <div className="flex items-center justify-end font-mono text-[11px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
         {isFocused ? <span className="text-accent">PRESS ENTER ↵</span> : 'VISIT ↗'}
       </div>
@@ -253,7 +259,6 @@ export default function App() {
     return '#ff8787';
   });
 
-  // --- NUEVO: ESTADO PARA EL MODO DE VISTA (GRID vs LIST) ---
   const [viewMode, setViewMode] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('nexus-view') || 'grid';
     return 'grid';
@@ -291,7 +296,6 @@ export default function App() {
       if (tools.length === 0) return;
       const currentTools = tools.filter(t => activeCategory === "All" || t.category === activeCategory);
 
-      // Si estamos en list view, solo arriba y abajo tienen sentido. Si estamos en grid, las 4 direcciones.
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); setFocusedIndex(prev => prev < currentTools.length - 1 ? prev + 1 : 0); }
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); setFocusedIndex(prev => prev > 0 ? prev - 1 : currentTools.length - 1); }
       else if (e.key === 'Enter' && focusedIndex >= 0) { e.preventDefault(); window.open(currentTools[focusedIndex].url, '_blank'); }
@@ -385,7 +389,6 @@ export default function App() {
         </button>
 
         <div className="flex gap-1 pr-1">
-          {/* --- BOTÓN DE CAMBIO DE VISTA --- */}
           <button
             onClick={() => {
               playSound('snap');
@@ -424,8 +427,6 @@ export default function App() {
       <main className={`max-w-[1600px] mx-auto mt-2 ${viewMode === 'list' ? 'w-full px-4 lg:w-[800px]' : 'w-[95%]'}`}>
         {isLoading ? ( <div className="flex justify-center items-center py-20 text-zinc-500"><svg className="animate-spin h-6 w-6 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>Loading...</div>
         ) : filteredTools.length > 0 ? (
-
-          // --- LOGICA CONDICIONAL DE RENDERIZADO (GRID o LISTA) ---
           viewMode === 'grid' ? (
             <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
               {filteredTools.map((tool, index) => <MasonryCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} />)}
@@ -435,7 +436,6 @@ export default function App() {
               {filteredTools.map((tool, index) => <ListCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} indexNumber={index} />)}
             </div>
           )
-
         ) : ( <div className="flex flex-col items-center justify-center py-20 text-zinc-400"><SearchIcon /><p className="mt-4 text-sm">No tools found.</p></div> )}
       </main>
 
