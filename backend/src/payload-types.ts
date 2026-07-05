@@ -130,7 +130,8 @@ export interface User {
   /**
    * Nivel del usuario basado en sus contribuciones.
    */
-  level?: ('Explorer' | 'Contributor' | 'Expert Curator') | null;
+  level?: ('Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator') | null;
+  approvedCount?: number | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -274,6 +275,7 @@ export interface UsersSelect<T extends boolean = true> {
   nickname?: T;
   bookmarks?: T;
   level?: T;
+  approvedCount?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
