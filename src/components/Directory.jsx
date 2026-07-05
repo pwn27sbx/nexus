@@ -4,87 +4,52 @@ import AuthModal from './AuthModal';
 import UserProfile from './UserProfile';
 import LeaderboardModal from './LeaderboardModal';
 
-const searchClient = algoliasearch(
-  "P34W7YOD99",
-  "0d8c3e7f27ab2d9f69f63b96b064a2a4"
-);
+const searchClient = algoliasearch("P34W7YOD99", "0d8c3e7f27ab2d9f69f63b96b064a2a4");
 const index = searchClient.initIndex('tools');
 
-// SINTETIZADOR DE AUDIO GLOBAL (Mejorado para saltar bloqueos de navegador)
+// SINTETIZADOR DE AUDIO GLOBAL
 let audioCtx = null;
-
 const playSound = (type) => {
   try {
-    // Solo creamos el contexto una vez para no saturar al navegador
     if (!audioCtx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) return;
       audioCtx = new AudioContext();
     }
-
-    // Obligamos al navegador a despertar el motor de audio
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    osc.connect(gain); gain.connect(audioCtx.destination);
     const now = audioCtx.currentTime;
 
     if (type === 'pop') {
-      // Pop para Favoritos (Más duradero y audible)
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
-      gain.gain.setValueAtTime(0.6, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-      osc.start(now);
-      osc.stop(now + 0.15);
+      osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+      gain.gain.setValueAtTime(0.6, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now); osc.stop(now + 0.15);
     } else if (type === 'woosh') {
-      // Zumbido profundo para Cmd+K
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
-      gain.gain.setValueAtTime(0.4, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-      osc.start(now);
-      osc.stop(now + 0.25);
+      osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+      gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
     } else if (type === 'snap') {
-      // Clic afilado para cambios de tema
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(1200, now);
-      osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-      gain.gain.setValueAtTime(0.4, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-      osc.start(now);
-      osc.stop(now + 0.1);
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+      gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.start(now); osc.stop(now + 0.1);
     }
-  } catch (e) {
-    console.error("Audio error:", e);
-  }
+  } catch (e) {}
 };
 
-const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-);
-const UserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-);
-const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-);
-const GlobeIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-);
+const SearchIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>);
+const UserIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>);
+const PlusIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>);
+const GlobeIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>);
+const HeartIcon = ({ isSaved }) => (<svg width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "var(--accent)" : "none"} stroke={isSaved ? "var(--accent)" : "currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>);
 
-const HeartIcon = ({ isSaved }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "var(--accent)" : "none"} stroke={isSaved ? "var(--accent)" : "currentColor"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300">
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-  </svg>
-);
+// ICONOS DE VISTA
+const GridIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>);
+const ListIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
+
+const getDomain = (url) => { try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; } };
 
 const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onAction }) => {
   const inputRef = useRef(null);
@@ -92,14 +57,12 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   useEffect(() => { const handleEsc = (e) => { if (e.key === 'Escape') onClose(); }; if (isOpen) document.addEventListener('keydown', handleEsc); return () => document.removeEventListener('keydown', handleEsc); }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-
   const commands = [
     { id: 'suggest', title: 'Suggest a Tool', category: 'Actions', action: () => onAction('suggest') },
     { id: 'leaderboard', title: 'View Leaderboard', category: 'Actions', action: () => onAction('leaderboard') },
     ...(user ? [{ id: 'profile', title: 'My Profile', category: 'Account', action: () => onAction('profile') }] : []),
     { id: 'auth', title: user ? 'Sign Out' : 'Sign In', category: 'Account', action: () => onAction(user ? 'logout' : 'auth') },
   ];
-
   const filteredTools = tools.filter(t => t.name.toLowerCase().includes(query.toLowerCase())).slice(0, 4);
   const filteredCommands = commands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
 
@@ -111,7 +74,6 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
           <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or type a command..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-4 text-xl font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-700" />
           <kbd className="hidden sm:inline-block font-mono text-[10px] font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
         </div>
-
         <div className="max-h-[50vh] overflow-y-auto p-3 no-scrollbar">
           {query && filteredTools.length > 0 && (
             <div className="mb-4">
@@ -139,13 +101,11 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   );
 };
 
+// --- TARJETA DE VISTA: GRID (MASONRY) ---
 const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
-  const [isSaved, setIsSaved] = useState(() => {
-    if (!user || !user.bookmarks) return false;
-    return user.bookmarks.some(b => (typeof b === 'object' ? b.id : b) === numericToolId);
-  });
+  const [isSaved, setIsSaved] = useState(() => user?.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId) || false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => { if (isFocused && cardRef.current) cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [isFocused]);
@@ -153,10 +113,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   const handleToggleSave = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     if (!user) return onRequireAuth();
-
-    // SONIDO POP OPTIMISTA AL GUARDAR
     if (!isSaved) playSound('pop');
-
     setIsSaving(true);
     const token = localStorage.getItem('payload-token');
     let newBookmarks = user.bookmarks ? user.bookmarks.map(b => typeof b === 'object' ? b.id : b) : [];
@@ -178,19 +135,12 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
 
   return (
     <div ref={cardRef} className={`break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border p-1.5 rounded-[22px] transition-all duration-300 transform-gpu ${isFocused ? 'border-accent ring-4 ring-accent-muted scale-[1.02] shadow-accent z-10' : 'border-black/5 dark:border-white/5 hover:-translate-y-1 shadow-sm hover:shadow-xl'}`}>
-
-      <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none hover-accent-text ${
-        isSaved ? 'bg-white border-black/5 shadow-sm dark:bg-[#111] dark:border-white/10 opacity-100'
-        : isFocused ? 'bg-black text-white dark:bg-white dark:text-black border-transparent opacity-100'
-        : 'bg-white/80 text-zinc-400 border-black/5 dark:bg-black/50 dark:text-zinc-500 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-[#111]'
-      }`}>
+      <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none hover-accent-text ${isSaved ? 'bg-white border-black/5 shadow-sm dark:bg-[#111] dark:border-white/10 opacity-100' : isFocused ? 'bg-black text-white dark:bg-white dark:text-black border-transparent opacity-100' : 'bg-white/80 text-zinc-400 border-black/5 dark:bg-black/50 dark:text-zinc-500 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-[#111]'}`}>
         {isSaving ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
       </button>
-
       <div className={`absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-black/80 dark:bg-white/80 backdrop-blur-md text-white dark:text-black text-[10px] font-bold tracking-widest uppercase transition-opacity duration-300 pointer-events-none shadow-xl ${isFocused ? 'opacity-100' : 'opacity-0'}`}>
         Press <kbd className="font-mono text-accent">F</kbd> to Save
       </div>
-
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
         <div className="flex justify-between items-center mb-3 px-1">
           <h3 className="text-zinc-900 dark:text-white text-[13px] font-medium tracking-tight truncate pr-8">{tool.name}</h3>
@@ -207,7 +157,70 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   );
 };
 
-// ... [AutoCaptureModal se mantiene exactamente igual] ...
+// --- NUEVO: TARJETA DE VISTA DENSA (TERMINAL) ---
+const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
+  const cardRef = useRef(null);
+  const numericToolId = Number(tool.id);
+  const [isSaved, setIsSaved] = useState(() => user?.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId) || false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => { if (isFocused && cardRef.current) cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [isFocused]);
+
+  const handleToggleSave = async (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (!user) return onRequireAuth();
+    if (!isSaved) playSound('pop');
+    setIsSaving(true);
+    const token = localStorage.getItem('payload-token');
+    let newBookmarks = user.bookmarks ? user.bookmarks.map(b => typeof b === 'object' ? b.id : b) : [];
+    if (isSaved) { newBookmarks = newBookmarks.filter(id => id !== numericToolId); } else { newBookmarks.push(numericToolId); }
+    try {
+      const res = await fetch(`https://nexus-production-8dca.up.railway.app/api/users/${user.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': `JWT ${token}` }, body: JSON.stringify({ bookmarks: newBookmarks }) });
+      if (res.ok) { setIsSaved(!isSaved); user.bookmarks = newBookmarks; }
+    } catch (err) {} finally { setIsSaving(false); }
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (isFocused && (e.key === 'f' || e.key === 'F')) { e.preventDefault(); handleToggleSave(e); }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isFocused, isSaved, user]);
+
+  return (
+    <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_2fr_1fr_1fr_auto] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
+
+      {/* Botón Guardar / Índice */}
+      <div className="flex items-center justify-center w-8" onClick={(e) => { e.stopPropagation(); }}>
+        <button onClick={handleToggleSave} disabled={isSaving} className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${isSaved ? 'text-accent bg-accent-muted opacity-100' : isFocused ? 'text-accent opacity-100' : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-accent hover:bg-accent-muted'}`}>
+          {isSaving ? <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
+        </button>
+        <span className={`text-[12px] font-mono w-7 text-center absolute pointer-events-none transition-opacity ${isSaved || isFocused ? 'opacity-0 group-hover:opacity-0' : 'opacity-100 group-hover:opacity-0 text-zinc-400'}`}>
+          {(indexNumber + 1).toString().padStart(2, '0')}
+        </span>
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 truncate">
+        <span className={`text-[14px] font-bold truncate transition-colors ${isFocused ? 'text-accent' : 'text-zinc-900 dark:text-white'}`}>{tool.name}</span>
+      </div>
+
+      <div className="hidden md:block">
+        <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{tool.category}</span>
+      </div>
+
+      <div className="hidden md:block truncate text-[13px] text-zinc-500 font-medium">
+        {getDomain(tool.url)}
+      </div>
+
+      <div className="flex items-center justify-end font-mono text-[11px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+        {isFocused ? <span className="text-accent">PRESS ENTER ↵</span> : 'VISIT ↗'}
+      </div>
+    </div>
+  );
+};
+
 const AutoCaptureModal = ({ isOpen, onClose, user }) => {
   const [name, setName] = useState(''); const [url, setUrl] = useState(''); const [category, setCategory] = useState('Design'); const [submitStatus, setSubmitStatus] = useState('idle');
   if (!isOpen) return null;
@@ -240,10 +253,20 @@ export default function App() {
     return '#ff8787';
   });
 
+  // --- NUEVO: ESTADO PARA EL MODO DE VISTA (GRID vs LIST) ---
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('nexus-view') || 'grid';
+    return 'grid';
+  });
+
   useEffect(() => {
     localStorage.setItem('nexus-accent', accentColor);
     document.documentElement.style.setProperty('--accent', accentColor);
   }, [accentColor]);
+
+  useEffect(() => {
+    localStorage.setItem('nexus-view', viewMode);
+  }, [viewMode]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState("All");
@@ -259,7 +282,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  useEffect(() => { setFocusedIndex(-1); }, [searchQuery, activeCategory]);
+  useEffect(() => { setFocusedIndex(-1); }, [searchQuery, activeCategory, viewMode]);
 
   useEffect(() => {
     if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen) return;
@@ -268,6 +291,7 @@ export default function App() {
       if (tools.length === 0) return;
       const currentTools = tools.filter(t => activeCategory === "All" || t.category === activeCategory);
 
+      // Si estamos en list view, solo arriba y abajo tienen sentido. Si estamos en grid, las 4 direcciones.
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); setFocusedIndex(prev => prev < currentTools.length - 1 ? prev + 1 : 0); }
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); setFocusedIndex(prev => prev > 0 ? prev - 1 : currentTools.length - 1); }
       else if (e.key === 'Enter' && focusedIndex >= 0) { e.preventDefault(); window.open(currentTools[focusedIndex].url, '_blank'); }
@@ -281,10 +305,7 @@ export default function App() {
     const handleCmdK = (e) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setIsCommandPaletteOpen((prev) => {
-          if (!prev) playSound('woosh'); // AQUÍ SUENA EL WOOSH AL ABRIR LA PALETA
-          return !prev;
-        });
+        setIsCommandPaletteOpen((prev) => { if (!prev) playSound('woosh'); return !prev; });
       }
     };
     document.addEventListener('keydown', handleCmdK); return () => document.removeEventListener('keydown', handleCmdK);
@@ -357,19 +378,25 @@ export default function App() {
           <div className="w-4 h-4 rounded bg-black dark:bg-white flex items-center justify-center"><div className="w-1 h-1 bg-white dark:bg-black rounded-full"></div></div>
         </div>
 
-        <button
-          onClick={() => {
-            playSound('woosh'); // SONIDO AL ABRIR CON EL RATÓN
-            setIsCommandPaletteOpen(true);
-          }}
-          className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent"
-        >
+        <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
           <SearchIcon />
           <span className="ml-2 text-zinc-500 text-[12px] font-medium text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
           <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
         </button>
 
         <div className="flex gap-1 pr-1">
+          {/* --- BOTÓN DE CAMBIO DE VISTA --- */}
+          <button
+            onClick={() => {
+              playSound('snap');
+              setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
+            }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer mr-1 focus:outline-none focus:ring-2 ring-accent"
+            title={`Switch to ${viewMode === 'grid' ? 'List' : 'Grid'} View`}
+          >
+            {viewMode === 'grid' ? <ListIcon /> : <GridIcon />}
+          </button>
+
           <button onClick={() => setIsLeaderboardOpen(true)} className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer mr-1" title="Leaderboard">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
           </button>
@@ -394,12 +421,21 @@ export default function App() {
         </div>
       </div>
 
-      <main className="max-w-[1600px] w-[95%] mx-auto mt-2">
+      <main className={`max-w-[1600px] mx-auto mt-2 ${viewMode === 'list' ? 'w-full px-4 lg:w-[800px]' : 'w-[95%]'}`}>
         {isLoading ? ( <div className="flex justify-center items-center py-20 text-zinc-500"><svg className="animate-spin h-6 w-6 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>Loading...</div>
         ) : filteredTools.length > 0 ? (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
-            {filteredTools.map((tool, index) => <MasonryCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} />)}
-          </div>
+
+          // --- LOGICA CONDICIONAL DE RENDERIZADO (GRID o LISTA) ---
+          viewMode === 'grid' ? (
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
+              {filteredTools.map((tool, index) => <MasonryCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} />)}
+            </div>
+          ) : (
+            <div className="flex flex-col bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm">
+              {filteredTools.map((tool, index) => <ListCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} indexNumber={index} />)}
+            </div>
+          )
+
         ) : ( <div className="flex flex-col items-center justify-center py-20 text-zinc-400"><SearchIcon /><p className="mt-4 text-sm">No tools found.</p></div> )}
       </main>
 
