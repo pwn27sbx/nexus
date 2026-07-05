@@ -125,6 +125,7 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  nickname?: string | null;
   bookmarks?: (number | Tool)[] | null;
   /**
    * Nivel del usuario basado en sus contribuciones.
@@ -270,6 +271,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  nickname?: T;
   bookmarks?: T;
   level?: T;
   updatedAt?: T;

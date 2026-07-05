@@ -400,7 +400,8 @@ export default function App() {
               className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 text-[11px] font-medium transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-              {user.email.split('@')[0]}
+              {/* MAGIA: Muestra el nickname si existe, si no, muestra el correo */}
+              {user.nickname ? `@${user.nickname}` : user.email.split('@')[0]}
             </button>
           ) : (
             <button
