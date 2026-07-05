@@ -1,29 +1,60 @@
 import React, { useState, useEffect } from 'react';
 
-// SINTETIZADOR DE AUDIO NATIVO (Cero latencia, cero descargas)
+// SINTETIZADOR DE AUDIO GLOBAL (Mejorado para saltar bloqueos de navegador)
+let audioCtx = null;
+
 const playSound = (type) => {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    // Solo creamos el contexto una vez para no saturar al navegador
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      audioCtx = new AudioContext();
+    }
+
+    // Obligamos al navegador a despertar el motor de audio
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
-    const now = ctx.currentTime;
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
 
-    if (type === 'snap') {
+    if (type === 'pop') {
+      // Pop para Favoritos (Más duradero y audible)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+      gain.gain.setValueAtTime(0.6, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === 'woosh') {
+      // Zumbido profundo para Cmd+K
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (type === 'snap') {
       // Clic afilado para cambios de tema
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(1000, now);
-      osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.frequency.setValueAtTime(1200, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
       osc.start(now);
-      osc.stop(now + 0.05);
+      osc.stop(now + 0.1);
     }
-  } catch (e) { /* Silencioso si el navegador lo bloquea temporalmente */ }
+  } catch (e) {
+    console.error("Audio error:", e);
+  }
 };
 
 const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor }) => {
