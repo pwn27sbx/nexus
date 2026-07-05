@@ -35,12 +35,20 @@ export const Users: CollectionConfig = {
     {
       name: 'level',
       type: 'select',
-      options: ['Explorer', 'Contributor', 'Expert Curator'],
+      options: ['Explorer', 'Contributor', 'Expert Curator', 'Master Curator'],
       defaultValue: 'Explorer',
       admin: {
         position: 'sidebar',
-        description: 'Nivel del usuario basado en sus contribuciones.'
+        description: 'Nivel del usuario basado en sus contribuciones.',
+        readOnly: true
       }
+    },
+    // Contador exacto para el Ranking
+    {
+      name: 'approvedCount',
+      type: 'number',
+      defaultValue: 0,
+      admin: { readOnly: true }
     }
   ],
 }

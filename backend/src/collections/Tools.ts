@@ -90,7 +90,7 @@ export const Tools: CollectionConfig = {
         }
 
         // ----------------------------------------------------
-        // 2. LÓGICA DE GAMIFICACIÓN (Cálculo de niveles)
+        // 2. LÓGICA DE GAMIFICACIÓN ENDURECIDA (Salón de la fama)
         // ----------------------------------------------------
         if (doc.status === 'approved' && doc.submittedBy) {
           try {
@@ -110,24 +110,29 @@ export const Tools: CollectionConfig = {
               limit: 1, // Solo necesitamos el totalDocs, esto lo hace ultrarrápido
             });
 
-            // Calculamos el nuevo nivel basado en sus aportes aprobados
+            // Calculamos el nuevo nivel basado en sus aportes aprobados (Más difícil)
             const totalApproved = userTools.totalDocs;
-            let newLevel: 'Explorer' | 'Contributor' | 'Expert Curator' = 'Explorer';
+            let newLevel: 'Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator' = 'Explorer';
 
-            if (totalApproved >= 5) {
+            if (totalApproved >= 30) {
+              newLevel = 'Master Curator';
+            } else if (totalApproved >= 15) {
               newLevel = 'Expert Curator';
-            } else if (totalApproved >= 1) {
+            } else if (totalApproved >= 5) {
               newLevel = 'Contributor';
             }
 
-            // Actualizamos el perfil del usuario silenciosamente en la base de datos
+            // Actualizamos el perfil del usuario silenciosamente en la base de datos (Nivel y Contador)
             await req.payload.update({
               collection: 'users',
               id: userId,
-              data: { level: newLevel }
+              data: {
+                level: newLevel,
+                approvedCount: totalApproved
+              } as any
             });
 
-            console.log(`🌟 Nivel del usuario ${userId} actualizado a: ${newLevel}`);
+            console.log(`🌟 Nivel del usuario ${userId} actualizado a: ${newLevel} con ${totalApproved} aportes.`);
 
           } catch (error) {
             console.error("Error en gamificación:", error);
