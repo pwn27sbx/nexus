@@ -16,6 +16,7 @@ export const Users: CollectionConfig = {
     {
       name: 'nickname',
       type: 'text',
+      unique: true,
       admin: {
         position: 'sidebar',
       }
