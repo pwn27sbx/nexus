@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import algoliasearch from 'algoliasearch/lite'; // Usamos la versión 'lite' para que cargue más rápido en el navegador
-import AuthModal from './AuthModal'; // Importación del nuevo modal
+import AuthModal from './AuthModal';
+import UserProfile from './UserProfile';
 
 // Inicializamos Algolia usando la sintaxis correcta de Astro/Vite
 const searchClient = algoliasearch(
@@ -37,13 +38,8 @@ const GlobeIcon = () => (
 
 const MasonryCard = ({ tool }) => {
   return (
-    // Borde exterior blanco/negro con padding para crear el efecto marco. Reducimos el mb-6 a mb-4 para juntarlas.
     <div className="break-inside-avoid mb-4 group cursor-pointer flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1">
-
-      {/* Caja Superior (Contiene Header e Imagen) */}
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors">
-
-        {/* Header (Textos separados e insertados en el área gris) */}
         <div className="flex justify-between items-center mb-3 px-1">
           <h3 className="text-zinc-900 dark:text-white text-[13px] font-medium tracking-tight truncate pr-4">
             {tool.name}
@@ -52,8 +48,6 @@ const MasonryCard = ({ tool }) => {
             {tool.category}
           </span>
         </div>
-
-        {/* Contenedor de la Imagen Inset */}
         <div className={`relative w-full ${tool.heightClass} rounded-[10px] overflow-hidden bg-white dark:bg-black shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]`}>
           <img
             src={tool.imageUrl}
@@ -63,21 +57,19 @@ const MasonryCard = ({ tool }) => {
           />
         </div>
       </div>
-
-      {/* Caja Inferior (Botón visualmente separado pero dentro del marco general) */}
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors">
         {tool.actionText}
       </div>
-
     </div>
   );
 };
 
-const AutoCaptureModal = ({ isOpen, onClose }) => {
+// Se agregó 'user' a los props para poder relacionarlo
+const AutoCaptureModal = ({ isOpen, onClose, user }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
-  const [submitStatus, setSubmitStatus] = useState('idle'); // idle, loading, success, error
+  const [submitStatus, setSubmitStatus] = useState('idle');
 
   if (!isOpen) return null;
 
@@ -86,7 +78,6 @@ const AutoCaptureModal = ({ isOpen, onClose }) => {
     setSubmitStatus('loading');
 
     try {
-      // Enviamos los datos directamente a tu Payload CMS
       const response = await fetch('https://nexus-production-8dca.up.railway.app/api/tools', {
         method: 'POST',
         headers: {
@@ -96,13 +87,13 @@ const AutoCaptureModal = ({ isOpen, onClose }) => {
           name,
           url,
           category,
-          // El estado "pending" se asigna automáticamente en el backend
+          // Guardamos qué usuario envió esto (si está logueado)
+          submittedBy: user ? user.id : null
         }),
       });
 
       if (response.ok) {
         setSubmitStatus('success');
-        // Esperamos unos segundos para que el usuario lea el mensaje de éxito
         setTimeout(() => {
           onClose();
           setName('');
@@ -205,21 +196,21 @@ export default function App() {
   // ESTADOS DE LOS MODALES
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // NUEVO ESTADO PARA EL PERFIL
 
   const [tools, setTools] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // NUEVO: Estado para saber si el usuario está logueado
+  // Estado para saber si el usuario está logueado
   const [user, setUser] = useState(null);
 
-  // NUEVO: Verificar si hay una sesión activa al cargar la página
+  // Verificar si hay una sesión activa al cargar la página
   useEffect(() => {
     const checkUserSession = async () => {
       const token = localStorage.getItem('payload-token');
       if (!token) return;
 
       try {
-        // Le preguntamos a Payload quién es el dueño de este token
         const response = await fetch('https://nexus-production-8dca.up.railway.app/api/users/me', {
           headers: {
             'Authorization': `JWT ${token}`
@@ -227,9 +218,8 @@ export default function App() {
         });
         if (response.ok) {
           const data = await response.json();
-          setUser(data.user); // Guardamos el usuario (trae su id, email, etc.)
+          setUser(data.user);
         } else {
-          // Si el token expiró o es inválido, lo limpiamos
           localStorage.removeItem('payload-token');
         }
       } catch (error) {
@@ -238,22 +228,21 @@ export default function App() {
     };
 
     checkUserSession();
-  }, [isAuthModalOpen]); // Se vuelve a verificar cada vez que se cierra/abre el modal de auth
+  }, [isAuthModalOpen]);
 
   // FUNCIÓN PARA CERRAR SESIÓN
   const handleLogout = () => {
     localStorage.removeItem('payload-token');
     setUser(null);
+    setIsProfileOpen(false); // Cerramos el panel si estaba abierto
   };
 
   useEffect(() => {
-    // Escuchar los cambios de tema del sistema
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e) => document.documentElement.classList.toggle('dark', e.matches);
     document.documentElement.classList.toggle('dark', mediaQuery.matches);
     mediaQuery.addEventListener('change', handleChange);
 
-    // Hacer el Fetch a Algolia
     const fetchTools = async () => {
       setIsLoading(true);
       try {
@@ -298,7 +287,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 font-sans selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
 
-      {/* Navbar Minimalista */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-lg bg-white/80 dark:bg-[#111]/80 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-full shadow-lg flex items-center justify-between p-1.5 transition-all">
         <div className="flex items-center gap-2 pl-3">
           <div className="w-4 h-4 rounded bg-black dark:bg-white flex items-center justify-center">
@@ -318,14 +306,14 @@ export default function App() {
         </div>
 
         <div className="flex gap-1 pr-1">
-          {/* MODIFICADO: Si el usuario está logueado, muestra un botón elegante de Logout, si no, abre el modal */}
           {user ? (
+            // AHORA ESTE BOTÓN ABRE EL PERFIL LATERAL Y MUESTRA EL CORREO DEL USUARIO
             <button
-              onClick={handleLogout}
-              className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-zinc-500 hover:text-red-500 hover:border-red-500/20 text-[11px] font-medium transition-all active:scale-95 cursor-pointer"
-              title={`Logged in as ${user.email}. Click to logout.`}
+              onClick={() => setIsProfileOpen(true)}
+              className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 text-[11px] font-medium transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
             >
-              Sign Out
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+              {user.email.split('@')[0]}
             </button>
           ) : (
             <button
@@ -345,7 +333,6 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Menú de Categorías Flotante */}
       <div className="pt-28 pb-8 flex justify-center w-full z-30 sticky top-0 bg-gradient-to-b from-[#fafafa] dark:from-[#050505] to-transparent pointer-events-none">
         <div className="flex gap-2 p-1.5 rounded-full bg-white/50 dark:bg-[#111]/50 backdrop-blur-md border border-black/5 dark:border-white/5 pointer-events-auto overflow-x-auto max-w-[95%] no-scrollbar">
           {["All", "Design", "Development", "AI Tools", "Productivity"].map(cat => (
@@ -364,7 +351,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Grid Principal */}
       <main className="max-w-[1600px] w-[95%] mx-auto mt-2">
         {isLoading ? (
           <div className="flex justify-center items-center py-20 text-zinc-500">
@@ -386,8 +372,16 @@ export default function App() {
       </main>
 
       {/* Modales */}
-      <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      {/* Nuestro nuevo Perfil de Usuario Lateral */}
+      <UserProfile
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        user={user}
+        onLogout={handleLogout}
+      />
     </div>
   );
 }
