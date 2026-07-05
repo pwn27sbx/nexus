@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
+// Añadimos accentColor y setAccentColor a las propiedades que recibe
+const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor }) => {
   const [activeTab, setActiveTab] = useState('arsenal');
   const [arsenal, setArsenal] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -8,12 +9,21 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
 
   const [nickname, setNickname] = useState('');
   const [isSavingName, setIsSavingName] = useState(false);
-  const [nameError, setNameError] = useState(''); // Nuevo estado para errores de nickname
+  const [nameError, setNameError] = useState('');
+
+  // Paleta de colores Premium
+  const accents = [
+    { name: 'Cherry', hex: '#ff8787' },
+    { name: 'Emerald', hex: '#4ade80' },
+    { name: 'Azure', hex: '#3b82f6' },
+    { name: 'Amethyst', hex: '#c084fc' },
+    { name: 'Cyber', hex: '#facc15' }
+  ];
 
   useEffect(() => {
     if (!isOpen || !user) return;
     setNickname(user.nickname || '');
-    setNameError(''); // Limpiamos errores al abrir
+    setNameError('');
 
     const fetchUserData = async () => {
       setIsLoading(true);
@@ -64,15 +74,14 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
       const data = await response.json();
 
       if (response.ok) {
-        user.nickname = nickname; // Actualizamos con éxito
+        user.nickname = nickname;
       } else {
-        // Payload devuelve un error si el 'unique: true' rebota la petición
         if (data.errors && data.errors[0]?.message.includes('unique')) {
           setNameError('This nickname is already taken.');
         } else {
           setNameError('Could not update nickname.');
         }
-        setNickname(user.nickname || ''); // Revertimos al original
+        setNickname(user.nickname || '');
       }
     } catch (error) {
       setNameError('Network error. Try again.');
@@ -82,7 +91,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
     }
   };
 
-  // Función auxiliar para extraer el dominio limpio (ej: figma.com)
   const getDomain = (url) => {
     try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; }
   };
@@ -95,19 +103,17 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
 
       <div className="fixed top-0 right-0 z-[101] w-full max-w-md h-full bg-[#fafafa] dark:bg-[#050505] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
 
-        {/* CABECERA REDISEÑADA */}
         <div className="px-8 pt-12 pb-8 bg-white dark:bg-[#0a0a0a] border-b border-black/5 dark:border-white/5 relative flex flex-col items-center text-center">
           <button onClick={onClose} className="absolute top-6 right-6 w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white transition-all active:scale-95">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
 
-          {/* Avatar Premium con gradiente sutil */}
           <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-zinc-200 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900 border-2 border-white dark:border-black shadow-md flex items-center justify-center mb-5 relative">
             <span className="text-3xl font-medium text-zinc-800 dark:text-zinc-200">
               {(nickname || user?.email || 'U').charAt(0).toUpperCase()}
             </span>
-            {/* Indicador Online */}
-            <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-black rounded-full"></div>
+            {/* El indicador online ahora usa el color de acento */}
+            <div className="absolute bottom-1 right-1 w-3.5 h-3.5 border-2 border-white dark:border-black rounded-full" style={{ backgroundColor: accentColor }}></div>
           </div>
 
           <div className="relative group flex flex-col items-center justify-center w-full max-w-[240px]">
@@ -117,7 +123,7 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
                 type="text"
                 value={nickname}
                 onChange={(e) => {
-                  setNickname(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')); // Solo letras, números y guiones bajos
+                  setNickname(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''));
                   setNameError('');
                 }}
                 onBlur={handleSaveNickname}
@@ -128,40 +134,41 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
               {isSavingName && <div className="absolute right-2 w-4 h-4 border-2 border-black/20 border-t-black dark:border-white/20 dark:border-t-white rounded-full animate-spin"></div>}
             </div>
 
-            {/* Mensaje de Error de Nickname */}
+            {/* Fila de Colores de Acento */}
+            <div className="flex items-center justify-center gap-3.5 mt-5">
+              {accents.map(color => (
+                <button
+                  key={color.name}
+                  onClick={() => setAccentColor(color.hex)}
+                  className={`w-4 h-4 rounded-full transition-all duration-300 focus:outline-none ${accentColor === color.hex ? 'scale-125 ring-2 ring-offset-2 ring-black/10 dark:ring-white/20 dark:ring-offset-[#0a0a0a]' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                  style={{ backgroundColor: color.hex }}
+                  title={color.name}
+                />
+              ))}
+            </div>
+
             {nameError && (
-              <p className="text-[#ff8787] text-[11px] font-medium mt-2 animate-in fade-in slide-in-from-top-1">{nameError}</p>
+              <p className="text-[#ff8787] text-[11px] font-medium mt-3 animate-in fade-in slide-in-from-top-1">{nameError}</p>
             )}
           </div>
 
-          <p className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 mt-2">{user?.email}</p>
-
-          {/* Badge Afilado */}
-          <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black text-white dark:bg-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/10">
+          <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/10 transition-colors duration-300" style={{ backgroundColor: accentColor }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             <span className="text-[10px] font-extrabold tracking-widest uppercase mt-px">{user?.level || 'Explorer'}</span>
           </div>
         </div>
 
-        {/* PESTAÑAS */}
         <div className="flex gap-8 px-8 pt-6 bg-[#fafafa] dark:bg-[#050505]">
-          <button
-            onClick={() => setActiveTab('arsenal')}
-            className={`pb-4 text-[14px] font-semibold transition-all relative ${activeTab === 'arsenal' ? 'text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
-          >
+          <button onClick={() => setActiveTab('arsenal')} className={`pb-4 text-[14px] font-semibold transition-all relative ${activeTab === 'arsenal' ? 'text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}>
             My Arsenal
-            {activeTab === 'arsenal' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-black dark:bg-white rounded-t-full" />}
+            {activeTab === 'arsenal' && <div className="absolute bottom-0 left-0 w-full h-[2px] rounded-t-full transition-colors duration-300" style={{ backgroundColor: accentColor }} />}
           </button>
-          <button
-            onClick={() => setActiveTab('submissions')}
-            className={`pb-4 text-[14px] font-semibold transition-all relative ${activeTab === 'submissions' ? 'text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
-          >
+          <button onClick={() => setActiveTab('submissions')} className={`pb-4 text-[14px] font-semibold transition-all relative ${activeTab === 'submissions' ? 'text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}>
             My Submissions
-            {activeTab === 'submissions' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-black dark:bg-white rounded-t-full" />}
+            {activeTab === 'submissions' && <div className="absolute bottom-0 left-0 w-full h-[2px] rounded-t-full transition-colors duration-300" style={{ backgroundColor: accentColor }} />}
           </button>
         </div>
 
-        {/* LISTAS VISUALES CON FAVICONS */}
         <div className="flex-1 overflow-y-auto p-6 no-scrollbar bg-[#fafafa] dark:bg-[#050505]">
           {isLoading ? (
             <div className="flex justify-center py-20 text-zinc-400">
@@ -179,7 +186,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
                   <a key={tool.id} href={tool.url} target="_blank" rel="noreferrer" className="block p-3 rounded-2xl bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3.5">
-                        {/* Extractor de Logo Automático */}
                         <div className="w-11 h-11 rounded-xl bg-[#fafafa] dark:bg-black border border-black/5 dark:border-white/5 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                           <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`} alt="" className="w-6 h-6 object-contain" />
                         </div>
@@ -188,7 +194,7 @@ const UserProfile = ({ isOpen, onClose, user, onLogout }) => {
                           <span className="text-[12px] font-medium text-zinc-400 mt-0.5">{getDomain(tool.url)}</span>
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-zinc-50 dark:bg-[#161616] flex items-center justify-center text-zinc-400 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-colors shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-zinc-50 dark:bg-[#161616] flex items-center justify-center text-zinc-400 transition-colors shrink-0 hover-bg-accent hover:text-white dark:hover-bg-accent dark:hover:text-black">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                       </div>
                     </div>
