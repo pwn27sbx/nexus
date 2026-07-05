@@ -209,6 +209,43 @@ export default function App() {
   const [tools, setTools] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // NUEVO: Estado para saber si el usuario está logueado
+  const [user, setUser] = useState(null);
+
+  // NUEVO: Verificar si hay una sesión activa al cargar la página
+  useEffect(() => {
+    const checkUserSession = async () => {
+      const token = localStorage.getItem('payload-token');
+      if (!token) return;
+
+      try {
+        // Le preguntamos a Payload quién es el dueño de este token
+        const response = await fetch('https://nexus-production-8dca.up.railway.app/api/users/me', {
+          headers: {
+            'Authorization': `JWT ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user); // Guardamos el usuario (trae su id, email, etc.)
+        } else {
+          // Si el token expiró o es inválido, lo limpiamos
+          localStorage.removeItem('payload-token');
+        }
+      } catch (error) {
+        console.error("Error verificando sesión:", error);
+      }
+    };
+
+    checkUserSession();
+  }, [isAuthModalOpen]); // Se vuelve a verificar cada vez que se cierra/abre el modal de auth
+
+  // FUNCIÓN PARA CERRAR SESIÓN
+  const handleLogout = () => {
+    localStorage.removeItem('payload-token');
+    setUser(null);
+  };
+
   useEffect(() => {
     // Escuchar los cambios de tema del sistema
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -220,7 +257,6 @@ export default function App() {
     const fetchTools = async () => {
       setIsLoading(true);
       try {
-        // Buscamos en Algolia usando el searchQuery actual
         const { hits } = await index.search(searchQuery);
 
         const fetchedTools = hits.map((tool, index) => {
@@ -230,11 +266,10 @@ export default function App() {
             : heights[index % heights.length];
 
           return {
-            id: tool.objectID, // Algolia usa objectID
+            id: tool.objectID,
             name: tool.name,
             category: tool.category,
             url: tool.url,
-            // Las URLs de Microlink ya vienen completas
             imageUrl: tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop",
             heightClass: assignedHeight,
             actionText: "View Production",
@@ -252,10 +287,9 @@ export default function App() {
     fetchTools();
 
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [searchQuery]); // Añadimos searchQuery a las dependencias para que se ejecute al teclear
+  }, [searchQuery]);
 
   const filteredTools = useMemo(() => {
-    // Ya no filtramos por nombre aquí, Algolia lo hace. Solo aplicamos el filtro de categoría localmente.
     return tools.filter(tool => {
       return activeCategory === "All" || tool.category === activeCategory;
     });
@@ -284,13 +318,24 @@ export default function App() {
         </div>
 
         <div className="flex gap-1 pr-1">
-          {/* BOTÓN ACTUALIZADO PARA ABRIR EL MODAL DE AUTENTICACIÓN */}
-          <button
-            onClick={() => setIsAuthModalOpen(true)}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"
-          >
-            <UserIcon />
-          </button>
+          {/* MODIFICADO: Si el usuario está logueado, muestra un botón elegante de Logout, si no, abre el modal */}
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-zinc-500 hover:text-red-500 hover:border-red-500/20 text-[11px] font-medium transition-all active:scale-95 cursor-pointer"
+              title={`Logged in as ${user.email}. Click to logout.`}
+            >
+              Sign Out
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"
+            >
+              <UserIcon />
+            </button>
+          )}
+
           <button
             onClick={() => setIsModalOpen(true)}
             className="w-8 h-8 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95 cursor-pointer"
@@ -327,7 +372,6 @@ export default function App() {
             Loading tools...
           </div>
         ) : filteredTools.length > 0 ? (
-          /* Reducimos gap-6 a gap-4 para juntar visualmente las columnas */
           <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
             {filteredTools.map(tool => (
               <MasonryCard key={tool.id} tool={tool} />
@@ -336,7 +380,6 @@ export default function App() {
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-zinc-400">
             <SearchIcon />
-            {/* Texto actualizado para reflejar la búsqueda vacía */}
             <p className="mt-4 text-sm">No tools found matching your search.</p>
           </div>
         )}
