@@ -10,6 +10,41 @@ const searchClient = algoliasearch(
 );
 const index = searchClient.initIndex('tools');
 
+// SINTETIZADOR DE AUDIO GLOBAL
+const playSound = (type) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const now = ctx.currentTime;
+
+    if (type === 'pop') {
+      // Pop suave para Favoritos
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+      gain.gain.setValueAtTime(0.5, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.start(now);
+      osc.stop(now + 0.1);
+    } else if (type === 'woosh') {
+      // Zumbido profundo para Cmd+K
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+  } catch (e) {}
+};
+
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
 );
@@ -49,7 +84,6 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   return (
     <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] bg-black/20 dark:bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-white dark:bg-[#0f0f11] w-full max-w-2xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-        {/* Anillo de acento en el buscador de la paleta */}
         <div className="flex items-center px-5 py-5 border-b border-black/5 dark:border-white/5 focus-within:bg-accent-muted/10 transition-colors">
           <SearchIcon />
           <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or type a command..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-4 text-xl font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-700" />
@@ -97,6 +131,10 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   const handleToggleSave = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     if (!user) return onRequireAuth();
+
+    // SONIDO POP OPTIMISTA AL GUARDAR
+    if (!isSaved) playSound('pop');
+
     setIsSaving(true);
     const token = localStorage.getItem('payload-token');
     let newBookmarks = user.bookmarks ? user.bookmarks.map(b => typeof b === 'object' ? b.id : b) : [];
@@ -117,7 +155,6 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   }, [isFocused, isSaved, user]);
 
   return (
-    // Borde y Halo (Ring) reaccionan al acento cuando está enfocada
     <div ref={cardRef} className={`break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border p-1.5 rounded-[22px] transition-all duration-300 transform-gpu ${isFocused ? 'border-accent ring-4 ring-accent-muted scale-[1.02] shadow-accent z-10' : 'border-black/5 dark:border-white/5 hover:-translate-y-1 shadow-sm hover:shadow-xl'}`}>
 
       <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 outline-none hover-accent-text ${
@@ -148,6 +185,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   );
 };
 
+// ... [AutoCaptureModal se mantiene exactamente igual] ...
 const AutoCaptureModal = ({ isOpen, onClose, user }) => {
   const [name, setName] = useState(''); const [url, setUrl] = useState(''); const [category, setCategory] = useState('Design'); const [submitStatus, setSubmitStatus] = useState('idle');
   if (!isOpen) return null;
@@ -161,14 +199,11 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
         ) : (
           <form onSubmit={handleCapture}>
             <div className="flex flex-col gap-3 mb-5">
-              {/* Entradas con focus-within al Acento */}
               <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 ring-accent transition-all text-sm text-black dark:text-white placeholder:text-zinc-400" />
               <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" /></div>
               <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-accent transition-all text-sm text-black dark:text-white"><option value="Design">Design</option><option value="Development">Development</option><option value="AI Tools">AI Tools</option><option value="Productivity">Productivity</option></select>
             </div>
             {submitStatus === 'error' && <p className="text-red-500 text-[12px] mb-3 text-center">Server error.</p>}
-
-            {/* Botón Principal usando el Acento */}
             <button type="submit" disabled={submitStatus === 'loading'} className="w-full bg-accent shadow-accent text-white dark:text-black text-sm font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all">{submitStatus === 'loading' ? "Sending..." : "Submit to Directory"}</button>
           </form>
         )}
@@ -178,7 +213,6 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 };
 
 export default function App() {
-  // Solución Vercel SSR para el Acento
   const [accentColor, setAccentColor] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('nexus-accent') || '#ff8787';
     return '#ff8787';
@@ -222,7 +256,15 @@ export default function App() {
   }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen]);
 
   useEffect(() => {
-    const handleCmdK = (e) => { if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); setIsCommandPaletteOpen((prev) => !prev); } };
+    const handleCmdK = (e) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => {
+          if (!prev) playSound('woosh'); // AQUÍ SUENA EL WOOSH AL ABRIR LA PALETA
+          return !prev;
+        });
+      }
+    };
     document.addEventListener('keydown', handleCmdK); return () => document.removeEventListener('keydown', handleCmdK);
   }, []);
 
@@ -274,12 +316,8 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 font-sans selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
 
-      {/* MAGIA CSS: Variables de raíz para Selección, Sombras, Botones y Resplandores */}
       <style>{`
-        :root {
-          --accent: ${accentColor};
-          --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
-        }
+        :root { --accent: ${accentColor}; --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent); }
         ::selection { background-color: var(--accent); color: #fff; }
         .text-accent { color: var(--accent) !important; }
         .bg-accent { background-color: var(--accent) !important; color: #fff !important; }
@@ -297,7 +335,13 @@ export default function App() {
           <div className="w-4 h-4 rounded bg-black dark:bg-white flex items-center justify-center"><div className="w-1 h-1 bg-white dark:bg-black rounded-full"></div></div>
         </div>
 
-        <button onClick={() => setIsCommandPaletteOpen(true)} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
+        <button
+          onClick={() => {
+            playSound('woosh'); // SONIDO AL ABRIR CON EL RATÓN
+            setIsCommandPaletteOpen(true);
+          }}
+          className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent"
+        >
           <SearchIcon />
           <span className="ml-2 text-zinc-500 text-[12px] font-medium text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
           <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
@@ -316,7 +360,6 @@ export default function App() {
             <button onClick={() => setIsAuthModalOpen(true)} className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"><UserIcon /></button>
           )}
 
-          {/* Botón Principal Plus usando el Acento */}
           <button onClick={() => setIsModalOpen(true)} className="w-8 h-8 rounded-full bg-accent shadow-accent text-white dark:text-black flex items-center justify-center hover:opacity-90 transition-all active:scale-95 cursor-pointer"><PlusIcon /></button>
         </div>
       </nav>

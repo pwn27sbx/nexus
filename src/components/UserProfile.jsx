@@ -1,5 +1,31 @@
 import React, { useState, useEffect } from 'react';
 
+// SINTETIZADOR DE AUDIO NATIVO (Cero latencia, cero descargas)
+const playSound = (type) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const now = ctx.currentTime;
+
+    if (type === 'snap') {
+      // Clic afilado para cambios de tema
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1000, now);
+      osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    }
+  } catch (e) { /* Silencioso si el navegador lo bloquea temporalmente */ }
+};
+
 const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor }) => {
   const [activeTab, setActiveTab] = useState('arsenal');
   const [arsenal, setArsenal] = useState([]);
@@ -75,7 +101,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
 
   const getDomain = (url) => { try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; } };
 
-  // --- CÁLCULO DE MÉTRICAS (CREATOR ANALYTICS) ---
   const totalSubmissions = submissions.length;
   const approvedSubmissions = submissions.filter(t => t.status === 'approved').length;
   const successRate = totalSubmissions > 0 ? Math.round((approvedSubmissions / totalSubmissions) * 100) : 0;
@@ -88,7 +113,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
 
       <div className="fixed top-0 right-0 z-[101] w-full max-w-md h-full bg-[#fafafa] dark:bg-[#050505] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
 
-        {/* CABECERA DEL USUARIO */}
         <div className="px-8 pt-12 pb-8 bg-white dark:bg-[#0a0a0a] border-b border-black/5 dark:border-white/5 relative flex flex-col items-center text-center">
           <button onClick={onClose} className="absolute top-6 right-6 w-8 h-8 rounded-md flex items-center justify-center text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all active:scale-95">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -116,7 +140,12 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
             <div className="flex items-center justify-center gap-3.5 mt-5">
               {accents.map(color => (
                 <button
-                  key={color.name} onClick={() => setAccentColor(color.hex)} title={color.name}
+                  key={color.name}
+                  onClick={() => {
+                    setAccentColor(color.hex);
+                    playSound('snap'); // AQUÍ SUENA EL SNAP AL CAMBIAR EL TEMA
+                  }}
+                  title={color.name}
                   className={`w-4 h-4 rounded-full transition-all duration-300 focus:outline-none ${accentColor === color.hex ? 'scale-125 ring-2 ring-offset-2 ring-black/10 dark:ring-white/20 dark:ring-offset-[#0a0a0a]' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
                   style={{ backgroundColor: color.hex }}
                 />
@@ -131,7 +160,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
           </div>
         </div>
 
-        {/* PESTAÑAS */}
         <div className="flex gap-8 px-8 pt-6 bg-[#fafafa] dark:bg-[#050505]">
           <button onClick={() => setActiveTab('arsenal')} className={`pb-4 text-[14px] font-semibold transition-all relative ${activeTab === 'arsenal' ? 'text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}>
             My Arsenal
@@ -143,7 +171,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
           </button>
         </div>
 
-        {/* CONTENIDO DESPLAZABLE */}
         <div className="flex-1 overflow-y-auto p-6 no-scrollbar bg-[#fafafa] dark:bg-[#050505]">
           {isLoading ? (
             <div className="flex justify-center py-20 text-zinc-400"><svg className="animate-spin h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg></div>
@@ -177,8 +204,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
             </div>
           ) : (
             <div className="space-y-6 animate-in fade-in duration-300">
-
-              {/* --- DASHBOARD DE ANALÍTICAS --- */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-4 flex flex-col justify-between shadow-sm">
                   <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Submitted</span>
@@ -186,7 +211,6 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
                 </div>
 
                 <div className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
-                  {/* Destello del acento en el fondo */}
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-accent opacity-10 rounded-full blur-xl"></div>
                   <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-mono relative z-10">Approved</span>
                   <span className="text-2xl font-bold text-accent mt-1 relative z-10">{approvedSubmissions}</span>
