@@ -35,13 +35,90 @@ const GlobeIcon = () => (
     <circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
   </svg>
 );
+const BookmarkIcon = ({ isSaved }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+  </svg>
+);
 
-const MasonryCard = ({ tool }) => {
+const MasonryCard = ({ tool, user, onRequireAuth }) => {
+  // Verificamos si el usuario actual ya tiene esta herramienta guardada
+  const [isSaved, setIsSaved] = useState(() => {
+    if (!user || !user.bookmarks) return false;
+    // Payload puede devolver los bookmarks como IDs o como objetos completos
+    return user.bookmarks.some(b => b === tool.id || b.id === tool.id);
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleToggleSave = async (e) => {
+    e.stopPropagation(); // Evitamos que el clic se propague
+
+    if (!user) {
+      onRequireAuth(); // Abre el modal de login si no hay usuario
+      return;
+    }
+
+    setIsSaving(true);
+    const token = localStorage.getItem('payload-token');
+
+    // Determinamos si vamos a agregar o quitar la herramienta
+    let newBookmarks = [];
+    if (user.bookmarks) {
+      newBookmarks = user.bookmarks.map(b => typeof b === 'object' ? b.id : b);
+    }
+
+    if (isSaved) {
+      newBookmarks = newBookmarks.filter(id => id !== tool.id);
+    } else {
+      newBookmarks.push(tool.id);
+    }
+
+    try {
+      // Actualizamos el usuario en Payload
+      const response = await fetch(`https://nexus-production-8dca.up.railway.app/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `JWT ${token}`
+        },
+        body: JSON.stringify({ bookmarks: newBookmarks }),
+      });
+
+      if (response.ok) {
+        setIsSaved(!isSaved);
+        // Actualizamos silenciosamente el estado del usuario localmente
+        user.bookmarks = newBookmarks;
+      }
+    } catch (error) {
+      console.error("Error guardando herramienta:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className="break-inside-avoid mb-4 group cursor-pointer flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1">
-      <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors">
+    <div className="break-inside-avoid mb-4 group relative flex flex-col gap-1.5 bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 p-1.5 rounded-[22px] shadow-sm hover:shadow-xl transition-all duration-300 transform-gpu hover:-translate-y-1">
+
+      {/* Botón Flotante de Guardar (Visible en hover o si ya está guardado) */}
+      <button
+        onClick={handleToggleSave}
+        disabled={isSaving}
+        className={`absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-300 ${
+          isSaved
+            ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white opacity-100'
+            : 'bg-white/80 text-zinc-500 border-black/10 dark:bg-black/50 dark:text-zinc-400 dark:border-white/10 opacity-0 group-hover:opacity-100 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black'
+        }`}
+      >
+        {isSaving ? (
+          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>
+        ) : (
+          <BookmarkIcon isSaved={isSaved} />
+        )}
+      </button>
+
+      <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
         <div className="flex justify-between items-center mb-3 px-1">
-          <h3 className="text-zinc-900 dark:text-white text-[13px] font-medium tracking-tight truncate pr-4">
+          <h3 className="text-zinc-900 dark:text-white text-[13px] font-medium tracking-tight truncate pr-8">
             {tool.name}
           </h3>
           <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-medium whitespace-nowrap">
@@ -49,15 +126,11 @@ const MasonryCard = ({ tool }) => {
           </span>
         </div>
         <div className={`relative w-full ${tool.heightClass} rounded-[10px] overflow-hidden bg-white dark:bg-black shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]`}>
-          <img
-            src={tool.imageUrl}
-            alt={tool.name}
-            className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700 ease-out"
-            loading="lazy"
-          />
+          <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700 ease-out" loading="lazy" />
         </div>
       </div>
-      <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors">
+
+      <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
         {tool.actionText}
       </div>
     </div>
@@ -360,7 +433,12 @@ export default function App() {
         ) : filteredTools.length > 0 ? (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-4">
             {filteredTools.map(tool => (
-              <MasonryCard key={tool.id} tool={tool} />
+              <MasonryCard
+                key={tool.id}
+                tool={tool}
+                user={user} // Pasamos el usuario
+                onRequireAuth={() => setIsAuthModalOpen(true)} // Abre el modal si no está logueado
+              />
             ))}
           </div>
         ) : (

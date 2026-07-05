@@ -125,6 +125,11 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  bookmarks?: (number | Tool)[] | null;
+  /**
+   * Nivel del usuario basado en sus contribuciones.
+   */
+  level?: ('Explorer' | 'Contributor' | 'Expert Curator') | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -146,6 +151,25 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tools".
+ */
+export interface Tool {
+  id: number;
+  name: string;
+  url: string;
+  category: 'Design' | 'Development' | 'AI Tools' | 'Productivity';
+  gridHeight?: ('normal' | 'tall') | null;
+  screenshotUrl?: string | null;
+  /**
+   * Cambia a "approved" y guarda para publicarlo en la web.
+   */
+  status?: ('pending' | 'approved') | null;
+  submittedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -162,24 +186,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tools".
- */
-export interface Tool {
-  id: number;
-  name: string;
-  url: string;
-  category: 'Design' | 'Development' | 'AI Tools' | 'Productivity';
-  gridHeight?: ('normal' | 'tall') | null;
-  screenshotUrl?: string | null;
-  /**
-   * Cambia a "approved" y guarda para publicarlo en la web.
-   */
-  status?: ('pending' | 'approved') | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -264,6 +270,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  bookmarks?: T;
+  level?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -310,6 +318,7 @@ export interface ToolsSelect<T extends boolean = true> {
   gridHeight?: T;
   screenshotUrl?: T;
   status?: T;
+  submittedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
