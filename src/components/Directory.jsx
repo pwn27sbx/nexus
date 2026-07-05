@@ -139,7 +139,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
       </div>
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
         <div className="flex justify-between items-center mb-3 px-1">
-          <h3 className="text-zinc-900 dark:text-white text-[13px] font-medium tracking-tight truncate pr-8">{tool.name}</h3>
+          <h3 className="text-zinc-900 dark:text-white text-[13px] font-bold tracking-tight truncate pr-8">{tool.name}</h3>
           <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-medium whitespace-nowrap">{tool.category}</span>
         </div>
         <div className={`relative w-full ${tool.heightClass} rounded-[10px] overflow-hidden bg-white dark:bg-black shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]`}>
@@ -153,7 +153,6 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
   );
 };
 
-// --- LIST CARD REFINADA (IMAGEN A LA DERECHA) ---
 const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
@@ -186,10 +185,7 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   }, [isFocused, isSaved, user]);
 
   return (
-    // Nueva cuadrícula perfecta con la imagen al final
     <div ref={cardRef} className={`group grid grid-cols-[auto_1fr_auto] md:grid-cols-[40px_2.5fr_1fr_1.5fr_80px] gap-4 items-center p-3 px-4 border-b border-black/5 dark:border-white/5 transition-all duration-200 cursor-pointer ${isFocused ? 'bg-accent-muted/20 border-l-4 border-l-accent' : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'}`} onClick={() => window.open(tool.url, '_blank')}>
-
-      {/* 1. Botón Guardar / Índice */}
       <div className="flex items-center justify-center w-8" onClick={(e) => { e.stopPropagation(); }}>
         <button onClick={handleToggleSave} disabled={isSaving} className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${isSaved ? 'text-accent bg-accent-muted opacity-100' : isFocused ? 'text-accent opacity-100' : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-accent hover:bg-accent-muted'}`}>
           {isSaving ? <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
@@ -199,7 +195,6 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         </span>
       </div>
 
-      {/* 2. Favicon + Nombre + Descripción Real */}
       <div className="flex flex-col truncate justify-center">
         <div className="flex items-center gap-2">
           <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`} alt="" className="w-3.5 h-3.5 object-contain rounded-sm" />
@@ -208,12 +203,10 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         <span className="text-[12px] text-zinc-500 dark:text-zinc-400 truncate mt-0.5">{tool.description}</span>
       </div>
 
-      {/* 3. Categoría */}
       <div className="hidden md:flex items-center">
         <span className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{tool.category}</span>
       </div>
 
-      {/* 4. Dominio / Visitar */}
       <div className="hidden md:flex flex-col items-end justify-center pr-2">
         <span className="truncate text-[13px] text-zinc-500 font-medium">{getDomain(tool.url)}</span>
         <div className="font-mono text-[10px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
@@ -221,7 +214,6 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         </div>
       </div>
 
-      {/* 5. Miniatura a la extrema derecha */}
       <div className="hidden md:flex justify-end">
         <div className="w-[72px] h-[40px] rounded-lg overflow-hidden border border-black/5 dark:border-white/5 shadow-sm relative group-hover:shadow-md transition-all">
           <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
@@ -235,7 +227,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
-  const [description, setDescription] = useState(''); // <-- NUEVO ESTADO DE DESCRIPCIÓN
+  const [description, setDescription] = useState('');
   const [submitStatus, setSubmitStatus] = useState('idle');
 
   if (!isOpen) return null;
@@ -267,7 +259,6 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
               <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 ring-accent transition-all text-sm text-black dark:text-white placeholder:text-zinc-400" />
               <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" /></div>
 
-              {/* NUEVO INPUT DE DESCRIPCIÓN */}
               <div className="flex items-start gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all">
                 <DescIcon />
                 <input type="text" required maxLength={100} placeholder="Short description (Max 100 chars)" value={description} onChange={(e) => setDescription(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" />
@@ -295,6 +286,11 @@ export default function App() {
     return 'grid';
   });
 
+  const [fontType, setFontType] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('nexus-font') || 'sans';
+    return 'sans';
+  });
+
   useEffect(() => {
     localStorage.setItem('nexus-accent', accentColor);
     document.documentElement.style.setProperty('--accent', accentColor);
@@ -303,6 +299,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('nexus-view', viewMode);
   }, [viewMode]);
+
+  useEffect(() => {
+    localStorage.setItem('nexus-font', fontType);
+  }, [fontType]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState("All");
@@ -389,7 +389,6 @@ export default function App() {
             imageUrl: tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop",
             heightClass: assignedHeight,
             actionText: "View Production",
-            // MAPEAMOS LA DESCRIPCIÓN DESDE ALGOLIA (o un fallback si es una herramienta antigua)
             description: tool.description || "High-performance platform for creators."
           };
         });
@@ -403,7 +402,7 @@ export default function App() {
   const filteredTools = useMemo(() => tools.filter(tool => activeCategory === "All" || tool.category === activeCategory), [activeCategory, tools]);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 font-sans selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
+    <div className={`min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 ${fontType === 'mono' ? 'font-mono' : 'font-sans'} selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32`}>
 
       <style>{`
         :root { --accent: ${accentColor}; --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent); }
@@ -426,13 +425,16 @@ export default function App() {
 
         <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
           <SearchIcon />
-          <span className="ml-2 text-zinc-500 text-[12px] font-medium text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
+          <span className="ml-2 text-zinc-500 text-[12px] font-bold text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
           <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
         </button>
 
         <div className="flex gap-1 pr-1">
           <button
-            onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }}
+            onClick={() => {
+              playSound('snap');
+              setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
+            }}
             className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer mr-1 focus:outline-none focus:ring-2 ring-accent"
             title={`Switch to ${viewMode === 'grid' ? 'List' : 'Grid'} View`}
           >
@@ -444,7 +446,7 @@ export default function App() {
           </button>
 
           {user ? (
-            <button onClick={() => setIsProfileOpen(true)} className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 text-[11px] font-medium transition-all active:scale-95 cursor-pointer flex items-center gap-1.5">
+            <button onClick={() => setIsProfileOpen(true)} className="px-3 h-8 rounded-full border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 text-[11px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor }}></div>{user.nickname ? `@${user.nickname}` : user.email.split('@')[0]}
             </button>
           ) : (
@@ -458,7 +460,7 @@ export default function App() {
       <div className="pt-28 pb-8 flex justify-center w-full z-30 sticky top-0 bg-gradient-to-b from-[#fafafa] dark:from-[#050505] to-transparent pointer-events-none">
         <div className="flex gap-2 p-1.5 rounded-full bg-white/50 dark:bg-[#111]/50 backdrop-blur-md border border-black/5 dark:border-white/5 pointer-events-auto overflow-x-auto max-w-[95%] no-scrollbar">
           {["All", "Design", "Development", "AI Tools", "Productivity"].map(cat => (
-            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-1.5 rounded-full text-[12px] font-medium transition-all whitespace-nowrap ${activeCategory === cat ? 'text-white shadow-accent bg-accent' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}>{cat}</button>
+            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all whitespace-nowrap ${activeCategory === cat ? 'text-white shadow-accent bg-accent' : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}>{cat}</button>
           ))}
         </div>
       </div>
@@ -475,7 +477,7 @@ export default function App() {
               {filteredTools.map((tool, index) => <ListCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} indexNumber={index} />)}
             </div>
           )
-        ) : ( <div className="flex flex-col items-center justify-center py-20 text-zinc-400"><SearchIcon /><p className="mt-4 text-sm">No tools found.</p></div> )}
+        ) : ( <div className="flex flex-col items-center justify-center py-20 text-zinc-400"><SearchIcon /><p className="mt-4 text-sm font-bold">No tools found.</p></div> )}
       </main>
 
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={setSearchQuery} tools={tools} user={user} onAction={handlePaletteAction} />
@@ -489,6 +491,8 @@ export default function App() {
         onLogout={handleLogout}
         accentColor={accentColor}
         setAccentColor={setAccentColor}
+        fontType={fontType}
+        setFontType={setFontType}
       />
       <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
     </div>

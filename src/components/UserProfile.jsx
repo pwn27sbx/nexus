@@ -57,7 +57,7 @@ const playSound = (type) => {
   }
 };
 
-const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor }) => {
+const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor, fontType, setFontType }) => {
   const [activeTab, setActiveTab] = useState('arsenal');
   const [arsenal, setArsenal] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -168,24 +168,43 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
               {isSavingName && <div className="absolute right-2 w-4 h-4 border-2 border-transparent border-t-accent rounded-full animate-spin"></div>}
             </div>
 
-            <div className="flex items-center justify-center gap-3.5 mt-5">
-              {accents.map(color => (
+            <div className="flex flex-col items-center gap-4 mt-6 w-full">
+              <div className="flex items-center justify-center gap-3.5">
+                {accents.map(color => (
+                  <button
+                    key={color.name}
+                    onClick={() => {
+                      setAccentColor(color.hex);
+                      playSound('snap');
+                    }}
+                    title={color.name}
+                    className={`w-4 h-4 rounded-full transition-all duration-300 focus:outline-none ${accentColor === color.hex ? 'scale-125 ring-2 ring-offset-2 ring-black/10 dark:ring-white/20 dark:ring-offset-[#0a0a0a]' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
+                    style={{ backgroundColor: color.hex }}
+                  />
+                ))}
+              </div>
+
+              {/* Toggles de Tipografía */}
+              <div className="flex p-1 bg-zinc-100 dark:bg-zinc-900 rounded-lg w-fit mt-1">
                 <button
-                  key={color.name}
-                  onClick={() => {
-                    setAccentColor(color.hex);
-                    playSound('snap'); // AQUÍ SUENA EL SNAP AL CAMBIAR EL TEMA
-                  }}
-                  title={color.name}
-                  className={`w-4 h-4 rounded-full transition-all duration-300 focus:outline-none ${accentColor === color.hex ? 'scale-125 ring-2 ring-offset-2 ring-black/10 dark:ring-white/20 dark:ring-offset-[#0a0a0a]' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
-                  style={{ backgroundColor: color.hex }}
-                />
-              ))}
+                  onClick={() => { setFontType('sans'); playSound('snap'); }}
+                  className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-all ${fontType === 'sans' ? 'bg-white dark:bg-black shadow-sm text-accent' : 'text-zinc-500 hover:text-black dark:hover:text-white'}`}
+                >
+                  SANS
+                </button>
+                <button
+                  onClick={() => { setFontType('mono'); playSound('snap'); }}
+                  className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-all font-mono ${fontType === 'mono' ? 'bg-white dark:bg-black shadow-sm text-accent' : 'text-zinc-500 hover:text-black dark:hover:text-white'}`}
+                >
+                  MONO
+                </button>
+              </div>
             </div>
+
             {nameError && <p className="text-[#ff8787] text-[11px] font-medium mt-3 animate-in fade-in slide-in-from-top-1">{nameError}</p>}
           </div>
 
-          <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/10 transition-colors duration-300" style={{ backgroundColor: accentColor }}>
+          <div className="mt-6 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-white dark:text-black shadow-lg shadow-black/10 dark:shadow-white/10 transition-colors duration-300" style={{ backgroundColor: accentColor }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             <span className="text-[10px] font-extrabold tracking-widest uppercase mt-px">{user?.level || 'Explorer'}</span>
           </div>
