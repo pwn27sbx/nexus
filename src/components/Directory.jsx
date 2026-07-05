@@ -86,7 +86,7 @@ const AutoCaptureModal = ({ isOpen, onClose }) => {
 
     try {
       // Enviamos los datos directamente a tu Payload CMS
-      const response = await fetch('https://nexus-production-8dca.up.railway.app/', {
+      const response = await fetch('https://nexus-production-8dca.up.railway.app/api/tools', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
