@@ -20,7 +20,7 @@ export default buildConfig({
     },
   },
   cors: ['https://nexus4all.vercel.app', 'https://nexus-production-8dca.up.railway.app'],
-  csrf: ['https://nexus4all.vercel.app', 'https://nexus-production-8dca.up.railway.app'],
+  csrf: ['https://nexus4all.vercel.app'],
   collections: [Users, Media, Tools],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
