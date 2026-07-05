@@ -177,7 +177,13 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 
 export default function App() {
   // --- EL CEREBRO DEL SISTEMA DE ACENTOS ---
-  const [accentColor, setAccentColor] = useState(() => localStorage.getItem('nexus-accent') || '#ff8787');
+  // Comprobamos si estamos en el navegador antes de usar localStorage
+  const [accentColor, setAccentColor] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('nexus-accent') || '#ff8787';
+    }
+    return '#ff8787'; // Color por defecto para el servidor de Vercel
+  });
 
   useEffect(() => {
     localStorage.setItem('nexus-accent', accentColor);
