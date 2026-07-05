@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import algoliasearch from 'algoliasearch/lite'; // Usamos la versión 'lite' para que cargue más rápido en el navegador
+import AuthModal from './AuthModal'; // Importación del nuevo modal
 
 // Inicializamos Algolia usando la sintaxis correcta de Astro/Vite
 const searchClient = algoliasearch(
@@ -200,7 +201,10 @@ const AutoCaptureModal = ({ isOpen, onClose }) => {
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState("All");
+
+  // ESTADOS DE LOS MODALES
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [tools, setTools] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -280,7 +284,11 @@ export default function App() {
         </div>
 
         <div className="flex gap-1 pr-1">
-          <button className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer">
+          {/* BOTÓN ACTUALIZADO PARA ABRIR EL MODAL DE AUTENTICACIÓN */}
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"
+          >
             <UserIcon />
           </button>
           <button
@@ -334,8 +342,9 @@ export default function App() {
         )}
       </main>
 
-      {/* Modal de Auto-Captura */}
+      {/* Modales */}
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }
