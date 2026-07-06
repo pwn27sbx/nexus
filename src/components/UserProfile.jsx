@@ -1,31 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
-// SINTETIZADOR DE AUDIO GLOBAL (Mejorado para saltar bloqueos de navegador)
 let audioCtx = null;
 
 const playSound = (type) => {
   try {
-    // Solo creamos el contexto una vez para no saturar al navegador
     if (!audioCtx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) return;
       audioCtx = new AudioContext();
     }
-
-    // Obligamos al navegador a despertar el motor de audio
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     const now = audioCtx.currentTime;
 
     if (type === 'pop') {
-      // Pop para Favoritos (Más duradero y audible)
       osc.type = 'sine';
       osc.frequency.setValueAtTime(800, now);
       osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
@@ -34,7 +25,6 @@ const playSound = (type) => {
       osc.start(now);
       osc.stop(now + 0.15);
     } else if (type === 'woosh') {
-      // Zumbido profundo para Cmd+K
       osc.type = 'sine';
       osc.frequency.setValueAtTime(300, now);
       osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
@@ -43,7 +33,6 @@ const playSound = (type) => {
       osc.start(now);
       osc.stop(now + 0.25);
     } else if (type === 'snap') {
-      // Clic afilado para cambios de tema
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(1200, now);
       osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
@@ -57,7 +46,7 @@ const playSound = (type) => {
   }
 };
 
-const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor, fontType, setFontType }) => {
+const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentColor, fontFamily, setFontFamily }) => {
   const [activeTab, setActiveTab] = useState('arsenal');
   const [arsenal, setArsenal] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -73,6 +62,15 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
     { name: 'Azure', hex: '#3b82f6' },
     { name: 'Amethyst', hex: '#c084fc' },
     { name: 'Cyber', hex: '#facc15' }
+  ];
+
+  // NUEVO: Catálogo de tipografías premium
+  const fonts = [
+    { id: 'jetbrains', name: 'JetBrains', value: "'JetBrains Mono', monospace" },
+    { id: 'geist', name: 'Geist', value: "'Geist Mono', monospace" },
+    { id: 'monaspace', name: 'Monaspace', value: "'Monaspace Neon', monospace" },
+    { id: 'cascadia', name: 'Cascadia', value: "'Cascadia Code', monospace" },
+    { id: 'fira', name: 'Fira Code', value: "'Fira Code', monospace" }
   ];
 
   useEffect(() => {
@@ -169,14 +167,12 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
             </div>
 
             <div className="flex flex-col items-center gap-4 mt-6 w-full">
+              {/* Selector de Acentos */}
               <div className="flex items-center justify-center gap-3.5">
                 {accents.map(color => (
                   <button
                     key={color.name}
-                    onClick={() => {
-                      setAccentColor(color.hex);
-                      playSound('snap');
-                    }}
+                    onClick={() => { setAccentColor(color.hex); playSound('snap'); }}
                     title={color.name}
                     className={`w-4 h-4 rounded-full transition-all duration-300 focus:outline-none ${accentColor === color.hex ? 'scale-125 ring-2 ring-offset-2 ring-black/10 dark:ring-white/20 dark:ring-offset-[#0a0a0a]' : 'opacity-40 hover:opacity-100 hover:scale-110'}`}
                     style={{ backgroundColor: color.hex }}
@@ -184,20 +180,18 @@ const UserProfile = ({ isOpen, onClose, user, onLogout, accentColor, setAccentCo
                 ))}
               </div>
 
-              {/* Toggles de Tipografía */}
-              <div className="flex p-1 bg-zinc-100 dark:bg-zinc-900 rounded-lg w-fit mt-1">
-                <button
-                  onClick={() => { setFontType('sans'); playSound('snap'); }}
-                  className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-all ${fontType === 'sans' ? 'bg-white dark:bg-black shadow-sm text-accent' : 'text-zinc-500 hover:text-black dark:hover:text-white'}`}
-                >
-                  SANS
-                </button>
-                <button
-                  onClick={() => { setFontType('mono'); playSound('snap'); }}
-                  className={`px-4 py-1.5 text-[11px] font-bold rounded-md transition-all font-mono ${fontType === 'mono' ? 'bg-white dark:bg-black shadow-sm text-accent' : 'text-zinc-500 hover:text-black dark:hover:text-white'}`}
-                >
-                  MONO
-                </button>
+              {/* Selector de Fuentes */}
+              <div className="flex flex-wrap justify-center gap-2 mt-2 max-w-[280px]">
+                {fonts.map(font => (
+                  <button
+                    key={font.id}
+                    onClick={() => { setFontFamily(font.value); playSound('snap'); }}
+                    className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all border ${fontFamily === font.value ? 'bg-accent/10 border-accent text-accent' : 'bg-transparent border-black/10 dark:border-white/10 text-zinc-500 hover:border-zinc-400 dark:hover:border-zinc-500'}`}
+                    style={{ fontFamily: font.value }} // Muestra el nombre en su propia tipografía
+                  >
+                    {font.name}
+                  </button>
+                ))}
               </div>
             </div>
 

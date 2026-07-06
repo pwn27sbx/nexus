@@ -69,25 +69,25 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
         <div className="flex items-center px-5 py-5 border-b border-black/5 dark:border-white/5 focus-within:bg-accent-muted/10 transition-colors">
           <SearchIcon />
           <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or type a command..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-4 text-xl font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-700" />
-          <kbd className="hidden sm:inline-block font-mono text-[10px] font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
+          <kbd className="hidden sm:inline-block font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto p-3 no-scrollbar">
           {query && filteredTools.length > 0 && (
             <div className="mb-4">
-              <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Tools</div>
+              <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Tools</div>
               {filteredTools.map(tool => (
                 <button key={tool.id} onClick={() => { window.open(tool.url, '_blank'); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover-bg-accent-muted flex items-center justify-between group transition-all">
-                  <span className="text-[15px] text-zinc-900 dark:text-white font-semibold group-hover:text-accent">{tool.name}</span><span className="text-[12px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Visit ↵</span>
+                  <span className="text-[15px] text-zinc-900 dark:text-white font-semibold group-hover:text-accent">{tool.name}</span><span className="text-[12px] text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Visit ↵</span>
                 </button>
               ))}
             </div>
           )}
           {(query ? filteredCommands : commands).length > 0 && (
             <div>
-              <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest font-mono">Commands</div>
+              <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Commands</div>
               {(query ? filteredCommands : commands).map(cmd => (
                 <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover-bg-accent-muted flex items-center justify-between group transition-all border-l-2 border-transparent hover:border-accent">
-                  <span className="text-[15px] text-zinc-900 dark:text-white font-medium group-hover:text-accent">{cmd.title}</span><span className="text-[12px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Execute ↵</span>
+                  <span className="text-[15px] text-zinc-900 dark:text-white font-medium group-hover:text-accent">{cmd.title}</span><span className="text-[12px] text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Execute ↵</span>
                 </button>
               ))}
             </div>
@@ -135,7 +135,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
         {isSaving ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
       </button>
       <div className={`absolute top-4 left-4 z-10 px-2.5 py-1 rounded-full bg-black/80 dark:bg-white/80 backdrop-blur-md text-white dark:text-black text-[10px] font-bold tracking-widest uppercase transition-opacity duration-300 pointer-events-none shadow-xl ${isFocused ? 'opacity-100' : 'opacity-0'}`}>
-        Press <kbd className="font-mono text-accent">F</kbd> to Save
+        Press <kbd className="text-accent">F</kbd> to Save
       </div>
       <div className="bg-[#f4f4f5] dark:bg-[#161616] rounded-[16px] p-3 flex flex-col transition-colors cursor-pointer" onClick={() => window.open(tool.url, '_blank')}>
         <div className="flex justify-between items-center mb-3 px-1">
@@ -147,7 +147,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
         </div>
       </div>
       <div className={`bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold transition-colors cursor-pointer ${isFocused ? 'text-accent bg-accent-muted/20' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white'}`} onClick={() => window.open(tool.url, '_blank')}>
-        {isFocused ? <span className="font-mono">Press ENTER to Visit</span> : tool.actionText}
+        {isFocused ? <span>Press ENTER to Visit</span> : tool.actionText}
       </div>
     </div>
   );
@@ -190,7 +190,7 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         <button onClick={handleToggleSave} disabled={isSaving} className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${isSaved ? 'text-accent bg-accent-muted opacity-100' : isFocused ? 'text-accent opacity-100' : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-accent hover:bg-accent-muted'}`}>
           {isSaving ? <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
         </button>
-        <span className={`text-[12px] font-mono w-7 text-center absolute pointer-events-none transition-opacity ${isSaved || isFocused ? 'opacity-0 group-hover:opacity-0' : 'opacity-100 group-hover:opacity-0 text-zinc-400'}`}>
+        <span className={`text-[12px] w-7 text-center absolute pointer-events-none transition-opacity ${isSaved || isFocused ? 'opacity-0 group-hover:opacity-0' : 'opacity-100 group-hover:opacity-0 text-zinc-400'}`}>
           {(indexNumber + 1).toString().padStart(2, '0')}
         </span>
       </div>
@@ -209,7 +209,7 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
 
       <div className="hidden md:flex flex-col items-end justify-center pr-2">
         <span className="truncate text-[13px] text-zinc-500 font-medium">{getDomain(tool.url)}</span>
-        <div className="font-mono text-[10px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+        <div className="text-[10px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
           {isFocused ? <span className="text-accent">PRESS ENTER ↵</span> : 'VISIT ↗'}
         </div>
       </div>
@@ -286,9 +286,10 @@ export default function App() {
     return 'grid';
   });
 
-  const [fontType, setFontType] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('nexus-font') || 'sans';
-    return 'sans';
+  // NUEVO: Estado para guardar la fuente preferida (JetBrains por defecto)
+  const [fontFamily, setFontFamily] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('nexus-font-family') || "'JetBrains Mono', monospace";
+    return "'JetBrains Mono', monospace";
   });
 
   useEffect(() => {
@@ -301,8 +302,8 @@ export default function App() {
   }, [viewMode]);
 
   useEffect(() => {
-    localStorage.setItem('nexus-font', fontType);
-  }, [fontType]);
+    localStorage.setItem('nexus-font-family', fontFamily);
+  }, [fontFamily]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState("All");
@@ -402,19 +403,28 @@ export default function App() {
   const filteredTools = useMemo(() => tools.filter(tool => activeCategory === "All" || tool.category === activeCategory), [activeCategory, tools]);
 
   return (
-    <div className={`min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 ${fontType === 'mono' ? 'font-mono-custom' : 'font-sans'} selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32`}>
+    <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
 
+      {/* MAGIA CSS: Importamos las tipografías top-tier en caché ultrarrápida */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+        /* Google Fonts: JetBrains, Geist, Fira Code */
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Geist+Mono:wght@400;500;700&family=Fira+Code:wght@400;500;700&display=swap');
+
+        /* Fontsource CDN: Cascadia y Monaspace */
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@5.0.8/index.css');
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.8/index.css');
 
         :root {
           --accent: ${accentColor};
           --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
-          /* Aquí aplicamos JetBrains Mono mágicamente */
-          --font-family: ${fontType === 'mono' ? "'JetBrains Mono', monospace" : "ui-sans-serif, system-ui, sans-serif"};
+          /* Inyectamos la tipografía seleccionada a la variable global */
+          --font-family: ${fontFamily};
         }
 
-        body { font-family: var(--font-family) !important; }
+        /* Forzamos a que toda la página, botones e inputs obedezcan la fuente */
+        body, input, button, select, textarea {
+          font-family: var(--font-family) !important;
+        }
 
         ::selection { background-color: var(--accent); color: #fff; }
         .text-accent { color: var(--accent) !important; }
@@ -436,7 +446,7 @@ export default function App() {
         <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
           <SearchIcon />
           <span className="ml-2 text-zinc-500 text-[12px] font-bold text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
-          <kbd className="hidden sm:inline-block font-mono text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
+          <kbd className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
         </button>
 
         <div className="flex gap-1 pr-1">
@@ -501,8 +511,8 @@ export default function App() {
         onLogout={handleLogout}
         accentColor={accentColor}
         setAccentColor={setAccentColor}
-        fontType={fontType}
-        setFontType={setFontType}
+        fontFamily={fontFamily}
+        setFontFamily={setFontFamily}
       />
       <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
     </div>
