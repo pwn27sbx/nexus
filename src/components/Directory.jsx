@@ -302,7 +302,6 @@ export default function App() {
           document.head.appendChild(link);
         }
       };
-
       loadFont('google-fonts', 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Geist+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
       loadFont('cascadia-font', 'https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@5.0.8/index.css');
       loadFont('monaspace-font', 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.8/index.css');
@@ -318,11 +317,15 @@ export default function App() {
     localStorage.setItem('nexus-view', viewMode);
   }, [viewMode]);
 
-  // --- AQUÍ ESTÁ EL FIX MÁGICO ---
+  // EL FIX MÁGICO: Forzamos la fuente por JavaScript directamente al tag body
   useEffect(() => {
     localStorage.setItem('nexus-font-family', fontFamily);
-    // Le forzamos la variable CSS directamente al navegador para que no lo ignore
     document.documentElement.style.setProperty('--global-font', fontFamily);
+
+    // Anulamos Tailwind aplicando la fuente directo al style del documento
+    if (typeof document !== 'undefined') {
+      document.body.style.setProperty('font-family', fontFamily, 'important');
+    }
   }, [fontFamily]);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -426,24 +429,14 @@ export default function App() {
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
 
       <style>{`
-        /* Google Fonts: JetBrains, Geist, Fira Code */
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Geist+Mono:wght@400;500;700&family=Fira+Code:wght@400;500;700&display=swap');
-
-        /* Fontsource CDN: Cascadia y Monaspace */
-        @import url('https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@5.0.8/index.css');
-        @import url('https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.8/index.css');
-
         :root {
           --accent: ${accentColor};
           --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
-          /* Variable inicial, conectada directo a JS */
           --global-font: ${fontFamily};
         }
 
-        /* Fuerza bruta para asegurar que TODO adopte la tipografía seleccionada */
-        *, body, input, button, select, textarea {
-          font-family: var(--global-font) !important;
-        }
+        /* FUERZA ABSOLUTA DE CSS */
+        * { font-family: var(--global-font) !important; }
 
         ::selection { background-color: var(--accent); color: #fff; }
         .text-accent { color: var(--accent) !important; }
@@ -465,7 +458,7 @@ export default function App() {
         <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
           <SearchIcon />
           <span className="ml-2 text-zinc-500 text-[12px] font-bold text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
-          <kbd className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
+          <kbd className="hidden sm:inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
         </button>
 
         <div className="flex gap-1 pr-1">
