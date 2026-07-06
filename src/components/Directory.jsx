@@ -45,8 +45,66 @@ const HeartIcon = ({ isSaved }) => (<svg width="16" height="16" viewBox="0 0 24 
 const GridIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>);
 const ListIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
 const DescIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>);
+const TypeIcon = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>);
 
 const getDomain = (url) => { try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; } };
+
+// NUEVO: LA CUADRÍCULA DE FUENTES (ESTILO MONKEYTYPE)
+const availableFonts = [
+  { id: 'jetbrains', name: 'JetBrains Mono', value: "'JetBrains Mono', monospace" },
+  { id: 'geist', name: 'Geist Mono', value: "'Geist Mono', monospace" },
+  { id: 'fira', name: 'Fira Code', value: "'Fira Code', monospace" },
+  { id: 'roboto', name: 'Roboto Mono', value: "'Roboto Mono', monospace" },
+  { id: 'space', name: 'Space Mono', value: "'Space Mono', monospace" },
+  { id: 'ibm', name: 'IBM Plex Mono', value: "'IBM Plex Mono', monospace" },
+  { id: 'ubuntu', name: 'Ubuntu Mono', value: "'Ubuntu Mono', monospace" },
+  { id: 'anonymous', name: 'Anonymous Pro', value: "'Anonymous Pro', monospace" },
+  { id: 'cascadia', name: 'Cascadia Code', value: "'Cascadia Code', monospace" },
+  { id: 'monaspace', name: 'Monaspace Neon', value: "'Monaspace Neon', monospace" }
+];
+
+const FontPickerModal = ({ isOpen, onClose, currentFont, setFontFamily }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[300] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onClose}>
+      <div className="w-full max-w-4xl bg-[#fafafa] dark:bg-[#0a0a0a] rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+
+        <div className="px-6 py-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-white dark:bg-[#111]">
+          <div>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <TypeIcon /> Typography Settings
+            </h2>
+            <p className="text-[13px] text-zinc-500 mt-1">Change the font family used by the platform. This will persist across your sessions.</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center bg-black/5 dark:bg-white/5 text-zinc-500 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 transition-all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <div className="p-6 overflow-y-auto no-scrollbar">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {availableFonts.map(font => {
+              const isActive = currentFont === font.value;
+              return (
+                <button
+                  key={font.id}
+                  onClick={() => { setFontFamily(font.value); playSound('snap'); }}
+                  className={`relative p-4 rounded-xl border flex items-center justify-center text-center transition-all duration-200 group ${isActive ? 'bg-accent/10 border-accent shadow-sm' : 'bg-white dark:bg-[#111] border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20 hover:shadow-md hover:-translate-y-0.5'}`}
+                  style={{ fontFamily: font.value }}
+                >
+                  <span className={`text-[13px] font-bold ${isActive ? 'text-accent' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white'}`}>
+                    {font.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
 
 const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onAction }) => {
   const inputRef = useRef(null);
@@ -57,6 +115,7 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   const commands = [
     { id: 'suggest', title: 'Suggest a Tool', category: 'Actions', action: () => onAction('suggest') },
     { id: 'leaderboard', title: 'View Leaderboard', category: 'Actions', action: () => onAction('leaderboard') },
+    { id: 'fonts', title: 'Change Typography', category: 'Settings', action: () => onAction('fonts') }, // NUEVO COMANDO
     ...(user ? [{ id: 'profile', title: 'My Profile', category: 'Account', action: () => onAction('profile') }] : []),
     { id: 'auth', title: user ? 'Sign Out' : 'Sign In', category: 'Account', action: () => onAction(user ? 'logout' : 'auth') },
   ];
@@ -291,6 +350,7 @@ export default function App() {
     return "'JetBrains Mono', monospace";
   });
 
+  // Efecto masivo para inyectar todas las fuentes premium que pide el modal
   useEffect(() => {
     if (typeof document !== 'undefined') {
       const loadFont = (id, url) => {
@@ -302,7 +362,8 @@ export default function App() {
           document.head.appendChild(link);
         }
       };
-      loadFont('google-fonts', 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Geist+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+      loadFont('google-fonts-expanded', 'https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@400;700&family=Fira+Code:wght@400;500;700&family=Geist+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700;800&family=Roboto+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&family=Ubuntu+Mono:wght@400;700&display=swap');
       loadFont('cascadia-font', 'https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@5.0.8/index.css');
       loadFont('monaspace-font', 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.8/index.css');
     }
@@ -317,12 +378,9 @@ export default function App() {
     localStorage.setItem('nexus-view', viewMode);
   }, [viewMode]);
 
-  // EL FIX MÁGICO: Forzamos la fuente por JavaScript directamente al tag body
   useEffect(() => {
     localStorage.setItem('nexus-font-family', fontFamily);
     document.documentElement.style.setProperty('--global-font', fontFamily);
-
-    // Anulamos Tailwind aplicando la fuente directo al style del documento
     if (typeof document !== 'undefined') {
       document.body.style.setProperty('font-family', fontFamily, 'important');
     }
@@ -336,6 +394,7 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isFontModalOpen, setIsFontModalOpen] = useState(false); // NUEVO ESTADO PARA EL MODAL
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const [tools, setTools] = useState([]);
@@ -345,7 +404,7 @@ export default function App() {
   useEffect(() => { setFocusedIndex(-1); }, [searchQuery, activeCategory, viewMode]);
 
   useEffect(() => {
-    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen) return;
+    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen || isFontModalOpen) return;
     const handleGlobalKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (tools.length === 0) return;
@@ -358,7 +417,7 @@ export default function App() {
     };
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen]);
+  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen, isFontModalOpen]);
 
   useEffect(() => {
     const handleCmdK = (e) => {
@@ -385,6 +444,7 @@ export default function App() {
       case 'suggest': setIsModalOpen(true); break;
       case 'leaderboard': setIsLeaderboardOpen(true); break;
       case 'profile': setIsProfileOpen(true); break;
+      case 'fonts': setIsFontModalOpen(true); break; // COMANDO DE FUENTES
       case 'auth': setIsAuthModalOpen(true); break;
       case 'logout': handleLogout(); break;
       default: break;
@@ -435,7 +495,6 @@ export default function App() {
           --global-font: ${fontFamily};
         }
 
-        /* FUERZA ABSOLUTA DE CSS */
         * { font-family: var(--global-font) !important; }
 
         ::selection { background-color: var(--accent); color: #fff; }
@@ -462,11 +521,17 @@ export default function App() {
         </button>
 
         <div className="flex gap-1 pr-1">
+          {/* NUEVO: BOTÓN DE CONFIGURACIÓN DE FUENTES */}
           <button
-            onClick={() => {
-              playSound('snap');
-              setViewMode(prev => prev === 'grid' ? 'list' : 'grid');
-            }}
+            onClick={() => { playSound('woosh'); setIsFontModalOpen(true); }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer mr-1"
+            title="Typography Settings"
+          >
+            <TypeIcon />
+          </button>
+
+          <button
+            onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }}
             className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer mr-1 focus:outline-none focus:ring-2 ring-accent"
             title={`Switch to ${viewMode === 'grid' ? 'List' : 'Grid'} View`}
           >
@@ -512,20 +577,11 @@ export default function App() {
         ) : ( <div className="flex flex-col items-center justify-center py-20 text-zinc-400"><SearchIcon /><p className="mt-4 text-sm font-bold">No tools found.</p></div> )}
       </main>
 
+      <FontPickerModal isOpen={isFontModalOpen} onClose={() => setIsFontModalOpen(false)} currentFont={fontFamily} setFontFamily={setFontFamily} />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={setSearchQuery} tools={tools} user={user} onAction={handlePaletteAction} />
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-
-      <UserProfile
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        user={user}
-        onLogout={handleLogout}
-        accentColor={accentColor}
-        setAccentColor={setAccentColor}
-        fontFamily={fontFamily}
-        setFontFamily={setFontFamily}
-      />
+      <UserProfile isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={handleLogout} accentColor={accentColor} setAccentColor={setAccentColor} />
       <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
     </div>
   );
