@@ -68,8 +68,8 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
       <div className="bg-white dark:bg-[#0f0f11] w-full max-w-2xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
         <div className="flex items-center px-5 py-5 border-b border-black/5 dark:border-white/5 focus-within:bg-accent-muted/10 transition-colors">
           <SearchIcon />
-          <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or type a command..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-4 text-xl font-medium placeholder:text-zinc-300 dark:placeholder:text-zinc-700" />
-          <kbd className="hidden sm:inline-block font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
+          <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or type a command..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-4 text-xl font-bold placeholder:text-zinc-300 dark:placeholder:text-zinc-700" />
+          <kbd className="hidden sm:inline-block text-[10px] font-bold px-2 py-1 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 border border-black/5 dark:border-white/5">ESC</kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto p-3 no-scrollbar">
           {query && filteredTools.length > 0 && (
@@ -77,7 +77,7 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
               <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Tools</div>
               {filteredTools.map(tool => (
                 <button key={tool.id} onClick={() => { window.open(tool.url, '_blank'); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover-bg-accent-muted flex items-center justify-between group transition-all">
-                  <span className="text-[15px] text-zinc-900 dark:text-white font-semibold group-hover:text-accent">{tool.name}</span><span className="text-[12px] text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Visit ↵</span>
+                  <span className="text-[15px] text-zinc-900 dark:text-white font-bold group-hover:text-accent">{tool.name}</span><span className="text-[12px] text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Visit ↵</span>
                 </button>
               ))}
             </div>
@@ -87,7 +87,7 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
               <div className="px-4 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Commands</div>
               {(query ? filteredCommands : commands).map(cmd => (
                 <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} className="w-full text-left px-4 py-3 rounded-xl hover-bg-accent-muted flex items-center justify-between group transition-all border-l-2 border-transparent hover:border-accent">
-                  <span className="text-[15px] text-zinc-900 dark:text-white font-medium group-hover:text-accent">{cmd.title}</span><span className="text-[12px] text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Execute ↵</span>
+                  <span className="text-[15px] text-zinc-900 dark:text-white font-bold group-hover:text-accent">{cmd.title}</span><span className="text-[12px] text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:text-accent transition-opacity">Execute ↵</span>
                 </button>
               ))}
             </div>
@@ -146,7 +146,7 @@ const MasonryCard = ({ tool, user, onRequireAuth, isFocused }) => {
           <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-700 ease-out" loading="lazy" />
         </div>
       </div>
-      <div className={`bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-semibold transition-colors cursor-pointer ${isFocused ? 'text-accent bg-accent-muted/20' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white'}`} onClick={() => window.open(tool.url, '_blank')}>
+      <div className={`bg-[#f4f4f5] dark:bg-[#161616] rounded-[14px] py-2.5 flex justify-center items-center text-[12px] font-bold transition-colors cursor-pointer ${isFocused ? 'text-accent bg-accent-muted/20' : 'text-zinc-600 dark:text-zinc-400 group-hover:text-black dark:group-hover:text-white'}`} onClick={() => window.open(tool.url, '_blank')}>
         {isFocused ? <span>Press ENTER to Visit</span> : tool.actionText}
       </div>
     </div>
@@ -251,22 +251,22 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/10 dark:bg-black/40 backdrop-blur-md transition-opacity">
       <div className="bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 w-[90%] max-w-md rounded-2xl p-6 shadow-2xl relative">
         <button onClick={onClose} className="absolute top-4 right-4 text-zinc-400 hover:text-black dark:hover:text-white transition-colors"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-        <h2 className="text-lg font-medium text-black dark:text-white mb-1">Suggest a tool</h2><p className="text-[13px] text-zinc-500 dark:text-zinc-400 mb-5">Submissions will be reviewed before appearing on the directory.</p>
-        {submitStatus === 'success' ? ( <div className="py-8 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-300"><div className="w-12 h-12 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><h3 className="text-black dark:text-white font-medium mb-1">Tool Submitted!</h3><p className="text-[13px] text-zinc-500">Waiting for approval.</p></div>
+        <h2 className="text-lg font-bold text-black dark:text-white mb-1">Suggest a tool</h2><p className="text-[13px] text-zinc-500 dark:text-zinc-400 mb-5">Submissions will be reviewed before appearing on the directory.</p>
+        {submitStatus === 'success' ? ( <div className="py-8 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-300"><div className="w-12 h-12 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mb-3"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><h3 className="text-black dark:text-white font-bold mb-1">Tool Submitted!</h3><p className="text-[13px] text-zinc-500">Waiting for approval.</p></div>
         ) : (
           <form onSubmit={handleCapture}>
             <div className="flex flex-col gap-3 mb-5">
-              <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 ring-accent transition-all text-sm text-black dark:text-white placeholder:text-zinc-400" />
-              <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" /></div>
+              <input type="text" required placeholder="Tool Name (e.g. Figma)" value={name} onChange={(e) => setName(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 ring-accent transition-all text-sm font-bold text-black dark:text-white placeholder:text-zinc-400" />
+              <div className="flex items-center gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all"><GlobeIcon /><input type="url" required placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm font-bold text-black dark:text-white placeholder:text-zinc-400" /></div>
 
               <div className="flex items-start gap-3 bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-accent transition-all">
                 <DescIcon />
-                <input type="text" required maxLength={100} placeholder="Short description (Max 100 chars)" value={description} onChange={(e) => setDescription(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm text-black dark:text-white placeholder:text-zinc-400" />
+                <input type="text" required maxLength={100} placeholder="Short description (Max 100 chars)" value={description} onChange={(e) => setDescription(e.target.value)} disabled={submitStatus === 'loading'} className="bg-transparent border-none outline-none w-full text-sm font-bold text-black dark:text-white placeholder:text-zinc-400" />
               </div>
 
-              <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-accent transition-all text-sm text-black dark:text-white"><option value="Design">Design</option><option value="Development">Development</option><option value="AI Tools">AI Tools</option><option value="Productivity">Productivity</option></select>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} disabled={submitStatus === 'loading'} className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-accent transition-all text-sm font-bold text-black dark:text-white"><option value="Design">Design</option><option value="Development">Development</option><option value="AI Tools">AI Tools</option><option value="Productivity">Productivity</option></select>
             </div>
-            {submitStatus === 'error' && <p className="text-red-500 text-[12px] mb-3 text-center">Server error.</p>}
+            {submitStatus === 'error' && <p className="text-red-500 text-[12px] font-bold mb-3 text-center">Server error.</p>}
             <button type="submit" disabled={submitStatus === 'loading'} className="w-full bg-accent shadow-accent text-white dark:text-black text-sm font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all">{submitStatus === 'loading' ? "Sending..." : "Submit to Directory"}</button>
           </form>
         )}
@@ -286,11 +286,29 @@ export default function App() {
     return 'grid';
   });
 
-  // NUEVO: Estado para guardar la fuente preferida (JetBrains por defecto)
   const [fontFamily, setFontFamily] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('nexus-font-family') || "'JetBrains Mono', monospace";
     return "'JetBrains Mono', monospace";
   });
+
+  // NUEVO: Efecto a prueba de fallos para inyectar los CSS de las fuentes en el <head>
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const loadFont = (id, url) => {
+        if (!document.getElementById(id)) {
+          const link = document.createElement('link');
+          link.id = id;
+          link.rel = 'stylesheet';
+          link.href = url;
+          document.head.appendChild(link);
+        }
+      };
+
+      loadFont('google-fonts', 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Geist+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+      loadFont('cascadia-font', 'https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@5.0.8/index.css');
+      loadFont('monaspace-font', 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.8/index.css');
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('nexus-accent', accentColor);
@@ -405,24 +423,15 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32">
 
-      {/* MAGIA CSS: Importamos las tipografías top-tier en caché ultrarrápida */}
       <style>{`
-        /* Google Fonts: JetBrains, Geist, Fira Code */
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Geist+Mono:wght@400;500;700&family=Fira+Code:wght@400;500;700&display=swap');
-
-        /* Fontsource CDN: Cascadia y Monaspace */
-        @import url('https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@5.0.8/index.css');
-        @import url('https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.8/index.css');
-
         :root {
           --accent: ${accentColor};
           --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
-          /* Inyectamos la tipografía seleccionada a la variable global */
           --font-family: ${fontFamily};
         }
 
-        /* Forzamos a que toda la página, botones e inputs obedezcan la fuente */
-        body, input, button, select, textarea {
+        /* Fuerza bruta para asegurar que TODO adopte la tipografía seleccionada */
+        * {
           font-family: var(--font-family) !important;
         }
 
@@ -446,7 +455,7 @@ export default function App() {
         <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex-1 flex items-center px-3 py-2 mx-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-all group focus:outline-none focus:ring-2 ring-accent">
           <SearchIcon />
           <span className="ml-2 text-zinc-500 text-[12px] font-bold text-left flex-1 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors truncate">{searchQuery ? searchQuery : "Search or type a command..."}</span>
-          <kbd className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
+          <kbd className="hidden sm:inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white dark:bg-black border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
         </button>
 
         <div className="flex gap-1 pr-1">
