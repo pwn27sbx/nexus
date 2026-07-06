@@ -405,15 +405,16 @@ export default function App() {
     <div className={`min-h-screen bg-[#fafafa] dark:bg-[#050505] transition-colors duration-300 ${fontType === 'mono' ? 'font-mono-custom' : 'font-sans'} selection:bg-zinc-300 dark:selection:bg-zinc-700 pb-32`}>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
 
         :root {
-            --accent: ${accentColor};
-            --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
+          --accent: ${accentColor};
+          --accent-muted: color-mix(in srgb, var(--accent) 20%, transparent);
+          /* Aquí aplicamos JetBrains Mono mágicamente */
+          --font-family: ${fontType === 'mono' ? "'JetBrains Mono', monospace" : "ui-sans-serif, system-ui, sans-serif"};
         }
 
-        /* Aplicar Mono solo cuando el estado fontType sea 'mono' */
-        .font-mono-custom { font-family: 'Roboto Mono', monospace !important; }
+        body { font-family: var(--font-family) !important; }
 
         ::selection { background-color: var(--accent); color: #fff; }
         .text-accent { color: var(--accent) !important; }
