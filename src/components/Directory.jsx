@@ -46,8 +46,51 @@ const GridIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="no
 const ListIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
 const DescIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>);
 const ArrowUpRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>);
+const TrophyIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>);
+const LayersIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>);
 
 const getDomain = (url) => { try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; } };
+
+// --- EXPANDED CATEGORY SYSTEM ---
+const TOP_CATEGORIES = ["All", "Design", "Development", "AI Tools"];
+const ALL_CATEGORIES = [
+  "Design", "Development", "AI Tools", "Productivity", "Medicine",
+  "Accounting", "Engineering", "Entertainment", "Finance",
+  "Education", "Marketing", "Utilities", "Crypto", "Security", "Open Source"
+];
+
+const CategoriesModal = ({ isOpen, onClose, activeCategory, setActiveCategory }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[300] bg-black/40 backdrop-blur-2xl flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
+      <div className="w-full max-w-4xl bg-white/80 dark:bg-[#111]/80 backdrop-blur-3xl rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.3)] border border-white/20 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-400" onClick={e => e.stopPropagation()}>
+        <div className="px-8 py-8 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-black dark:text-white">Explore Categories</h2>
+            <p className="text-[14px] text-zinc-500 font-medium mt-1">Discover tools across all industries and niches.</p>
+          </div>
+          <button onClick={onClose} className="w-10 h-10 bg-black/5 dark:bg-white/10 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div className="px-8 pb-10 overflow-y-auto no-scrollbar grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {ALL_CATEGORIES.map(cat => {
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => { setActiveCategory(cat); playSound('pop'); onClose(); }}
+                className={`p-5 rounded-[20px] flex items-center justify-between transition-all duration-300 ${isActive ? 'bg-accent text-white shadow-lg scale-105' : 'bg-white/50 dark:bg-black/30 border border-white/40 dark:border-white/5 text-black dark:text-white hover:bg-white dark:hover:bg-white/10'}`}
+              >
+                <span className="text-[16px] font-bold">{cat}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onAction }) => {
   const inputRef = useRef(null);
@@ -58,9 +101,8 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   const commands = [
     { id: 'suggest', title: 'Submit Tool', action: () => onAction('suggest') },
     { id: 'leaderboard', title: 'Leaderboard', action: () => onAction('leaderboard') },
-    // Eliminamos el comando "fonts" independiente, ahora redirige al perfil que es el Command Center
-    { id: 'profile', title: 'Command Center (Aesthetics & Profile)', action: () => onAction('profile') },
-    { id: 'auth', title: user ? 'Sign Out' : 'Sign In', action: () => onAction(user ? 'logout' : 'auth') },
+    { id: 'profile', title: 'Command Center (Profile & Aesthetics)', action: () => onAction('profile') },
+    ...(user ? [] : [{ id: 'auth', title: 'Sign In', action: () => onAction('auth') }]),
   ];
   const filteredTools = tools.filter(t => t.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
   const filteredCommands = commands.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
@@ -107,7 +149,6 @@ const BentoCard = ({ tool, user, onRequireAuth, isFocused, index }) => {
   const [isSaved, setIsSaved] = useState(() => user?.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId) || false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // LOGÍCA BENTO 2.0: Patrón asimétrico para la grilla
   const getBentoSpan = (i) => {
     const pattern = i % 7;
     switch(pattern) {
@@ -153,28 +194,20 @@ const BentoCard = ({ tool, user, onRequireAuth, isFocused, index }) => {
       onClick={() => window.open(tool.url, '_blank')}
       className={`group relative overflow-hidden rounded-[24px] cursor-pointer transition-all duration-500 bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-2xl ${spanClass} ${isFocused ? 'ring-4 ring-accent ring-offset-4 ring-offset-white dark:ring-offset-black scale-[1.02] z-10' : 'hover:-translate-y-1'}`}
     >
-      {/* Botón Guardar */}
       <button onClick={handleToggleSave} disabled={isSaving} className={`absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 outline-none ${isSaved ? 'bg-white text-accent dark:bg-black opacity-100' : 'bg-black/30 text-white dark:bg-black/50 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-black dark:hover:bg-white dark:hover:text-black'}`}>
         {isSaving ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg> : <HeartIcon isSaved={isSaved} />}
       </button>
 
-      {/* Imagen Full-Bleed con zoom lento */}
       <img src={tool.imageUrl} alt={tool.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.05]" loading="lazy" />
-
-      {/* Gradiente Editorial Oscuro para legibilidad */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500 z-10" />
 
-      {/* Contenido Editorial (Texto grande, alto contraste) */}
       <div className="absolute bottom-0 left-0 w-full p-6 z-20 flex flex-col justify-end h-full">
          <span className="text-accent text-[12px] font-extrabold uppercase tracking-widest mb-2 opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">{tool.category}</span>
-
          <div className="flex items-end justify-between">
            <div>
              <h3 className="text-white text-2xl md:text-3xl font-extrabold tracking-tighter leading-none mb-1 group-hover:text-white transition-colors">{tool.name}</h3>
              <p className="text-white/60 text-[14px] font-medium tracking-tight line-clamp-1 max-w-[80%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">{getDomain(tool.url)}</p>
            </div>
-
-           {/* Flecha reveladora tipo revista */}
            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white text-black opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 shrink-0">
              <ArrowUpRight />
            </div>
@@ -184,7 +217,7 @@ const BentoCard = ({ tool, user, onRequireAuth, isFocused, index }) => {
   );
 };
 
-// --- WOW EFFECT 2: LISTA DE ALTO RENDIMIENTO CON IMAGEN FLOTANTE (HOVER REVEAL) ---
+// --- WOW EFFECT 2: LISTA CON IMAGEN FLOTANTE (HOVER REVEAL) ---
 const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
   const numericToolId = Number(tool.id);
   const [isSaved, setIsSaved] = useState(() => user?.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId) || false);
@@ -234,7 +267,6 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber }) => {
         <ArrowUpRight />
       </div>
 
-      {/* LA IMAGEN FLOTANTE MÁGICA: Aparece al hacer hover, anclada a la derecha de la fila */}
       <div className="hidden lg:block absolute right-32 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 scale-90 rotate-2 group-hover:opacity-100 group-hover:scale-100 group-hover:rotate-0 transition-all duration-400 origin-center">
         <div className="w-[320px] h-[200px] rounded-[16px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/20">
           <img src={tool.imageUrl} alt="" className="w-full h-full object-cover" />
@@ -317,7 +349,7 @@ export default function App() {
           const link = document.createElement('link'); link.id = id; link.rel = 'stylesheet'; link.href = url; document.head.appendChild(link);
         }
       };
-      loadFont('google-fonts-expanded', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Geist+Mono:wght@400;500;700&display=swap');
+      loadFont('google-fonts-expanded', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&family=Geist+Mono:wght@400;500;700&display=swap');
     }
   }, []);
 
@@ -344,6 +376,7 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const [tools, setTools] = useState([]);
@@ -353,7 +386,7 @@ export default function App() {
   useEffect(() => { setFocusedIndex(-1); }, [searchQuery, activeCategory, viewMode]);
 
   useEffect(() => {
-    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen) return;
+    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen || isCategoryModalOpen) return;
     const handleGlobalKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (tools.length === 0) return;
@@ -365,7 +398,7 @@ export default function App() {
     };
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen]);
+  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen, isCategoryModalOpen]);
 
   useEffect(() => {
     const handleCmdK = (e) => {
@@ -425,12 +458,11 @@ export default function App() {
   const filteredTools = useMemo(() => tools.filter(tool => activeCategory === "All" || tool.category === activeCategory), [activeCategory, tools]);
 
   return (
-    <div className="relative min-h-screen bg-[#f0f0f5] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-40 overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-40 overflow-x-hidden">
 
       {/* MAGIA SPATIAL: MESH GRADIENT VIVO DE FONDO */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vh] bg-accent/20 dark:bg-accent/30 rounded-[100%] blur-[160px] animate-pulse" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vh] bg-blue-500/10 dark:bg-blue-600/20 rounded-[100%] blur-[160px] animate-pulse" style={{ animationDuration: '12s' }}></div>
+        <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vh] bg-accent/10 dark:bg-accent/20 rounded-[100%] blur-[160px] animate-pulse" style={{ animationDuration: '8s' }}></div>
       </div>
 
       <style>{`
@@ -453,6 +485,11 @@ export default function App() {
         </button>
 
         <div className="flex gap-2 pr-1">
+          {/* EL TROFEO ESTÁ DE VUELTA */}
+          <button onClick={() => setIsLeaderboardOpen(true)} className="w-12 h-12 rounded-[20px] flex items-center justify-center bg-white/40 dark:bg-black/40 hover:bg-white dark:hover:bg-white/10 text-black dark:text-white transition-all shadow-sm border border-black/5 dark:border-white/5" title="Leaderboard">
+            <TrophyIcon />
+          </button>
+
           <button onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} className="w-12 h-12 rounded-[20px] flex items-center justify-center bg-white/40 dark:bg-black/40 hover:bg-white dark:hover:bg-white/10 text-black dark:text-white transition-all shadow-sm border border-black/5 dark:border-white/5" title="View">{viewMode === 'grid' ? <ListIcon /> : <GridIcon />}</button>
           {user ? (
             <button onClick={() => setIsProfileOpen(true)} className="px-5 h-12 rounded-[20px] bg-black text-white dark:bg-white dark:text-black shadow-lg hover:opacity-90 text-[14px] font-bold transition-all flex items-center gap-3 ml-1">
@@ -464,12 +501,17 @@ export default function App() {
         </div>
       </nav>
 
-      {/* FILTROS FLOTANTES */}
+      {/* FILTROS FLOTANTES ESCALABLES */}
       <div className="pt-[140px] pb-10 flex justify-center w-full z-30 sticky top-0 pointer-events-none">
-        <div className="flex gap-3 p-2 rounded-[24px] bg-white/40 dark:bg-black/40 backdrop-blur-[40px] pointer-events-auto overflow-x-auto max-w-[95%] no-scrollbar border border-white/50 dark:border-white/10 shadow-xl">
-          {["All", "Design", "Development", "AI Tools", "Productivity"].map(cat => (
+        <div className="flex gap-3 p-2 rounded-[24px] bg-white/40 dark:bg-black/40 backdrop-blur-[40px] pointer-events-auto overflow-x-auto max-w-[95%] no-scrollbar border border-white/50 dark:border-white/10 shadow-xl items-center">
+          {TOP_CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-6 py-2.5 rounded-[16px] text-[14px] font-bold transition-all duration-300 whitespace-nowrap ${activeCategory === cat ? 'text-white shadow-lg bg-black dark:bg-white dark:text-black scale-105' : 'text-black/60 dark:text-white/60 hover:bg-white/50 dark:hover:bg-white/10 hover:text-black dark:hover:text-white'}`}>{cat}</button>
           ))}
+          <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-2"></div>
+          {/* BOTÓN EXPLORE CATEGORIES */}
+          <button onClick={() => setIsCategoryModalOpen(true)} className="px-5 py-2.5 rounded-[16px] text-[14px] font-bold text-black/60 dark:text-white/60 hover:bg-white/50 dark:hover:bg-white/10 hover:text-black dark:hover:text-white transition-all duration-300 flex items-center gap-2">
+            More <LayersIcon />
+          </button>
         </div>
       </div>
 
@@ -488,6 +530,7 @@ export default function App() {
         ) : ( <div className="flex flex-col items-center justify-center py-32 text-black/50 dark:text-white/50"><SearchIcon /><p className="mt-4 text-[18px] font-bold">No tools found.</p></div> )}
       </main>
 
+      <CategoriesModal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={setSearchQuery} tools={tools} user={user} onAction={handlePaletteAction} />
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
