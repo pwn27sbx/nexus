@@ -45,46 +45,9 @@ const HeartIcon = ({ isSaved }) => (<svg width="18" height="18" viewBox="0 0 24 
 const GridIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect></svg>);
 const ListIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>);
 const DescIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400"><line x1="21" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>);
-const TypeIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>);
-const ArrowUpRight = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>);
+const ArrowUpRight = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>);
 
 const getDomain = (url) => { try { return new URL(url).hostname.replace('www.', ''); } catch(e) { return ''; } };
-
-const availableFonts = [
-  { id: 'inter', name: 'Inter', value: "'Inter', sans-serif" },
-  { id: 'system', name: 'System UI', value: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
-  { id: 'outfit', name: 'Outfit', value: "'Outfit', sans-serif" },
-  { id: 'jetbrains', name: 'JetBrains', value: "'JetBrains Mono', monospace" }
-];
-
-const FontPickerModal = ({ isOpen, onClose, currentFont, setFontFamily }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-[300] bg-black/40 backdrop-blur-2xl flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
-      <div className="w-full max-w-lg bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-[32px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-400" onClick={e => e.stopPropagation()}>
-        <div className="px-8 py-8 flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-black dark:text-white">Typography</h2>
-          </div>
-          <button onClick={onClose} className="w-10 h-10 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-        <div className="px-8 pb-10 flex flex-col gap-3">
-          {availableFonts.map(font => {
-            const isActive = currentFont === font.value;
-            return (
-              <button key={font.id} onClick={() => { setFontFamily(font.value); playSound('snap'); }} className={`w-full text-left px-6 py-5 rounded-[20px] flex items-center justify-between transition-all duration-300 ${isActive ? 'bg-accent text-white shadow-lg scale-[1.02]' : 'bg-zinc-50 dark:bg-[#1a1a1a] border border-transparent text-black dark:text-white hover:border-black/10 dark:hover:border-white/10'}`} style={{ fontFamily: font.value }}>
-                <span className="text-[18px] font-bold tracking-tight">{font.name}</span>
-                {isActive && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onAction }) => {
   const inputRef = useRef(null);
@@ -95,8 +58,8 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
   const commands = [
     { id: 'suggest', title: 'Submit Tool', action: () => onAction('suggest') },
     { id: 'leaderboard', title: 'Leaderboard', action: () => onAction('leaderboard') },
-    { id: 'fonts', title: 'Typography', action: () => onAction('fonts') },
-    ...(user ? [{ id: 'profile', title: 'My Profile', action: () => onAction('profile') }] : []),
+    // Eliminamos el comando "fonts" independiente, ahora redirige al perfil que es el Command Center
+    { id: 'profile', title: 'Command Center (Aesthetics & Profile)', action: () => onAction('profile') },
     { id: 'auth', title: user ? 'Sign Out' : 'Sign In', action: () => onAction(user ? 'logout' : 'auth') },
   ];
   const filteredTools = tools.filter(t => t.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
@@ -104,29 +67,29 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools, user, onActio
 
   return (
     <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-2xl p-4 animate-in fade-in duration-300" onClick={onClose}>
-      <div className="bg-white dark:bg-[#111] w-full max-w-2xl rounded-[32px] shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
+      <div className="bg-white/80 dark:bg-[#111]/80 backdrop-blur-3xl w-full max-w-2xl rounded-[36px] shadow-[0_30px_60px_rgba(0,0,0,0.3)] border border-white/20 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
         <div className="flex items-center px-8 py-6 border-b border-black/5 dark:border-white/5">
           <SearchIcon />
-          <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search directory..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-5 text-2xl font-bold tracking-tight placeholder:text-zinc-400 dark:placeholder:text-zinc-600" />
+          <input ref={inputRef} value={query} onChange={e => setQuery(e.target.value)} placeholder="Search tools or commands..." className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-5 text-2xl font-bold tracking-tight placeholder:text-zinc-400 dark:placeholder:text-zinc-600" />
           <kbd className="hidden sm:inline-block text-[12px] font-bold px-3 py-1.5 rounded-xl bg-black/5 dark:bg-white/10 text-zinc-500">ESC</kbd>
         </div>
         <div className="max-h-[50vh] overflow-y-auto p-4 no-scrollbar">
           {query && filteredTools.length > 0 && (
             <div className="mb-6">
-              <div className="px-5 py-2 text-[12px] font-bold text-zinc-400 uppercase tracking-widest">Tools</div>
+              <div className="px-5 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Tools</div>
               {filteredTools.map(tool => (
-                <button key={tool.id} onClick={() => { window.open(tool.url, '_blank'); onClose(); }} className="w-full text-left px-5 py-4 rounded-[20px] hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between group transition-all">
-                  <span className="text-[20px] font-extrabold text-black dark:text-white tracking-tight group-hover:text-accent">{tool.name}</span><span className="text-[14px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">Visit</span>
+                <button key={tool.id} onClick={() => { window.open(tool.url, '_blank'); onClose(); }} className="w-full text-left px-5 py-4 rounded-[24px] hover:bg-white dark:hover:bg-white/10 flex items-center justify-between group transition-all">
+                  <span className="text-[18px] font-bold text-black dark:text-white group-hover:text-accent">{tool.name}</span><span className="text-[13px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">Visit</span>
                 </button>
               ))}
             </div>
           )}
           {(query ? filteredCommands : commands).length > 0 && (
             <div>
-              <div className="px-5 py-2 text-[12px] font-bold text-zinc-400 uppercase tracking-widest">Commands</div>
+              <div className="px-5 py-2 text-[11px] font-bold text-zinc-400 uppercase tracking-widest">Commands</div>
               {(query ? filteredCommands : commands).map(cmd => (
-                <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} className="w-full text-left px-5 py-4 rounded-[20px] hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between group transition-all">
-                  <span className="text-[20px] font-extrabold text-black dark:text-white tracking-tight group-hover:text-accent">{cmd.title}</span><span className="text-[14px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">Execute</span>
+                <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} className="w-full text-left px-5 py-4 rounded-[24px] hover:bg-white dark:hover:bg-white/10 flex items-center justify-between group transition-all">
+                  <span className="text-[18px] font-bold text-black dark:text-white group-hover:text-accent">{cmd.title}</span><span className="text-[13px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">Execute</span>
                 </button>
               ))}
             </div>
@@ -174,6 +137,15 @@ const BentoCard = ({ tool, user, onRequireAuth, isFocused, index }) => {
       if (res.ok) { setIsSaved(!isSaved); user.bookmarks = newBookmarks; }
     } catch (err) {} finally { setIsSaving(false); }
   };
+
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (isFocused && (e.key === 'f' || e.key === 'F')) { e.preventDefault(); handleToggleSave(e); }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isFocused, isSaved, user]);
 
   return (
     <div
@@ -324,7 +296,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 
 export default function App() {
   const [accentColor, setAccentColor] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('nexus-accent') || '#000000'; // Default black for high editorial contrast
+    if (typeof window !== 'undefined') return localStorage.getItem('nexus-accent') || '#000000';
     return '#000000';
   });
 
@@ -345,7 +317,7 @@ export default function App() {
           const link = document.createElement('link'); link.id = id; link.rel = 'stylesheet'; link.href = url; document.head.appendChild(link);
         }
       };
-      loadFont('google-fonts-expanded', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&family=Geist+Mono:wght@400;500;700&display=swap');
+      loadFont('google-fonts-expanded', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Geist+Mono:wght@400;500;700&display=swap');
     }
   }, []);
 
@@ -372,7 +344,6 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-  const [isFontModalOpen, setIsFontModalOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const [tools, setTools] = useState([]);
@@ -382,7 +353,7 @@ export default function App() {
   useEffect(() => { setFocusedIndex(-1); }, [searchQuery, activeCategory, viewMode]);
 
   useEffect(() => {
-    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen || isFontModalOpen) return;
+    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen) return;
     const handleGlobalKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (tools.length === 0) return;
@@ -394,7 +365,7 @@ export default function App() {
     };
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen, isFontModalOpen]);
+  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen]);
 
   useEffect(() => {
     const handleCmdK = (e) => {
@@ -421,7 +392,6 @@ export default function App() {
       case 'suggest': setIsModalOpen(true); break;
       case 'leaderboard': setIsLeaderboardOpen(true); break;
       case 'profile': setIsProfileOpen(true); break;
-      case 'fonts': setIsFontModalOpen(true); break;
       case 'auth': setIsAuthModalOpen(true); break;
       case 'logout': handleLogout(); break;
       default: break;
@@ -438,11 +408,10 @@ export default function App() {
       setIsLoading(true);
       try {
         const { hits } = await index.search(searchQuery);
-        const fetchedTools = hits.map((tool, index) => {
+        const fetchedTools = hits.map((tool) => {
           return {
             id: tool.objectID, name: tool.name, category: tool.category, url: tool.url,
             imageUrl: tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop",
-            heightClass: "h-full min-h-[300px]", // Altura dinámica para el Grid
             description: tool.description || "High-performance platform."
           };
         });
@@ -456,7 +425,13 @@ export default function App() {
   const filteredTools = useMemo(() => tools.filter(tool => activeCategory === "All" || tool.category === activeCategory), [activeCategory, tools]);
 
   return (
-    <div className="relative min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-32 overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#f0f0f5] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-40 overflow-x-hidden">
+
+      {/* MAGIA SPATIAL: MESH GRADIENT VIVO DE FONDO */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vh] bg-accent/20 dark:bg-accent/30 rounded-[100%] blur-[160px] animate-pulse" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vh] bg-blue-500/10 dark:bg-blue-600/20 rounded-[100%] blur-[160px] animate-pulse" style={{ animationDuration: '12s' }}></div>
+      </div>
 
       <style>{`
         :root {
@@ -465,69 +440,58 @@ export default function App() {
         * { font-family: var(--global-font) !important; }
       `}</style>
 
-      {/* HEADER EDITORIAL (Suelto y espacioso) */}
-      <header className="fixed top-0 left-0 w-full z-40 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-black/5 dark:border-white/5 py-4 px-6 md:px-10 flex items-center justify-between transition-colors duration-500">
-        <div className="flex items-center gap-6">
-          <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center shadow-md">
-             <div className="w-2.5 h-2.5 bg-white dark:bg-black rounded-full"></div>
-          </div>
-
-          <div className="hidden md:flex gap-2">
-            {["All", "Design", "Development", "AI Tools", "Productivity"].map(cat => (
-              <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-5 py-2 text-[14px] rounded-full transition-all duration-300 font-bold ${activeCategory === cat ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-zinc-500 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'}`}>{cat}</button>
-            ))}
-          </div>
+      {/* NAVBAR SPATIAL DYNAMIC ISLAND */}
+      <nav className="fixed top-8 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-4xl bg-white/50 dark:bg-[#111]/50 backdrop-blur-[50px] border border-white/60 dark:border-white/10 rounded-[32px] shadow-[0_30px_60px_rgba(0,0,0,0.08)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] flex items-center justify-between p-3 transition-all duration-500">
+        <div className="flex items-center gap-3 pl-4 pr-2">
+          <div className="w-8 h-8 rounded-[10px] bg-gradient-to-tr from-black to-zinc-700 dark:from-white dark:to-zinc-300 flex items-center justify-center shadow-lg"><div className="w-2.5 h-2.5 bg-white dark:bg-black rounded-full"></div></div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all font-bold" title="Search">
-            <SearchIcon /> <span className="text-[14px] hidden sm:inline">Search</span>
-          </button>
+        <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex-1 flex items-center px-5 py-3 mx-4 bg-white/40 dark:bg-black/40 hover:bg-white/80 dark:hover:bg-black/80 rounded-[20px] transition-all group border border-black/5 dark:border-white/5 shadow-inner">
+          <SearchIcon />
+          <span className="ml-3 text-black dark:text-white text-[15px] font-bold tracking-tight text-left flex-1 opacity-70 group-hover:opacity-100 transition-opacity truncate">{searchQuery ? searchQuery : "Search tools or command..."}</span>
+          <kbd className="hidden sm:inline-block text-[11px] font-bold px-3 py-1 rounded-[8px] bg-black/10 dark:bg-white/10 text-black dark:text-white opacity-60">⌘K</kbd>
+        </button>
 
-          <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-2"></div>
-
-          <button onClick={() => { playSound('woosh'); setIsFontModalOpen(true); }} className="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all" title="Typography">
-            <TypeIcon />
-          </button>
-          <button onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} className="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all" title="View">
-            {viewMode === 'grid' ? <ListIcon /> : <GridIcon />}
-          </button>
+        <div className="flex gap-2 pr-1">
+          <button onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} className="w-12 h-12 rounded-[20px] flex items-center justify-center bg-white/40 dark:bg-black/40 hover:bg-white dark:hover:bg-white/10 text-black dark:text-white transition-all shadow-sm border border-black/5 dark:border-white/5" title="View">{viewMode === 'grid' ? <ListIcon /> : <GridIcon />}</button>
           {user ? (
-            <button onClick={() => setIsProfileOpen(true)} className="ml-2 px-4 py-2 rounded-full border border-black/10 dark:border-white/10 text-[14px] font-bold text-black dark:text-white hover:border-black dark:hover:border-white transition-all flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }}></div>
-              {user.nickname ? user.nickname : user.email.split('@')[0]}
+            <button onClick={() => setIsProfileOpen(true)} className="px-5 h-12 rounded-[20px] bg-black text-white dark:bg-white dark:text-black shadow-lg hover:opacity-90 text-[14px] font-bold transition-all flex items-center gap-3 ml-1">
+              <div className="w-3 h-3 rounded-full shadow-inner" style={{ backgroundColor: accentColor }}></div>{user.nickname ? user.nickname : user.email.split('@')[0]}
             </button>
           ) : (
-            <button onClick={() => setIsAuthModalOpen(true)} className="ml-2 w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"><UserIcon /></button>
+            <button onClick={() => setIsAuthModalOpen(true)} className="w-12 h-12 ml-1 rounded-[20px] flex items-center justify-center bg-black text-white dark:bg-white dark:text-black shadow-lg hover:scale-105 transition-all"><UserIcon /></button>
           )}
-          <button onClick={() => setIsModalOpen(true)} className="bg-black text-white dark:bg-white dark:text-black px-5 py-2 rounded-full text-[14px] font-bold hover:opacity-80 transition-opacity ml-2 flex items-center gap-2 shadow-md">
-            Submit <PlusIcon />
-          </button>
         </div>
-      </header>
+      </nav>
 
-      <main className={`relative z-10 max-w-[1800px] mx-auto pt-32 px-6 lg:px-12`}>
-        {isLoading ? ( <div className="flex justify-center items-center py-40 text-black dark:text-white"><svg className="animate-spin h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg></div>
+      {/* FILTROS FLOTANTES */}
+      <div className="pt-[140px] pb-10 flex justify-center w-full z-30 sticky top-0 pointer-events-none">
+        <div className="flex gap-3 p-2 rounded-[24px] bg-white/40 dark:bg-black/40 backdrop-blur-[40px] pointer-events-auto overflow-x-auto max-w-[95%] no-scrollbar border border-white/50 dark:border-white/10 shadow-xl">
+          {["All", "Design", "Development", "AI Tools", "Productivity"].map(cat => (
+            <button key={cat} onClick={() => setActiveCategory(cat)} className={`px-6 py-2.5 rounded-[16px] text-[14px] font-bold transition-all duration-300 whitespace-nowrap ${activeCategory === cat ? 'text-white shadow-lg bg-black dark:bg-white dark:text-black scale-105' : 'text-black/60 dark:text-white/60 hover:bg-white/50 dark:hover:bg-white/10 hover:text-black dark:hover:text-white'}`}>{cat}</button>
+          ))}
+        </div>
+      </div>
+
+      <main className={`relative z-10 max-w-[1600px] mx-auto mt-2 ${viewMode === 'list' ? 'w-full px-4 lg:w-[1000px]' : 'w-[95%]'}`}>
+        {isLoading ? ( <div className="flex justify-center items-center py-32 text-black dark:text-white"><svg className="animate-spin h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg></div>
         ) : filteredTools.length > 0 ? (
           viewMode === 'grid' ? (
-            /* EL MAGNÍFICO BENTO GRID 2.0 */
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[300px] gap-6">
               {filteredTools.map((tool, index) => <BentoCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} index={index} />)}
             </div>
           ) : (
-            /* LA LISTA CON IMAGEN FLOTANTE */
-            <div className="flex flex-col w-full max-w-6xl mx-auto border-t border-black/10 dark:border-white/10 mt-10">
+            <div className="flex flex-col gap-4">
               {filteredTools.map((tool, index) => <ListCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} indexNumber={index} />)}
             </div>
           )
-        ) : ( <div className="flex flex-col items-center justify-center py-40 text-zinc-400"><SearchIcon /><p className="mt-4 text-[20px] font-bold tracking-tight">No tools found.</p></div> )}
+        ) : ( <div className="flex flex-col items-center justify-center py-32 text-black/50 dark:text-white/50"><SearchIcon /><p className="mt-4 text-[18px] font-bold">No tools found.</p></div> )}
       </main>
 
-      <FontPickerModal isOpen={isFontModalOpen} onClose={() => setIsFontModalOpen(false)} currentFont={fontFamily} setFontFamily={setFontFamily} />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={setSearchQuery} tools={tools} user={user} onAction={handlePaletteAction} />
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-      <UserProfile isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={handleLogout} accentColor={accentColor} setAccentColor={setAccentColor} />
+      <UserProfile isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={handleLogout} accentColor={accentColor} setAccentColor={setAccentColor} fontFamily={fontFamily} setFontFamily={setFontFamily} />
       <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />
     </div>
   );
