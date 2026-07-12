@@ -132,6 +132,13 @@ export interface User {
    */
   level?: ('Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator') | null;
   approvedCount?: number | null;
+  collections?:
+    | {
+        name: string;
+        tools?: (number | Tool)[] | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -280,6 +287,13 @@ export interface UsersSelect<T extends boolean = true> {
   bookmarks?: T;
   level?: T;
   approvedCount?: T;
+  collections?:
+    | T
+    | {
+        name?: T;
+        tools?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   email?: T;
