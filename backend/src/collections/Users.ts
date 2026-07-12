@@ -49,6 +49,23 @@ export const Users: CollectionConfig = {
       type: 'number',
       defaultValue: 0,
       admin: { readOnly: true }
+    },
+    {
+      name: 'collections',
+      type: 'array',
+      fields: [
+        {
+          name: 'name', // Nombre de la carpeta (ej. "Frontend", "Inspiración")
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'tools', // Las herramientas dentro de esta carpeta
+          type: 'relationship',
+          relationTo: 'tools',
+          hasMany: true,
+        }
+      ]
     }
   ],
 }
