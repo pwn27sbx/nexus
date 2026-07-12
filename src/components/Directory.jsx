@@ -58,16 +58,32 @@ const ALL_CATEGORIES = [
   "Education", "Marketing", "Utilities", "Crypto", "Security", "Open Source"
 ];
 
-// --- MODAL PARA ELEGIR DÓNDE GUARDAR (SAVE TO FOLDER) ---
-const SaveToFolderModal = ({ isOpen, onClose, tool, user, setUser }) => {
+// --- NUEVO: POPOVER CONTEXTUAL FLOTANTE (SPATIAL MENU) ---
+const SavePopover = ({ config, onClose, user, setUser }) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  if (!isOpen || !tool || !user) return null;
+  if (!config || !user) return null;
 
+  const { tool, rect } = config;
   const numericToolId = Number(tool.id);
   const collections = user.collections || [];
-
   const isInArsenal = user.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId);
+
+  // Lógica matemática para posicionar la caja exactamente bajo el botón sin salirse de la pantalla
+  const popoverWidth = 240;
+  let left = rect.left;
+  // Si se sale por la derecha (ej. tarjetas Bento alineadas a la derecha)
+  if (left + popoverWidth > window.innerWidth) {
+    left = rect.right - popoverWidth;
+  }
+  // Margen de seguridad izquierdo
+  left = Math.max(16, left);
+
+  let top = rect.bottom + 12; // 12px de espacio bajo el botón
+  // Si se sale por abajo, lo mostramos por encima del botón
+  if (top + 280 > window.innerHeight) {
+    top = rect.top - 280 - 12; // 280 es aprox el alto máximo del popover
+  }
 
   const handleToggleFolder = async (folderIndex) => {
     setIsSaving(true);
@@ -76,24 +92,16 @@ const SaveToFolderModal = ({ isOpen, onClose, tool, user, setUser }) => {
 
     if (folderIndex === -1) {
       let currentBookmarks = updatedUser.bookmarks ? updatedUser.bookmarks.map(b => typeof b === 'object' ? b.id : b) : [];
-      if (isInArsenal) {
-        currentBookmarks = currentBookmarks.filter(id => id !== numericToolId);
-      } else {
-        currentBookmarks.push(numericToolId);
-        playSound('pop');
-      }
+      if (isInArsenal) { currentBookmarks = currentBookmarks.filter(id => id !== numericToolId); }
+      else { currentBookmarks.push(numericToolId); playSound('pop'); }
       updatedUser.bookmarks = currentBookmarks;
     } else {
       let folder = updatedUser.collections[folderIndex];
       let toolsInFolder = folder.tools ? folder.tools.map(t => typeof t === 'object' ? t.id : t) : [];
       const isInFolder = toolsInFolder.includes(numericToolId);
 
-      if (isInFolder) {
-        toolsInFolder = toolsInFolder.filter(id => id !== numericToolId);
-      } else {
-        toolsInFolder.push(numericToolId);
-        playSound('pop');
-      }
+      if (isInFolder) { toolsInFolder = toolsInFolder.filter(id => id !== numericToolId); }
+      else { toolsInFolder.push(numericToolId); playSound('pop'); }
       updatedUser.collections[folderIndex].tools = toolsInFolder;
     }
 
@@ -103,39 +111,39 @@ const SaveToFolderModal = ({ isOpen, onClose, tool, user, setUser }) => {
         headers: { 'Content-Type': 'application/json', 'Authorization': `JWT ${token}` },
         body: JSON.stringify(updatedUser)
       });
-      if (res.ok) {
-        setUser(updatedUser);
-      }
-    } catch (err) {} finally {
-      setIsSaving(false);
-    }
+      if (res.ok) setUser(updatedUser);
+    } catch (err) {} finally { setIsSaving(false); }
   };
 
   return (
-    <div className="fixed inset-0 z-[400] bg-black/40 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onClose}>
-      <div className="w-full max-w-md bg-white dark:bg-[#111] rounded-[32px] shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
-        <div className="px-8 py-6 flex items-center justify-between border-b border-black/5 dark:border-white/5">
-          <h2 className="text-xl font-extrabold tracking-tight text-black dark:text-white">Save to...</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
+    // Backdrop invisible para detectar el clic fuera y cerrar el menú
+    <div className="fixed inset-0 z-[500]" onClick={onClose}>
+      <div
+        className="absolute bg-white/80 dark:bg-[#151515]/80 backdrop-blur-3xl border border-black/10 dark:border-white/10 rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] p-2 animate-in fade-in zoom-in-95 duration-200"
+        style={{ top, left, width: popoverWidth }}
+        onClick={e => e.stopPropagation()} // Evita que se cierre al hacer clic dentro
+      >
+        <div className="px-3 pt-3 pb-2 text-[11px] font-extrabold text-zinc-400 uppercase tracking-widest flex items-center justify-between">
+          <span>Save to...</span>
+          {isSaving && <svg className="animate-spin h-3 w-3 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10"></circle></svg>}
         </div>
 
-        <div className="p-4 flex flex-col gap-2 max-h-[50vh] overflow-y-auto no-scrollbar">
+        <div className="flex flex-col max-h-[240px] overflow-y-auto no-scrollbar gap-1">
+          {/* Opción Bóveda General */}
           <button
             disabled={isSaving}
             onClick={() => handleToggleFolder(-1)}
-            className="w-full flex items-center justify-between p-4 rounded-[20px] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-[16px] bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
           >
             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 rounded-full bg-white dark:bg-black flex items-center justify-center shadow-sm">
+               <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isInArsenal ? 'bg-accent text-white' : 'bg-black/5 dark:bg-white/10 text-black dark:text-white'}`}>
                  <HeartIcon isSaved={isInArsenal} />
                </div>
-               <span className="font-bold">General Arsenal</span>
+               <span className="font-bold text-[14px]">General Arsenal</span>
             </div>
-            {isInArsenal && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-accent"><polyline points="20 6 9 17 4 12"></polyline></svg>}
           </button>
 
+          {/* Carpetas Personalizadas */}
           {collections.map((folder, idx) => {
             const toolsInFolder = folder.tools ? folder.tools.map(t => typeof t === 'object' ? t.id : t) : [];
             const isInFolder = toolsInFolder.includes(numericToolId);
@@ -145,15 +153,14 @@ const SaveToFolderModal = ({ isOpen, onClose, tool, user, setUser }) => {
                 key={idx}
                 disabled={isSaving}
                 onClick={() => handleToggleFolder(idx)}
-                className="w-full flex items-center justify-between p-4 rounded-[20px] bg-transparent border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-black dark:text-white"
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-[16px] bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isInFolder ? 'bg-accent text-white' : 'bg-black/5 dark:bg-white/10 text-black dark:text-white'}`}>
                     <LayersIcon />
                   </div>
-                  <span className="font-bold">{folder.name}</span>
+                  <span className="font-bold text-[14px] truncate max-w-[110px] text-left">{folder.name}</span>
                 </div>
-                {isInFolder && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-accent"><polyline points="20 6 9 17 4 12"></polyline></svg>}
               </button>
             )
           })}
@@ -264,7 +271,13 @@ const BentoCard = ({ tool, user, onRequireAuth, isFocused, index, onSaveRequest 
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      if (isFocused && (e.key === 'f' || e.key === 'F')) { e.preventDefault(); if(user) onSaveRequest(tool); else onRequireAuth(); }
+      if (isFocused && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault();
+        if(user && cardRef.current) {
+          const rect = cardRef.current.querySelector('button').getBoundingClientRect();
+          onSaveRequest({ tool, rect });
+        } else { onRequireAuth(); }
+      }
     };
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
@@ -277,8 +290,15 @@ const BentoCard = ({ tool, user, onRequireAuth, isFocused, index, onSaveRequest 
       className={`group relative overflow-hidden rounded-[24px] cursor-pointer transition-all duration-500 bg-zinc-100 dark:bg-zinc-900 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-2xl ${spanClass} ${isFocused ? 'ring-4 ring-accent ring-offset-4 ring-offset-white dark:ring-offset-black scale-[1.02] z-10' : 'hover:-translate-y-1'}`}
     >
       <button
-        onClick={(e) => { e.stopPropagation(); if(user) onSaveRequest(tool); else onRequireAuth(); }}
-        className={`absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 outline-none ${isSavedAnywhere ? 'bg-white text-accent dark:bg-black opacity-100' : 'bg-black/30 text-white dark:bg-black/50 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-black dark:hover:bg-white dark:hover:text-black'}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          if(user) {
+            // Capturamos las coordenadas exactas del botón al hacer clic
+            const rect = e.currentTarget.getBoundingClientRect();
+            onSaveRequest({ tool, rect });
+          } else { onRequireAuth(); }
+        }}
+        className={`absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 outline-none ${isSavedAnywhere ? 'bg-white text-accent dark:bg-black opacity-100 shadow-lg' : 'bg-black/30 text-white dark:bg-black/50 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-black dark:hover:bg-white dark:hover:text-black'}`}
       >
         <HeartIcon isSaved={isSavedAnywhere} />
       </button>
@@ -307,15 +327,22 @@ const ListCard = ({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveReq
   const isSavedAnywhere = user?.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId) ||
                           user?.collections?.some(c => c.tools?.some(t => (typeof t === 'object' ? t.id : t) === numericToolId));
 
-  useEffect(() => { if (isFocused) { /* scroll logic */ } }, [isFocused]);
-
   return (
     <div
       className={`group relative grid grid-cols-[auto_1fr_auto] md:grid-cols-[60px_2.5fr_1fr_1.5fr] gap-6 items-center py-6 px-4 md:px-8 border-b border-black/10 dark:border-white/10 transition-all duration-300 cursor-pointer ${isFocused ? 'bg-black/5 dark:bg-white/5' : 'hover:bg-black/[0.03] dark:hover:bg-white/[0.03]'}`}
       onClick={() => window.open(tool.url, '_blank')}
     >
       <div className="flex items-center justify-center w-10" onClick={(e) => { e.stopPropagation(); }}>
-        <button onClick={(e) => { e.stopPropagation(); if(user) onSaveRequest(tool); else onRequireAuth(); }} className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isSavedAnywhere ? 'text-accent bg-accent/10 opacity-100 scale-110' : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:scale-110'}`}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if(user) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              onSaveRequest({ tool, rect });
+            } else { onRequireAuth(); }
+          }}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isSavedAnywhere ? 'text-accent bg-accent/10 opacity-100 scale-110 shadow-sm' : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:scale-110'}`}
+        >
           <HeartIcon isSaved={isSavedAnywhere} />
         </button>
         <span className={`text-[14px] font-bold w-10 text-center absolute pointer-events-none transition-opacity ${isSavedAnywhere || isFocused ? 'opacity-0 group-hover:opacity-0' : 'opacity-100 group-hover:opacity-0 text-zinc-400'}`}>
@@ -374,8 +401,8 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-xl transition-opacity p-4">
-      <div className="bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 w-full max-w-md rounded-[32px] p-8 shadow-2xl relative animate-in zoom-in-95 duration-300">
-        <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/5 text-zinc-500 hover:text-black dark:hover:text-white transition-colors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      <div className="bg-white/90 dark:bg-[#111]/90 backdrop-blur-3xl border border-white/20 dark:border-white/10 w-full max-w-md rounded-[32px] p-8 shadow-2xl relative animate-in zoom-in-95 duration-300">
+        <button onClick={onClose} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-zinc-500 hover:text-black dark:hover:text-white transition-colors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         <h2 className="text-3xl font-extrabold text-black dark:text-white tracking-tight mb-2">Suggest Tool</h2><p className="text-[15px] text-zinc-500 font-medium mb-8">Add a resource to the directory.</p>
         {submitStatus === 'success' ? ( <div className="py-10 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-300"><div className="w-20 h-20 bg-accent text-white rounded-full flex items-center justify-center shadow-lg mb-5"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div><h3 className="text-black dark:text-white font-extrabold text-2xl tracking-tight mb-1">Received!</h3><p className="text-[15px] text-zinc-500">Waiting for curation review.</p></div>
         ) : (
@@ -392,7 +419,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
               </select>
             </div>
             {submitStatus === 'error' && <p className="text-red-500 text-[14px] font-bold mb-4 text-center">Server connection failed.</p>}
-            <button type="submit" disabled={submitStatus === 'loading'} className="w-full bg-accent text-white text-[18px] font-extrabold tracking-tight py-4 rounded-[16px] hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] shadow-lg">{submitStatus === 'loading' ? "Sending..." : "Submit to Directory"}</button>
+            <button type="submit" disabled={submitStatus === 'loading'} className="w-full bg-accent text-zinc-500 text-[18px] font-extrabold tracking-tight py-4 rounded-[16px] hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] shadow-lg">{submitStatus === 'loading' ? "Sending..." : "Submit to Directory"}</button>
           </form>
         )}
       </div>
@@ -451,7 +478,10 @@ export default function App() {
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [toolToSave, setToolToSave] = useState(null);
+
+  // ESTADO MODIFICADO: Ahora almacena el objeto de la herramienta Y las coordenadas del clic (x, y)
+  const [savePopoverConfig, setSavePopoverConfig] = useState(null);
+
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const [tools, setTools] = useState([]);
@@ -461,7 +491,7 @@ export default function App() {
   useEffect(() => { setFocusedIndex(-1); }, [searchQuery, activeCategory, viewMode]);
 
   useEffect(() => {
-    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen || isCategoryModalOpen || toolToSave) return;
+    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen || isCommandPaletteOpen || isCategoryModalOpen || savePopoverConfig) return;
     const handleGlobalKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (tools.length === 0) return;
@@ -473,7 +503,7 @@ export default function App() {
     };
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen, isCategoryModalOpen, toolToSave]);
+  }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen, isLeaderboardOpen, isCommandPaletteOpen, isCategoryModalOpen, savePopoverConfig]);
 
   useEffect(() => {
     const handleCmdK = (e) => {
@@ -536,7 +566,6 @@ export default function App() {
       {/* HEADER UNIFICADO (EDGE-TO-EDGE) */}
       <header className="fixed top-0 inset-x-0 z-40 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-black/5 dark:border-white/5 h-[72px] flex items-center justify-between px-4 md:px-8 transition-colors duration-500">
 
-        {/* PARTE IZQUIERDA: LOGO + CATEGORÍAS */}
         <div className="flex items-center gap-6">
           <div className="w-10 h-10 rounded-[12px] bg-black dark:bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform cursor-pointer">
              <div className="w-3 h-3 bg-white dark:bg-black rounded-full"></div>
@@ -553,24 +582,17 @@ export default function App() {
           </div>
         </div>
 
-        {/* PARTE DERECHA: BUSCADOR + ICONOS + SUGGEST + USUARIO */}
         <div className="flex items-center gap-2 md:gap-3">
-
           <button onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }} className="flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all text-zinc-500 hover:text-black dark:hover:text-white group">
             <SearchIcon />
             <span className="hidden md:block text-[14px] font-bold tracking-tight">Search...</span>
             <kbd className="hidden md:inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border border-black/10 dark:border-white/10 text-zinc-400">⌘K</kbd>
           </button>
-
           <button onClick={() => setIsLeaderboardOpen(true)} className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all" title="Leaderboard"><TrophyIcon /></button>
-
           <button onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all" title="Toggle View">{viewMode === 'grid' ? <ListIcon /> : <GridIcon />}</button>
-
-          {/* BOTÓN SUBMIT FUERA DEL MENÚ */}
-          <button onClick={() => setIsModalOpen(true)} className="hidden sm:flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-accent text-zinc-500 dark:text-whitetext-[14px] font-bold hover:shadow-[0_0_15px_var(--accent-muted)] hover:scale-105 transition-all ml-1">
+          <button onClick={() => setIsModalOpen(true)} className="hidden sm:flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-accent text-zinc-500 text-[14px] font-bold hover:shadow-[0_0_15px_var(--accent-muted)] hover:scale-105 transition-all ml-1">
             Suggest Tool <PlusIcon />
           </button>
-
           {user ? (
             <button onClick={() => setIsProfileOpen(true)} className="ml-1 px-4 h-10 rounded-full border-2 border-black/10 dark:border-white/10 text-[14px] font-bold text-black dark:text-white hover:border-black dark:hover:border-white transition-all flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: accentColor }}></div>
@@ -593,17 +615,17 @@ export default function App() {
         ) : filteredTools.length > 0 ? (
           viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[300px] gap-6">
-              {filteredTools.map((tool, index) => <BentoCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} index={index} onSaveRequest={setToolToSave} />)}
+              {filteredTools.map((tool, index) => <BentoCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} index={index} onSaveRequest={setSavePopoverConfig} />)}
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {filteredTools.map((tool, index) => <ListCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} indexNumber={index} onSaveRequest={setToolToSave} />)}
+              {filteredTools.map((tool, index) => <ListCard key={tool.id} tool={tool} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} isFocused={focusedIndex === index} indexNumber={index} onSaveRequest={setSavePopoverConfig} />)}
             </div>
           )
         ) : ( <div className="flex flex-col items-center justify-center py-32 text-black/50 dark:text-white/50"><SearchIcon /><p className="mt-4 text-[18px] font-bold">No tools found.</p></div> )}
       </main>
 
-      <SaveToFolderModal isOpen={!!toolToSave} onClose={() => setToolToSave(null)} tool={toolToSave} user={user} setUser={setUser} />
+      <SavePopover config={savePopoverConfig} onClose={() => setSavePopoverConfig(null)} user={user} setUser={setUser} />
       <CategoriesModal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
       <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={setSearchQuery} tools={tools} />
       <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
