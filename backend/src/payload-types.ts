@@ -170,6 +170,10 @@ export interface Tool {
    * Breve descripción de la herramienta (Máx 100 caracteres).
    */
   description: string;
+  /**
+   * Etiquetas separadas por coma (ej: diseño, ui, gratis).
+   */
+  tags?: string | null;
   category: 'Design' | 'Development' | 'AI Tools' | 'Productivity';
   gridHeight?: ('normal' | 'tall') | null;
   screenshotUrl?: string | null;
@@ -337,6 +341,7 @@ export interface ToolsSelect<T extends boolean = true> {
   name?: T;
   url?: T;
   description?: T;
+  tags?: T;
   category?: T;
   gridHeight?: T;
   screenshotUrl?: T;

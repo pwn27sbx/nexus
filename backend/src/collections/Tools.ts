@@ -20,14 +20,21 @@ export const Tools: CollectionConfig = {
     { name: 'name', type: 'text', required: true },
     { name: 'url', type: 'text', required: true },
 
-    // NUEVO CAMPO: La descripción real guardada en base de datos
     {
       name: 'description',
       type: 'text',
       required: true,
       defaultValue: 'High-performance platform for creators.',
-      maxLength: 100, // Límite para mantener el diseño limpio
+      maxLength: 100,
       admin: { description: 'Breve descripción de la herramienta (Máx 100 caracteres).' }
+    },
+
+    {
+      name: 'tags',
+      type: 'text',
+      required: false,
+      defaultValue: '',
+      admin: { description: 'Etiquetas separadas por coma (ej: diseño, ui, gratis).' }
     },
 
     { name: 'category', type: 'select', options: ['Design', 'Development', 'AI Tools', 'Productivity'], required: true },
@@ -68,6 +75,7 @@ export const Tools: CollectionConfig = {
       async ({ doc, req, operation }) => {
         if (doc.status === 'approved') {
           try {
+            const tags = doc.tags ? doc.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
             const algoliaRecord = {
               objectID: doc.id.toString(),
               name: doc.name,
@@ -75,7 +83,8 @@ export const Tools: CollectionConfig = {
               url: doc.url,
               screenshotUrl: doc.screenshotUrl,
               gridHeight: doc.gridHeight,
-              description: doc.description // <-- NUEVO: Enviamos la descripción a Algolia
+              description: doc.description,
+              tags
             };
             await index.saveObject(algoliaRecord);
             console.log(`🚀 ¡Sugerencia ${doc.name} aprobada y en vivo!`);

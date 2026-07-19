@@ -1,17 +1,18 @@
 ---
-import Directory from "../components/Directory.jsx";
+import Directory from "../components/Directory.tsx";
 import "../styles/global.css";
 ---
 
-<html lang="en" class="dark">
-  <!-- Activamos dark mode por defecto -->
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Nexus - Premium Tools</title>
+    <title>Nexus - Premium Tools Directory</title>
+    <meta name="description" content="Discover the best tools across Design, Development, AI, and more." />
+    <meta name="theme-color" content="#050505" />
+    <meta name="color-scheme" content="dark light" />
   </head>
-  <body class="bg-[#050505]">
-    <!-- Aquí ocurre la magia de las 'islas' de Astro. client:load hace que React funcione. -->
+  <body>
     <Directory client:load />
   </body>
 </html>
