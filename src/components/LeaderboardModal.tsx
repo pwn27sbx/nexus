@@ -3,17 +3,17 @@ import { API_BASE_URL, SCORE_THRESHOLDS } from '../utils/constants';
 import { SpinnerIcon } from '../utils/icons';
 
 const BADGES = [
-  { name: 'Platinum', icon: '\uD83D\uDC51', minScore: SCORE_THRESHOLDS.PLATINUM, color: 'text-slate-300 bg-slate-100 dark:bg-slate-800' },
-  { name: 'Gold', icon: '\uD83E\uDD47', minScore: SCORE_THRESHOLDS.GOLD, color: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30' },
-  { name: 'Silver', icon: '\uD83E\uDD48', minScore: SCORE_THRESHOLDS.SILVER, color: 'text-gray-400 bg-gray-100 dark:bg-gray-800' },
-  { name: 'Bronze', icon: '\uD83E\uDD49', minScore: SCORE_THRESHOLDS.BRONZE, color: 'text-amber-700 bg-amber-100 dark:bg-amber-900/30' },
+  { name: 'Platinum', icon: '👑', minScore: SCORE_THRESHOLDS.PLATINUM, color: 'text-slate-300 bg-slate-100 dark:bg-slate-800' },
+  { name: 'Gold', icon: '🥇', minScore: SCORE_THRESHOLDS.GOLD, color: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30' },
+  { name: 'Silver', icon: '🥈', minScore: SCORE_THRESHOLDS.SILVER, color: 'text-gray-400 bg-gray-100 dark:bg-gray-800' },
+  { name: 'Bronze', icon: '🥉', minScore: SCORE_THRESHOLDS.BRONZE, color: 'text-amber-700 bg-amber-100 dark:bg-amber-900/30' },
 ];
 
 const getBadge = (score) => {
   for (const badge of BADGES) {
     if (score >= badge.minScore) return badge;
   }
-  return { name: 'Rising Star', icon: '\u2B50', color: 'text-zinc-400 bg-zinc-100 dark:bg-zinc-800' };
+  return { name: 'Rising Star', icon: '⭐', color: 'text-zinc-400 bg-zinc-100 dark:bg-zinc-800' };
 };
 
 const LEVEL_COLORS = {
@@ -63,8 +63,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
         <div className="px-10 py-8 flex items-center justify-between border-b border-black/5 dark:border-white/5 bg-white dark:bg-[#111]">
           <div>
             <h2 className="text-4xl font-extrabold tracking-tighter text-black dark:text-white flex items-center gap-3">
-              Hall of Fame
-              <span className="text-3xl" role="img" aria-hidden="true">\uD83C\uDFC6</span>
+              🏆 Hall of Fame
             </h2>
             <p className="text-[15px] font-medium text-zinc-500 mt-2">
               Top contributors shaping the directory.
@@ -170,7 +169,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mb-6 text-4xl">
-                {'\uD83C\uDFC6'}
+                {'🏆'}
               </div>
               <p className="text-zinc-500 font-bold text-[20px]">No champions yet.</p>
               <p className="text-zinc-400 text-[14px] mt-2 max-w-md">
@@ -189,7 +188,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
             </div>
           ))}
           <div className="flex items-center gap-1.5">
-            <span className="text-sm">{'\u2B50'}</span>
+            <span className="text-sm">{'⭐'}</span>
             <span className="text-[11px] font-bold text-zinc-500">Rising Star</span>
           </div>
         </div>
@@ -203,7 +202,7 @@ const LeaderPodiumCard = ({ leader, rank, badge, levelColor, isFirst }) => {
   const initials = (leader.nickname || leader.email || 'U').charAt(0).toUpperCase();
   const name = leader.nickname ? `@${leader.nickname}` : leader.email.split('@')[0];
   const height = rank === 1 ? 'h-full' : rank === 2 ? 'h-[80%]' : 'h-[60%]';
-  const crown = rank === 1 ? '\uD83D\uDC51' : rank === 2 ? '\uD83E\uDD48' : '\uD83E\uDD49';
+  const crown = rank === 1 ? '👑' : rank === 2 ? '🥈' : '🥉';
 
   return (
     <div className={`flex flex-col items-center ${isFirst ? 'md:-mt-8' : ''}`}>

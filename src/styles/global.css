@@ -12,6 +12,21 @@
     --global-font: 'Inter', sans-serif;
   }
 
+  /* Smooth dark mode transitions */
+  html, body, *,
+  *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Exclude animated elements that should NOT get color transitions */
+  .animate-spin, .animate-pulse, .animate-float,
+  .skeleton-pulse {
+    transition-property: none !important;
+    transition-duration: 0ms !important;
+  }
+
   * {
     font-family: var(--global-font) !important;
   }

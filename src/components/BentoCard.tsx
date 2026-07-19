@@ -75,16 +75,14 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
       style={{ background: `linear-gradient(135deg, ${c1}, ${c2})` }}
     >
       {/* IMAGE - covers the fallback gradient if it loads */}
-      <div className="absolute inset-0 overflow-hidden">
-        <img
-          ref={imgRef}
-          src={tool.imageUrl}
-          alt={`${tool.name} screenshot`}
-          className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.05]"
-          loading="lazy"
-          onError={() => { if (imgRef.current) imgRef.current.style.opacity = '0'; }}
-        />
-      </div>
+      <img
+        ref={imgRef}
+        src={tool.imageUrl}
+        alt={`${tool.name} screenshot`}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-[1.05]"
+        loading="lazy"
+        onError={(e) => { e.currentTarget.style.opacity = '0'; e.currentTarget.style.visibility = 'hidden'; }}
+      />
 
       {/* TOP RIGHT BUTTONS */}
       <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
