@@ -75,7 +75,7 @@ export const Tools: CollectionConfig = {
       async ({ doc, req, operation }) => {
         if (doc.status === 'approved') {
           try {
-            const tags = doc.tags ? doc.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+            const tags = doc.tags ? String(doc.tags).split(',').map(t => t.trim()).filter(Boolean) : [];
             const algoliaRecord = {
               objectID: doc.id.toString(),
               name: doc.name,
