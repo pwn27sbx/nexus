@@ -128,7 +128,7 @@ export interface User {
   /**
    * Rol del usuario. Solo administradores pueden cambiarlo.
    */
-  role: 'user' | 'admin';
+  role?: ('user' | 'admin') | null;
   nickname?: string | null;
   bookmarks?: (number | Tool)[] | null;
   /**

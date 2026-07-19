@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { memo } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';

@@ -1,7 +1,7 @@
 /**
  * Extrae el dominio limpio de una URL
  */
-export const getDomain = (url) => {
+export const getDomain = (url: string) => {
   try {
     return new URL(url).hostname.replace('www.', '');
   } catch {
@@ -12,7 +12,7 @@ export const getDomain = (url) => {
 /**
  * Valida una URL
  */
-export const isValidUrl = (url) => {
+export const isValidUrl = (url: string) => {
   try {
     const parsed = new URL(url);
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
@@ -24,9 +24,9 @@ export const isValidUrl = (url) => {
 /**
  * Debounce para búsquedas y otros eventos frecuentes
  */
-export const debounce = (fn, delay = 300) => {
-  let timeoutId;
-  return (...args) => {
+export const debounce = <T extends (...args: any[]) => any>(fn: T, delay: number = 300) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn(...args), delay);
   };
@@ -35,7 +35,7 @@ export const debounce = (fn, delay = 300) => {
 /**
  * Obtiene las iniciales de un nombre
  */
-export const getInitials = (name) => {
+export const getInitials = (name: string) => {
   if (!name) return '?';
   return name.charAt(0).toUpperCase();
 };
@@ -43,7 +43,7 @@ export const getInitials = (name) => {
 /**
  * Trunca texto manteniendo palabras completas
  */
-export const truncateText = (text, maxLength = 100) => {
+export const truncateText = (text: string, maxLength: number = 100) => {
   if (!text || text.length <= maxLength) return text;
   const truncated = text.substring(0, maxLength);
   const lastSpace = truncated.lastIndexOf(' ');
@@ -53,7 +53,7 @@ export const truncateText = (text, maxLength = 100) => {
 /**
  * Formatea un número para display
  */
-export const formatNumber = (num) => {
+export const formatNumber = (num: number) => {
   if (!num) return '0';
   if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
   return num.toString();
@@ -62,8 +62,8 @@ export const formatNumber = (num) => {
 /**
  * Obtiene el color de nivel del usuario
  */
-export const getLevelColor = (level) => {
-  const colors = {
+export const getLevelColor = (level: string) => {
+  const colors: Record<string, string> = {
     Explorer: 'text-zinc-400',
     Contributor: 'text-blue-400',
     'Expert Curator': 'text-purple-400',
@@ -75,8 +75,8 @@ export const getLevelColor = (level) => {
 /**
  * Obtiene el emoji del nivel
  */
-export const getLevelEmoji = (level) => {
-  const emojis = {
+export const getLevelEmoji = (level: string) => {
+  const emojis: Record<string, string> = {
     Explorer: '🌱',
     Contributor: '⭐',
     'Expert Curator': '🏆',
@@ -88,9 +88,8 @@ export const getLevelEmoji = (level) => {
 /**
  * Genera un patrón de bento grid más orgánico basado en el índice
  */
-export const getBentoSpan = (i, total) => {
+export const getBentoSpan = (i: number, total: number) => {
   // Patrón más orgánico que evita repetición predecible
-  const position = i / total;
   const hash = ((i * 7 + 13) * 31) % 7;
 
   // Herramientas importantes (primeras) tienen más espacio

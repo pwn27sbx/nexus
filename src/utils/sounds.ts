@@ -1,15 +1,15 @@
-let audioCtx = null;
+let audioCtx: AudioContext | null = null;
 
 /**
  * Reproduce efectos de sonido usando Web Audio API
- * Tipos disponibles: 'pop', 'woosh', 'snap'
+ * Tipos disponibles: 'pop', 'woosh', 'snap', 'success'
  */
-export const playSound = (type = 'pop') => {
+export const playSound = (type: string = 'pop') => {
   try {
     if (!audioCtx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      audioCtx = new AudioContext();
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      audioCtx = new AudioContextClass();
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
 

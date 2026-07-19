@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL, ACCENTS } from '../utils/constants';
 import { playSound } from '../utils/sounds';

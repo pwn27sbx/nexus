@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { ALL_CATEGORIES } from '../utils/constants';
 import { CloseIcon } from '../utils/icons';

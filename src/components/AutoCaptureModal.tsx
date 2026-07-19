@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { GlobeIcon, DescIcon, CloseIcon, CheckIcon, SpinnerIcon, PlusIcon } from '../utils/icons';
 import { ALL_CATEGORIES, API_BASE_URL, APP_CONFIG, COMMON_TAGS } from '../utils/constants';

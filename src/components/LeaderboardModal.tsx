@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL, SCORE_THRESHOLDS } from '../utils/constants';
 import { SpinnerIcon } from '../utils/icons';

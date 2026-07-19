@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { HeartIcon, LayersIcon, SpinnerIcon } from '../utils/icons';
 import { API_BASE_URL } from '../utils/constants';

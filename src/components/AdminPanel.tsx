@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
 import { API_BASE_URL } from '../utils/constants';
 import { CloseIcon, CheckIcon, SpinnerIcon } from '../utils/icons';

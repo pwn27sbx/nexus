@@ -29,7 +29,7 @@ export const Users: CollectionConfig = {
       type: 'select',
       options: ['user', 'admin'],
       defaultValue: 'user',
-      required: true,
+      required: false,
       admin: {
         position: 'sidebar',
         description: 'Rol del usuario. Solo administradores pueden cambiarlo.',

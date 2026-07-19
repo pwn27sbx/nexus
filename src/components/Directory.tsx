@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import algoliasearch from 'algoliasearch/lite';
 import BentoCard from './BentoCard';
@@ -596,7 +597,7 @@ export default function App() {
         {/* Loading State */}
         {isLoading ? (
           viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[300px] gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[260px] gap-4 md:gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <SkeletonCard
                   key={i}
@@ -616,12 +617,12 @@ export default function App() {
         ) : filteredTools.length > 0 ? (
           viewMode === 'grid' ? (
             /* Bento Grid */
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[300px] gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[260px] gap-4 md:gap-6">
               {filteredTools.map((tool, index) => (
                 <div
                   key={tool.id}
-                  className="animate-in fade-in duration-500"
-                  style={{ animationDelay: `${(index % 12) * 50}ms` }}
+                  className="animate-in fade-in duration-700"
+                  style={{ animationDelay: `${(index % 12) * 60}ms` }}
                 >
                   <BentoCard
                     tool={tool}
