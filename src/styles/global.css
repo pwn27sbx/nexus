@@ -73,6 +73,9 @@
   }
 }
 
+
+
+
 /* scrollbar oculto (utilidad) */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

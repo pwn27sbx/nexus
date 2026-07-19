@@ -597,12 +597,12 @@ export default function App() {
         {/* Loading State */}
         {isLoading ? (
           viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[260px] gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] md:auto-rows-[240px] gap-3 md:gap-4 lg:gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <SkeletonCard
                   key={i}
                   spanClass={
-                    i === 0 ? 'md:col-span-2 md:row-span-2' : 'md:col-span-1 md:row-span-1'
+                    i === 0 ? 'md:col-span-2 md:row-span-2' : i === 1 ? 'md:col-span-2 md:row-span-1' : 'md:col-span-1 md:row-span-1'
                   }
                 />
               ))}
@@ -616,13 +616,13 @@ export default function App() {
           )
         ) : filteredTools.length > 0 ? (
           viewMode === 'grid' ? (
-            /* Bento Grid */
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 auto-rows-[260px] gap-4 md:gap-6">
+            /* Bento 2.0 Grid - Layout orgánico con variedad visual */
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] md:auto-rows-[240px] gap-3 md:gap-4 lg:gap-5">
               {filteredTools.map((tool, index) => (
                 <div
                   key={tool.id}
-                  className="animate-in fade-in duration-700"
-                  style={{ animationDelay: `${(index % 12) * 60}ms` }}
+                  className="animate-in fade-in duration-500"
+                  style={{ animationDelay: `${(index % 12) * 50}ms` }}
                 >
                   <BentoCard
                     tool={tool}

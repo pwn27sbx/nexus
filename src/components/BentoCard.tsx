@@ -38,6 +38,7 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
   const domain = getDomain(tool.url);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const isSavedAnywhere =
     user?.bookmarks?.some((b) => (typeof b === 'object' ? b.id : b) === numericToolId) ||
@@ -72,16 +73,22 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
   }, [isFocused, user, tool, onSaveRequest, onRequireAuth]);
 
   const isBig = spanClass.includes('row-span-2') || spanClass.includes('col-span-2');
+  const isHero = spanClass.includes('row-span-2') && spanClass.includes('col-span-2');
 
   return (
     <div
       ref={cardRef}
       onClick={() => window.open(tool.url, '_blank')}
-      className={`group relative overflow-hidden rounded-[32px] cursor-pointer transition-all duration-700 ease-out shadow-sm hover:shadow-[0_40px_80px_rgba(0,0,0,0.4)] ${spanClass} ${
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`group relative overflow-hidden cursor-pointer transition-all duration-500 ease-out ${spanClass} ${
         isFocused
-          ? 'ring-4 ring-accent ring-offset-4 ring-offset-white dark:ring-offset-black scale-[1.02] z-10'
-          : 'hover:-translate-y-2 hover:scale-[1.01]'
+          ? 'ring-2 ring-white/40 dark:ring-white/20 z-10'
+          : ''
       }`}
+      style={{
+        borderRadius: isHero ? '28px' : isBig ? '24px' : '20px',
+      }}
       role="article"
       aria-label={`${tool.name} - ${tool.category}`}
       tabIndex={0}
@@ -99,9 +106,9 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
             src={tool.imageUrl}
             alt={`Screenshot of ${tool.name}`}
             loading="lazy"
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out group-hover:scale-110 ${
-              imageLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out ${
+              isHovered ? 'scale-110' : 'scale-100'
+            } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
           />
@@ -115,41 +122,48 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
       {/* ─── Fallback gradient if no image ─────────────────── */}
       {imageError && (
         <div
-          className="absolute inset-0 transition-transform duration-700 group-hover:scale-110"
+          className="absolute inset-0 transition-transform duration-700"
           style={{
-            background: `linear-gradient(145deg, ${accentColor} 0%, ${accentColor}33 100%)`,
+            background: `linear-gradient(135deg, ${accentColor} 0%, ${accentColor}66 50%, ${accentColor}33 100%)`,
+            transform: isHovered ? 'scale(1.1)' : 'scale(1)',
           }}
         />
       )}
 
-      {/* ─── Subtle Grid Pattern Overlay ───────────────────── */}
+      {/* ─── Dark Overlay Gradient (bottom-heavy for text) ──── */}
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+        className="absolute inset-0 transition-opacity duration-500"
         style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: isBig ? '60px 60px' : '40px 40px',
+          background: isHero
+            ? 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.1) 70%, transparent 100%)'
+            : isBig
+            ? 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 80%)'
+            : 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 40%, transparent 70%)',
         }}
       />
 
-      {/* ─── Multi-layer Gradient Overlay for readability ─── */}
-      {/* Deep bottom gradient */}
+      {/* ─── Accent Glow on Hover ───────────────────────────── */}
       <div
-        className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/90 via-black/50 to-transparent transition-opacity duration-700"
-      />
-      {/* Top subtle gradient */}
-      <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-black/40 via-black/10 to-transparent" />
-
-      {/* ─── Category Accent Border (bottom) ───────────────── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[3px] z-20 transition-all duration-500 group-hover:h-[4px]"
-        style={{ backgroundColor: accentColor }}
+        className="absolute inset-0 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(ellipse at 50% 100%, ${accentColor}33 0%, transparent 60%)`,
+        }}
       />
 
-      {/* ─── Action Buttons (Top-Right, always visible) ────── */}
-      <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
-        <div className="translate-y-0 opacity-100 transition-all duration-300 hover:scale-110">
-          <div className="w-9 h-9 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/30 transition-all">
+      {/* ─── Category Accent Bar (left side) ────────────────── */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-[3px] z-20 transition-all duration-500 group-hover:w-[4px]"
+        style={{
+          background: `linear-gradient(to bottom, ${accentColor}, ${accentColor}88)`,
+        }}
+      />
+
+      {/* ─── Action Buttons (Top-Right) ─────────────────────── */}
+      <div className={`absolute top-4 right-4 z-30 flex items-center gap-2 transition-all duration-300 ${
+        isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+      }`}>
+        <div className="hover:scale-110 transition-transform">
+          <div className="w-9 h-9 rounded-full backdrop-blur-xl bg-black/30 border border-white/10 flex items-center justify-center hover:bg-black/50 transition-all">
             <ShareButton url={tool.url} name={tool.name} />
           </div>
         </div>
@@ -164,10 +178,10 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
               onRequireAuth();
             }
           }}
-          className={`w-9 h-9 rounded-full backdrop-blur-xl border border-white/20 flex items-center justify-center transition-all duration-300 outline-none hover:scale-110 ${
+          className={`w-9 h-9 rounded-full backdrop-blur-xl border border-white/10 flex items-center justify-center transition-all duration-300 outline-none hover:scale-110 ${
             isSavedAnywhere
-              ? 'bg-white text-accent dark:bg-black shadow-lg scale-110'
-              : 'bg-white/10 text-white hover:bg-white/30'
+              ? 'bg-white text-black dark:bg-white shadow-lg'
+              : 'bg-black/30 text-white hover:bg-black/50'
           }`}
           aria-label={isSavedAnywhere ? 'Remove from saved' : 'Save tool'}
         >
@@ -175,13 +189,15 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
         </button>
       </div>
 
-      {/* ─── Main Content ──────────────────────────────────── */}
-      <div className="relative z-10 flex flex-col justify-end h-full w-full p-5 md:p-7">
-        {/* Tool Name + Favicon Row (at bottom) */}
+      {/* ─── Main Content (Bottom) ──────────────────────────── */}
+      <div className={`relative z-10 flex flex-col justify-end h-full w-full ${
+        isHero ? 'p-6 md:p-8' : isBig ? 'p-5 md:p-7' : 'p-4 md:p-5'
+      }`}>
+        {/* Tool Name + Favicon Row */}
         <div className="flex items-center gap-3">
           <div
-            className={`shrink-0 rounded-xl bg-white/15 backdrop-blur-md shadow-lg ring-1 ring-white/20 overflow-hidden flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-[-3deg] ${
-              isBig ? 'w-10 h-10 md:w-12 md:h-12' : 'w-8 h-8'
+            className={`shrink-0 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 overflow-hidden flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:bg-white/20 ${
+              isHero ? 'w-12 h-12 md:w-14 md:h-14' : isBig ? 'w-10 h-10 md:w-12 md:h-12' : 'w-8 h-8 md:w-10 md:h-10'
             }`}
           >
             <img
@@ -189,30 +205,35 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
               alt=""
               loading="lazy"
               className={`object-contain ${
-                isBig ? 'w-5 h-5 md:w-6 md:h-6' : 'w-4 h-4'
+                isHero ? 'w-6 h-6 md:w-7 md:h-7' : isBig ? 'w-5 h-5 md:w-6 md:h-6' : 'w-4 h-4 md:w-5 md:h-5'
               }`}
               aria-hidden="true"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           </div>
-          <h3
-            className={`
-              text-white font-extrabold leading-tight tracking-tight
-              transition-all duration-300 drop-shadow-lg
-              ${isBig ? 'text-2xl md:text-4xl md:leading-[1.1]' : 'text-lg md:text-xl'}
-            `}
-          >
-            {tool.name}
-          </h3>
+          <div className="flex-1 min-w-0">
+            <h3
+              className={`text-white font-bold leading-tight tracking-tight drop-shadow-lg ${
+                isHero ? 'text-2xl md:text-3xl' : isBig ? 'text-xl md:text-2xl' : 'text-base md:text-lg'
+              }`}
+            >
+              {tool.name}
+            </h3>
+          </div>
         </div>
 
         {/* Bottom row: Domain + Category */}
-        <div className="flex items-center justify-between mt-1.5 md:mt-2">
-          <span className="text-[10px] md:text-[11px] font-medium text-white/50 truncate max-w-[60%] drop-shadow">
+        <div className="flex items-center justify-between mt-2 md:mt-3">
+          <span className="text-[10px] md:text-[11px] font-medium text-white/50 truncate max-w-[60%]">
             {domain || tool.url}
           </span>
           <span
-            className="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest bg-white/15 backdrop-blur-sm text-white/80 ring-1 ring-white/10"
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm"
+            style={{
+              backgroundColor: `${accentColor}33`,
+              color: accentColor,
+              border: `1px solid ${accentColor}44`,
+            }}
           >
             {tool.category}
           </span>
@@ -221,16 +242,16 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
 
       {/* ─── Hover Reveal Panel (glass slide-up) ───────────── */}
       <div
-        className="
+        className={`
           absolute inset-x-0 bottom-0 z-20
-          translate-y-full group-hover:translate-y-0
-          transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
-        "
+          transition-all duration-500 ease-out
+          ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
+        `}
       >
-        <div className="backdrop-blur-2xl bg-black/70 border-t border-white/10 p-5 md:p-7">
+        <div className="backdrop-blur-2xl bg-black/80 border-t border-white/10 p-5 md:p-7">
           {/* Description */}
           {tool.description && (
-            <p className="text-white/80 text-[12px] md:text-[14px] font-medium leading-relaxed mb-3 line-clamp-2">
+            <p className="text-white/90 text-[13px] md:text-[14px] font-medium leading-relaxed mb-3 line-clamp-2">
               {tool.description}
             </p>
           )}
@@ -238,14 +259,10 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           {/* Tags */}
           {tool.tags && tool.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {tool.tags.slice(0, 4).map((tag) => (
+              {tool.tags.slice(0, isBig ? 4 : 3).map((tag) => (
                 <span
                   key={tag}
-                  className="
-                    inline-block px-2 py-0.5 rounded-full
-                    bg-white/10 text-white/70
-                    text-[9px] font-bold uppercase tracking-wider
-                  "
+                  className="inline-block px-2.5 py-1 rounded-full bg-white/10 text-white/70 text-[10px] font-bold uppercase tracking-wider"
                 >
                   {tag}
                 </span>
@@ -254,9 +271,9 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           )}
 
           {/* Visit Button */}
-          <div className="flex items-center gap-2 text-white/70 text-[12px] font-bold group/link hover:text-white transition-colors">
+          <div className="flex items-center gap-2 text-white/80 text-[12px] font-bold group/link hover:text-white transition-colors">
             <span>Visit site</span>
-            <ArrowUpRight size={14} />
+            <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </div>
         </div>
       </div>
@@ -264,7 +281,8 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
       {/* ─── Focus ring ────────────────────────────────────── */}
       {isFocused && (
         <div
-          className="absolute inset-0 rounded-[32px] ring-2 ring-white/40 z-30 pointer-events-none"
+          className="absolute inset-0 ring-2 ring-white/40 z-30 pointer-events-none"
+          style={{ borderRadius: 'inherit' }}
           aria-hidden="true"
         />
       )}
