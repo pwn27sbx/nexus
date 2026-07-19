@@ -9,10 +9,38 @@ export const Users: CollectionConfig = {
   access: {
     read: () => true,
     create: () => true,
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => {
+      if (!user) return false;
+      // Admins pueden actualizar cualquier usuario
+      if (user.role === 'admin') return true;
+      // Usuarios normales solo pueden actualizar su propio perfil
+      return { id: { equals: user.id } };
+    },
+    delete: ({ req: { user } }) => {
+      if (!user) return false;
+      // Solo admins pueden eliminar usuarios
+      return user.role === 'admin';
+    },
   },
   fields: [
+    // ─── ROL DE USUARIO (Admin/User) ─────────────────────────
+    {
+      name: 'role',
+      type: 'select',
+      options: ['user', 'admin'],
+      defaultValue: 'user',
+      required: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Rol del usuario. Solo administradores pueden cambiarlo.',
+        hidden: (({ user }: { user: any }) => user?.role !== 'admin') as any,
+      },
+      access: {
+        read: () => true,
+        create: ({ req: { user } }: { req: { user: any } }) => user?.role === 'admin',
+        update: ({ req: { user } }: { req: { user: any } }) => user?.role === 'admin',
+      },
+    },
     {
       name: 'nickname',
       type: 'text',
@@ -68,4 +96,17 @@ export const Users: CollectionConfig = {
       ]
     }
   ],
+  hooks: {
+    beforeChange: [
+      ({ data, originalDoc, req: { user } }) => {
+        // Protección server-side: evitar que usuarios se autopromuevan a admin
+        if (data.role && originalDoc && data.role !== originalDoc.role) {
+          if (!user || user?.role !== 'admin') {
+            throw new Error('Solo los administradores pueden cambiar el rol de un usuario.');
+          }
+        }
+        return data;
+      },
+    ],
+  },
 }

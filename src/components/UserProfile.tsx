@@ -28,6 +28,7 @@ const UserProfile = ({
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [activeFolder, setActiveFolder] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !user) return;
@@ -168,10 +169,7 @@ const UserProfile = ({
                 {user?.level || 'Explorer'}
               </span>
               <button
-                onClick={() => {
-                  onLogout();
-                  onClose();
-                }}
+                onClick={() => setShowLogoutConfirm(true)}
                 className="text-red-500 font-bold text-[14px] hover:underline underline-offset-4"
               >
                 Sign Out
@@ -431,6 +429,25 @@ const UserProfile = ({
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="bg-white dark:bg-[#151515] rounded-[24px] p-8 max-w-sm w-full shadow-2xl border border-black/10 dark:border-white/10 animate-in zoom-in-95 duration-200 text-center" onClick={(e) => e.stopPropagation()}>
+            <div className="w-14 h-14 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4 text-3xl">{'🚪'}</div>
+            <h3 className="text-xl font-extrabold text-black dark:text-white mb-2">Sign Out?</h3>
+            <p className="text-[14px] text-zinc-500 font-medium mb-6">You will need to sign in again to save and submit tools.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowLogoutConfirm(false)} className="flex-1 py-3 rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white font-bold text-[14px] hover:bg-black/10 dark:hover:bg-white/20 transition-all">
+                Cancel
+              </button>
+              <button onClick={() => { onLogout(); onClose(); }} className="flex-1 py-3 rounded-full bg-red-500 text-white font-bold text-[14px] hover:bg-red-600 transition-all">
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

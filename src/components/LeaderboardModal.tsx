@@ -3,15 +3,15 @@ import { API_BASE_URL, SCORE_THRESHOLDS } from '../utils/constants';
 import { SpinnerIcon } from '../utils/icons';
 
 const BADGES = [
-  { name: 'Platinum', icon: '👑', minScore: SCORE_THRESHOLDS.PLATINUM, color: 'text-slate-300 bg-slate-100 dark:bg-slate-800' },
-  { name: 'Gold', icon: '🥇', minScore: SCORE_THRESHOLDS.GOLD, color: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30' },
-  { name: 'Silver', icon: '🥈', minScore: SCORE_THRESHOLDS.SILVER, color: 'text-gray-400 bg-gray-100 dark:bg-gray-800' },
-  { name: 'Bronze', icon: '🥉', minScore: SCORE_THRESHOLDS.BRONZE, color: 'text-amber-700 bg-amber-100 dark:bg-amber-900/30' },
+  { name: 'Platinum', icon: '👑', minApproved: 30, color: 'text-slate-300 bg-slate-100 dark:bg-slate-800' },
+  { name: 'Gold', icon: '🥇', minApproved: 15, color: 'text-yellow-500 bg-yellow-100 dark:bg-yellow-900/30' },
+  { name: 'Silver', icon: '🥈', minApproved: 5, color: 'text-gray-400 bg-gray-100 dark:bg-gray-800' },
+  { name: 'Bronze', icon: '🥉', minApproved: 3, color: 'text-amber-700 bg-amber-100 dark:bg-amber-900/30' },
 ];
 
-const getBadge = (score) => {
+const getBadge = (approvedCount) => {
   for (const badge of BADGES) {
-    if (score >= badge.minScore) return badge;
+    if (approvedCount >= badge.minApproved) return badge;
   }
   return { name: 'Rising Star', icon: '⭐', color: 'text-zinc-400 bg-zinc-100 dark:bg-zinc-800' };
 };
@@ -33,7 +33,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
     const fetchLeaders = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`${API_BASE_URL}/api/users?sort=-score&limit=20`);
+        const res = await fetch(`${API_BASE_URL}/api/users?sort=-approvedCount&limit=20`);
         const data = await res.json();
         setLeaders(data.docs || []);
       } catch (error) {
@@ -96,7 +96,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                     <LeaderPodiumCard
                       leader={leaders[1]}
                       rank={2}
-                      badge={getBadge(leaders[1].score || 0)}
+                      badge={getBadge(leaders[1].approvedCount || 0)}
                       levelColor={LEVEL_COLORS[leaders[1].level] || LEVEL_COLORS.Explorer}
                     />
                   )}
@@ -105,7 +105,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                     <LeaderPodiumCard
                       leader={leaders[0]}
                       rank={1}
-                      badge={getBadge(leaders[0].score || 0)}
+                      badge={getBadge(leaders[0].approvedCount || 0)}
                       levelColor={LEVEL_COLORS[leaders[0].level] || LEVEL_COLORS.Explorer}
                       isFirst
                     />
@@ -115,7 +115,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                     <LeaderPodiumCard
                       leader={leaders[2]}
                       rank={3}
-                      badge={getBadge(leaders[2].score || 0)}
+                      badge={getBadge(leaders[2].approvedCount || 0)}
                       levelColor={LEVEL_COLORS[leaders[2].level] || LEVEL_COLORS.Explorer}
                     />
                   )}
@@ -124,7 +124,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
 
               {/* Rest of leaderboard */}
               {leaders.slice(3).map((leader, index) => {
-                const badge = getBadge(leader.score || 0);
+                const badge = getBadge(leader.approvedCount || 0);
                 return (
                   <div
                     key={leader.id}
@@ -156,10 +156,10 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-extrabold text-black dark:text-white">
-                        {leader.score || 0}
+                        {leader.approvedCount || 0}
                       </div>
                       <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-                        Points
+                        Approved
                       </span>
                     </div>
                   </div>
@@ -184,7 +184,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
           {BADGES.map((badge) => (
             <div key={badge.name} className="flex items-center gap-1.5">
               <span className="text-sm">{badge.icon}</span>
-              <span className="text-[11px] font-bold text-zinc-500">{badge.name} ({badge.minScore}+ pts)</span>
+              <span className="text-[11px] font-bold text-zinc-500">{badge.name} ({badge.minApproved}+ approved)</span>
             </div>
           ))}
           <div className="flex items-center gap-1.5">
@@ -216,9 +216,8 @@ const LeaderPodiumCard = ({ leader, rank, badge, levelColor, isFirst }) => {
       <span className="text-[11px] text-zinc-500 font-medium truncate max-w-full">
         {leader.level || 'Explorer'}
       </span>
-      <div className="flex items-center gap-1 mt-1">
-        <span className="text-lg font-extrabold text-black dark:text-white">{leader.score || 0}</span>
-        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">pts</span>
+      <div className="flex items-center gap-1 mt-1">                      <span className="text-lg font-extrabold text-black dark:text-white">{leader.approvedCount || 0}</span>
+                        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">approved</span>
       </div>
       <div className="flex items-center gap-1 mt-1">
         <span className="text-lg">{badge.icon}</span>

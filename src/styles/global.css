@@ -12,9 +12,14 @@
     --global-font: 'Inter', sans-serif;
   }
 
-  /* Smooth dark mode transitions */
-  html, body, *,
-  *::before, *::after {
+  /* Smooth dark mode transitions - optimized for performance */
+  /* Only apply to specific properties, not all elements */
+  html, body {
+    transition: background-color 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Individual property transitions avoid layout thrashing */
+  .transition-theme {
     transition-property: background-color, border-color, color, fill, stroke, box-shadow;
     transition-duration: 400ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -22,7 +27,9 @@
 
   /* Exclude animated elements that should NOT get color transitions */
   .animate-spin, .animate-pulse, .animate-float,
-  .skeleton-pulse {
+  .skeleton-pulse,
+  [class*="animate-"],
+  img, svg {
     transition-property: none !important;
     transition-duration: 0ms !important;
   }

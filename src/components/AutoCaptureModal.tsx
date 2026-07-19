@@ -54,7 +54,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
           url,
           category,
           description,
-          tags: selectedTags.join(', '),
+          tags: selectedTags,
           status: 'pending',
           submittedBy: user ? user.id : null,
         }),

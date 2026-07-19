@@ -64,6 +64,7 @@ const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSa
           <img
             src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`}
             alt=""
+            loading="lazy"
             className="w-6 h-6 rounded-md bg-white dark:bg-zinc-800"
             aria-hidden="true"
           />

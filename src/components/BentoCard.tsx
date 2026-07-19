@@ -164,6 +164,7 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           <img
             src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=128`}
             alt=""
+            loading="lazy"
             className={`transition-transform duration-500 object-contain ${
               isBig ? 'w-10 h-10 md:w-12 md:h-12' : 'w-7 h-7 md:w-8 md:h-8'
             }`}
@@ -185,7 +186,7 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           {tool.name}
         </h3>
 
-        {/* Category Badge (always visible) */}
+        {/* Category Badge + New Badge (always visible) */}
         <div className="mt-3 flex items-center gap-2">
           <span
             className="

@@ -12,6 +12,7 @@ import AuthModal from './AuthModal';
 import UserProfile from './UserProfile';
 import LeaderboardModal from './LeaderboardModal';
 import AdminPanel from './AdminPanel';
+import ErrorBoundary from './ErrorBoundary';
 import {
   SearchIcon,
   UserIcon,
@@ -373,7 +374,8 @@ export default function App() {
   const totalItems = filteredTools.length;
 
   return (
-    <div className="relative min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-40 overflow-x-hidden">
+    <ErrorBoundary>
+      <div className="relative min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-40 overflow-x-hidden">
       {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div
@@ -486,7 +488,7 @@ export default function App() {
           {/* User */}
           {user ? (
             <>
-              {user.email?.includes('admin') && (
+              {(user as User).role === 'admin' && (
                 <button
                   onClick={() => setIsAdminPanelOpen(true)}
                   className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"
@@ -756,6 +758,7 @@ export default function App() {
         onClose={() => setIsAdminPanelOpen(false)}
         user={user}
       />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

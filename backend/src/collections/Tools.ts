@@ -31,10 +31,10 @@ export const Tools: CollectionConfig = {
 
     {
       name: 'tags',
-      type: 'text',
+      type: 'json',
       required: false,
-      defaultValue: '',
-      admin: { description: 'Etiquetas separadas por coma (ej: diseño, ui, gratis).' }
+      defaultValue: [],
+      admin: { description: 'Etiquetas como array (ej: ["diseño", "ui", "gratis"]).' }
     },
 
     { name: 'category', type: 'select', options: ['Design', 'Development', 'AI Tools', 'Productivity'], required: true },
@@ -44,7 +44,7 @@ export const Tools: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
-      options: ['pending', 'approved'],
+      options: ['pending', 'approved', 'rejected'],
       defaultValue: 'pending',
       admin: { position: 'sidebar', description: 'Cambia a "approved" y guarda para publicarlo en la web.' }
     },
@@ -57,6 +57,15 @@ export const Tools: CollectionConfig = {
     },
   ],
   hooks: {
+    afterRead: [
+      // Normalizar tags legacy (string CSV → array) para compatibilidad hacia atrás
+      ({ doc }: { doc: Record<string, any> }) => {
+        if (doc && typeof doc.tags === 'string') {
+          doc.tags = doc.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+        }
+        return doc;
+      },
+    ],
     beforeChange: [
       async ({ data, operation }) => {
         if (data.url && (operation === 'create' || operation === 'update')) {
@@ -75,7 +84,13 @@ export const Tools: CollectionConfig = {
       async ({ doc, req, operation }) => {
         if (doc.status === 'approved') {
           try {
-            const tags = doc.tags ? String(doc.tags).split(',').map(t => t.trim()).filter(Boolean) : [];
+            // Normalizar tags: puede venir como array (nuevo) o string CSV (legacy)
+            let tags: string[] = [];
+            if (Array.isArray(doc.tags)) {
+              tags = doc.tags.map((t: any) => String(t).trim()).filter(Boolean);
+            } else if (typeof doc.tags === 'string' && doc.tags) {
+              tags = doc.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+            }
             const algoliaRecord = {
               objectID: doc.id.toString(),
               name: doc.name,

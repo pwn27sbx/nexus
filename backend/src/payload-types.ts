@@ -125,6 +125,10 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  /**
+   * Rol del usuario. Solo administradores pueden cambiarlo.
+   */
+  role: 'user' | 'admin';
   nickname?: string | null;
   bookmarks?: (number | Tool)[] | null;
   /**
@@ -171,16 +175,24 @@ export interface Tool {
    */
   description: string;
   /**
-   * Etiquetas separadas por coma (ej: diseño, ui, gratis).
+   * Etiquetas como array (ej: ["diseño", "ui", "gratis"]).
    */
-  tags?: string | null;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   category: 'Design' | 'Development' | 'AI Tools' | 'Productivity';
   gridHeight?: ('normal' | 'tall') | null;
   screenshotUrl?: string | null;
   /**
    * Cambia a "approved" y guarda para publicarlo en la web.
    */
-  status?: ('pending' | 'approved') | null;
+  status?: ('pending' | 'approved' | 'rejected') | null;
   submittedBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -287,6 +299,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   nickname?: T;
   bookmarks?: T;
   level?: T;
