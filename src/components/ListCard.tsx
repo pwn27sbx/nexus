@@ -1,115 +1,168 @@
 // @ts-nocheck
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 
 const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveRequest }) => {
   const numericToolId = Number(tool.id);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+
   const isSavedAnywhere =
-    user?.bookmarks?.some((b) => (typeof b === 'object' ? b.id : b) === numericToolId) ||
-    user?.collections?.some((c) =>
-      c.tools?.some((t) => (typeof t === 'object' ? t.id : t) === numericToolId)
-    );
+    user?.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId) ||
+    user?.collections?.some(c => c.tools?.some(t => (typeof t === 'object' ? t.id : t) === numericToolId));
 
   return (
     <div
-      className={`group relative grid grid-cols-[auto_1fr_auto] md:grid-cols-[60px_2.5fr_1fr_1.5fr] gap-6 items-center py-6 px-4 md:px-8 border-b border-black/10 dark:border-white/10 transition-all duration-300 cursor-pointer ${
-        isFocused
-          ? 'bg-black/5 dark:bg-white/5'
-          : 'hover:bg-black/[0.03] dark:hover:bg-white/[0.03]'
-      }`}
       onClick={() => window.open(tool.url, '_blank')}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       role="article"
       aria-label={`${tool.name} - ${tool.category}`}
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          window.open(tool.url, '_blank');
-        }
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); window.open(tool.url, '_blank'); } }}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr auto',
+        gap: '16px',
+        alignItems: 'center',
+        padding: '14px 18px',
+        borderRadius: '14px',
+        cursor: 'pointer',
+        transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+        background: isHovered || isFocused
+          ? isDark ? 'rgba(124,58,237,0.1)' : 'rgba(124,58,237,0.07)'
+          : isDark ? 'rgba(18,16,40,0.55)' : 'rgba(255,255,255,0.6)',
+        border: isFocused
+          ? '1px solid rgba(124,58,237,0.5)'
+          : isHovered
+          ? isDark ? '1px solid rgba(124,58,237,0.25)' : '1px solid rgba(124,58,237,0.2)'
+          : isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.85)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: isHovered
+          ? isDark
+            ? '0 6px 28px rgba(0,0,0,0.4), 0 0 0 0 rgba(124,58,237,0.1)'
+            : '0 6px 28px rgba(80,60,180,0.12)'
+          : 'none',
+        transform: isHovered ? 'translateY(-2px)' : 'none',
       }}
     >
-      <div className="flex items-center justify-center w-10 relative" onClick={(e) => e.stopPropagation()}>
+      {/* Index / Save button */}
+      <div style={{ position: 'relative', width: '32px', height: '32px' }} onClick={e => e.stopPropagation()}>
         <button
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation();
-            if (user) {
-              const rect = e.currentTarget.getBoundingClientRect();
-              onSaveRequest({ tool, rect });
-            } else {
-              onRequireAuth();
-            }
+            if (user) { const rect = e.currentTarget.getBoundingClientRect(); onSaveRequest({ tool, rect }); }
+            else onRequireAuth();
           }}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all z-10 ${
-            isSavedAnywhere
-              ? 'text-accent bg-accent/10 opacity-100 scale-110 shadow-sm'
-              : 'text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:scale-110'
-          }`}
+          style={{
+            position: 'absolute', inset: 0,
+            width: '32px', height: '32px',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: isSavedAnywhere
+              ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
+              : 'transparent',
+            color: isSavedAnywhere
+              ? 'white'
+              : isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,180,0.45)',
+            opacity: isSavedAnywhere ? 1 : isHovered ? 1 : 0,
+            transition: 'all 0.2s ease',
+            cursor: 'pointer',
+            border: isSavedAnywhere ? 'none' : isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(200,180,255,0.3)',
+          }}
           aria-label={isSavedAnywhere ? 'Remove from saved' : 'Save tool'}
         >
-          <HeartIcon isSaved={isSavedAnywhere} size={18} />
+          <HeartIcon isSaved={isSavedAnywhere} size={14} />
         </button>
-        <span
-          className={`text-[14px] font-bold w-10 text-center absolute pointer-events-none transition-opacity z-0 ${
-            isSavedAnywhere || isFocused
-              ? 'opacity-0'
-              : 'opacity-100 group-hover:opacity-0 text-zinc-400'
-          }`}
-        >
+        <span style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '12px', fontWeight: 700,
+          color: isDark ? 'rgba(180,160,255,0.3)' : 'rgba(100,80,180,0.35)',
+          opacity: (isSavedAnywhere || isHovered) ? 0 : 1,
+          transition: 'opacity 0.2s ease',
+          pointerEvents: 'none',
+        }}>
           {(indexNumber + 1).toString().padStart(2, '0')}
         </span>
       </div>
 
-      <div className="flex flex-col truncate justify-center z-10">
-        <div className="flex items-center gap-4">
+      {/* Main content */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img
             src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`}
-            alt=""
-            loading="lazy"
-            className="w-6 h-6 rounded-md bg-white dark:bg-zinc-800"
+            alt="" loading="lazy"
+            style={{ width: '18px', height: '18px', borderRadius: '5px', flexShrink: 0 }}
             aria-hidden="true"
           />
-          <span className="text-[24px] font-extrabold tracking-tight text-black dark:text-white truncate group-hover:text-accent transition-colors">
+          <span style={{
+            fontSize: '15px', fontWeight: 700, letterSpacing: '-0.015em',
+            color: isDark ? 'rgba(240,235,255,0.92)' : 'rgba(15,10,40,0.88)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {tool.name}
           </span>
+          <span style={{
+            flexShrink: 0,
+            padding: '1.5px 7px',
+            borderRadius: '100px',
+            fontSize: '10px', fontWeight: 700,
+            background: isDark ? 'rgba(124,58,237,0.15)' : 'rgba(124,58,237,0.1)',
+            color: isDark ? '#c084fc' : '#7c3aed',
+            border: '1px solid rgba(124,58,237,0.2)',
+          }}>
+            {tool.category}
+          </span>
         </div>
-        <span className="text-[14px] text-zinc-500 font-medium truncate mt-1 ml-10">
-          {tool.description}
-        </span>
-        {/* Tags */}
-        {tool.tags && tool.tags.length > 0 && (
-          <div className="flex gap-1.5 mt-1.5 ml-10">
-            {tool.tags.slice(0, 4).map((tag) => (
-              <span
-                key={tag}
-                className="inline-block px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-wider"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+        {tool.description && (
+          <span style={{
+            fontSize: '12.5px',
+            color: isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,180,0.5)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            {tool.description}
+          </span>
         )}
       </div>
 
-      <div className="hidden md:flex items-center z-10">
-        <span className="text-[12px] font-bold text-zinc-400 uppercase tracking-widest">
-          {tool.category}
+      {/* Right: domain + arrow */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '6px',
+        color: isHovered
+          ? isDark ? '#c084fc' : '#7c3aed'
+          : isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.4)',
+        transition: 'color 0.2s ease',
+        flexShrink: 0,
+      }}>
+        <span style={{ fontSize: '12px', fontWeight: 600 }}>
+          {getDomain(tool.url)}
+        </span>
+        <span style={{ transform: isHovered ? 'translate(1px,-1px)' : 'none', transition: 'transform 0.2s ease' }}>
+          <ArrowUpRight size={13} />
         </span>
       </div>
 
-      <div className="hidden md:flex justify-end items-center gap-2 pr-2 z-10 text-zinc-400 group-hover:text-black dark:group-hover:text-white transition-colors">
-        <span className="truncate text-[15px] font-bold">{getDomain(tool.url)}</span>
-        <ArrowUpRight />
-      </div>
-
-      <div className="hidden lg:block absolute right-32 top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 scale-90 rotate-2 group-hover:opacity-100 group-hover:scale-100 group-hover:rotate-0 transition-all duration-400 origin-center">
-        <div className="w-[320px] h-[200px] rounded-[16px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.3)] border border-white/20">
-          <img
-            src={tool.imageUrl}
-            alt={`Preview of ${tool.name}`}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+      {/* Hover preview */}
+      <div style={{
+        position: 'absolute', right: '80px', top: '50%',
+        transform: isHovered ? 'translate(0,-50%) scale(1) rotate(0deg)' : 'translate(0,-50%) scale(0.85) rotate(2deg)',
+        opacity: isHovered ? 1 : 0,
+        transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+        zIndex: 50,
+        pointerEvents: 'none',
+      }}>
+        <div style={{
+          width: '280px', height: '175px',
+          borderRadius: '12px', overflow: 'hidden',
+          border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
+          boxShadow: isDark
+            ? '0 20px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,58,237,0.15)'
+            : '0 20px 48px rgba(80,60,180,0.25)',
+        }}>
+          <img src={tool.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
         </div>
       </div>
     </div>

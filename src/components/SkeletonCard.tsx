@@ -1,25 +1,54 @@
+// @ts-nocheck
 import React from 'react';
 
 interface SkeletonCardProps {
   spanClass?: string;
+  isDark?: boolean;
 }
 
-const SkeletonCard: React.FC<SkeletonCardProps> = () => (
-  <div className="rounded-2xl overflow-hidden bg-white dark:bg-[#161616] border border-black/[0.07] dark:border-white/[0.07]">
-    {/* Image area */}
-    <div className="w-full bg-zinc-100 dark:bg-zinc-800 animate-pulse relative overflow-hidden" style={{ paddingBottom: '58%' }}>
-      <div className="absolute inset-0 skeleton-pulse" />
-    </div>
-    {/* Info area */}
-    <div className="px-4 py-3.5 space-y-2.5">
-      <div className="flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 animate-pulse shrink-0" />
-        <div className="flex-1 h-3.5 rounded-full bg-zinc-100 dark:bg-zinc-800 animate-pulse" />
-        <div className="w-16 h-5 rounded-full bg-zinc-100 dark:bg-zinc-800 animate-pulse shrink-0" />
+const SkeletonCard: React.FC<SkeletonCardProps> = ({ isDark }) => (
+  <div
+    style={{
+      borderRadius: '16px',
+      overflow: 'hidden',
+      background: isDark ? 'rgba(18,16,40,0.65)' : 'rgba(255,255,255,0.65)',
+      border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.85)',
+      backdropFilter: 'blur(16px)',
+    }}
+  >
+    {/* Browser chrome skeleton */}
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '6px',
+      padding: '8px 12px',
+      background: isDark ? 'rgba(12,10,28,0.8)' : 'rgba(248,246,255,0.85)',
+      borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(200,190,240,0.3)',
+    }}>
+      <div style={{ display: 'flex', gap: '4px' }}>
+        {['#ff5f5766', '#febc2e66', '#28c84066'].map(c => (
+          <div key={c} style={{ width: '7px', height: '7px', borderRadius: '50%', background: c }} />
+        ))}
       </div>
-      <div className="h-3 rounded-full bg-zinc-100 dark:bg-zinc-800 animate-pulse w-full" />
-      <div className="h-3 rounded-full bg-zinc-100 dark:bg-zinc-800 animate-pulse w-4/5" />
-      <div className="h-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 animate-pulse w-1/3 mt-1" />
+      <div className="skeleton-pulse" style={{
+        flex: 1, height: '14px', borderRadius: '4px',
+        background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+      }} />
+    </div>
+
+    {/* Image skeleton */}
+    <div className="skeleton-pulse" style={{ width: '100%', paddingBottom: '60%', position: 'relative' }}>
+      <div style={{ position: 'absolute', inset: 0 }} />
+    </div>
+
+    {/* Info skeleton */}
+    <div style={{ padding: '12px 14px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="skeleton-pulse" style={{ width: '22px', height: '22px', borderRadius: '6px', flexShrink: 0 }} />
+        <div className="skeleton-pulse" style={{ flex: 1, height: '13px', borderRadius: '6px' }} />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+        <div className="skeleton-pulse" style={{ width: '64px', height: '18px', borderRadius: '100px' }} />
+        <div className="skeleton-pulse" style={{ width: '40px', height: '12px', borderRadius: '4px' }} />
+      </div>
     </div>
   </div>
 );

@@ -3,16 +3,22 @@ import Directory from "../components/Directory.tsx";
 import "../styles/global.css";
 ---
 
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Nexus - Premium Tools Directory</title>
-    <meta name="description" content="Discover the best tools across Design, Development, AI, and more." />
-    <meta name="theme-color" content="#050505" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nexus — Ultimate Spatial Gallery Directory</title>
+    <meta name="description" content="Next-generation immersive web directory & resource library. Discover the best tools across Design, Development, AI, and more." />
+    <meta name="theme-color" content="#c7d7f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d0d1a" media="(prefers-color-scheme: dark)" />
     <meta name="color-scheme" content="dark light" />
+    <meta property="og:title" content="Nexus — Ultimate Spatial Gallery Directory" />
+    <meta property="og:description" content="Next-generation immersive web directory & resource library." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
   </head>
-  <body>
+  <body class="spatial-bg overflow-x-hidden">
     <Directory client:load />
   </body>
 </html>
