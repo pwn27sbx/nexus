@@ -33,7 +33,7 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Rol del usuario. Solo administradores pueden cambiarlo.',
-        hidden: (({ user }: { user: any }) => user?.role !== 'admin') as any,
+        condition: ({ user }: { user: any }) => user?.role === 'admin',
       },
       access: {
         read: () => true,

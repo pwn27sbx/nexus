@@ -31,10 +31,12 @@ export const Tools: CollectionConfig = {
 
     {
       name: 'tags',
-      type: 'json',
+      type: 'text',
       required: false,
-      defaultValue: [],
-      admin: { description: 'Etiquetas como array (ej: ["diseño", "ui", "gratis"]).' }
+      defaultValue: '[]',
+      admin: {
+        description: 'Etiquetas en formato JSON array (ej: ["diseño", "ui", "gratis"]). O también separado por comas: diseño, ui, gratis'
+      }
     },
 
     { name: 'category', type: 'select', options: ['Design', 'Development', 'AI Tools', 'Productivity'], required: true },
@@ -58,16 +60,50 @@ export const Tools: CollectionConfig = {
   ],
   hooks: {
     afterRead: [
-      // Normalizar tags legacy (string CSV → array) para compatibilidad hacia atrás
+      // Normalizar tags: intenta parsear JSON; si falla, asume CSV legacy ("tag1, tag2") → array
       ({ doc }: { doc: Record<string, any> }) => {
-        if (doc && typeof doc.tags === 'string') {
-          doc.tags = doc.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+        if (doc && typeof doc.tags === 'string' && doc.tags) {
+          try {
+            const parsed = JSON.parse(doc.tags);
+            if (Array.isArray(parsed)) {
+              doc.tags = parsed.map((t: any) => String(t).trim()).filter(Boolean);
+            } else {
+              doc.tags = [String(parsed).trim()];
+            }
+          } catch {
+            // No es JSON válido → tratar como CSV legacy
+            doc.tags = doc.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+          }
+        } else if (doc && (doc.tags === '' || doc.tags === null || doc.tags === undefined)) {
+          doc.tags = [];
         }
         return doc;
       },
     ],
     beforeChange: [
       async ({ data, operation }) => {
+        // Normalizar tags: siempre guardar como JSON string para consistencia
+        if (data.tags !== undefined && data.tags !== null) {
+          if (Array.isArray(data.tags)) {
+            data.tags = JSON.stringify(data.tags.map((t: any) => String(t).trim()).filter(Boolean));
+          } else if (typeof data.tags === 'string') {
+            if (!data.tags) {
+              data.tags = '[]';
+            } else {
+              // Si ya es string, verificar si es JSON válido; si no, convertir CSV → JSON
+              try {
+                const parsed = JSON.parse(data.tags);
+                if (!Array.isArray(parsed)) {
+                  data.tags = JSON.stringify([String(parsed).trim()]);
+                }
+              } catch {
+                // No es JSON → asumir CSV legacy y convertir a JSON array
+                data.tags = JSON.stringify(data.tags.split(',').map((t: string) => t.trim()).filter(Boolean));
+              }
+            }
+          }
+        }
+
         if (data.url && (operation === 'create' || operation === 'update')) {
           try {
             const response = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(data.url)}&screenshot=true&meta=false`);
@@ -75,7 +111,7 @@ export const Tools: CollectionConfig = {
             if (json.status === 'success' && json.data?.screenshot?.url) {
               data.screenshotUrl = json.data.screenshot.url;
             }
-          } catch (error) { console.error("Error Microlink:", error); }
+          } catch (error) { console.error('Error Microlink:', error); }
         }
         return data;
       },
@@ -84,12 +120,19 @@ export const Tools: CollectionConfig = {
       async ({ doc, req, operation }) => {
         if (doc.status === 'approved') {
           try {
-            // Normalizar tags: puede venir como array (nuevo) o string CSV (legacy)
+            // Normalizar tags: beforeChange garantiza que es JSON string, pero soportamos CSV legacy por si hay datos antiguos
             let tags: string[] = [];
-            if (Array.isArray(doc.tags)) {
-              tags = doc.tags.map((t: any) => String(t).trim()).filter(Boolean);
-            } else if (typeof doc.tags === 'string' && doc.tags) {
-              tags = doc.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+            if (typeof doc.tags === 'string' && doc.tags) {
+              try {
+                const parsed = JSON.parse(doc.tags);
+                if (Array.isArray(parsed)) {
+                  tags = parsed.map((t: any) => String(t).trim()).filter(Boolean);
+                } else {
+                  tags = [String(parsed).trim()];
+                }
+              } catch {
+                tags = doc.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+              }
             }
             const algoliaRecord = {
               objectID: doc.id.toString(),

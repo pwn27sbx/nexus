@@ -175,17 +175,9 @@ export interface Tool {
    */
   description: string;
   /**
-   * Etiquetas como array (ej: ["diseño", "ui", "gratis"]).
+   * Etiquetas en formato JSON array (ej: ["diseño", "ui", "gratis"]). O también separado por comas: diseño, ui, gratis
    */
-  tags?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  tags?: string | null;
   category: 'Design' | 'Development' | 'AI Tools' | 'Productivity';
   gridHeight?: ('normal' | 'tall') | null;
   screenshotUrl?: string | null;
