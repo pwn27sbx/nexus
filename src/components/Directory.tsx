@@ -5,7 +5,6 @@ import BentoCard from './BentoCard';
 import ListCard from './ListCard';
 import SavePopover from './SavePopover';
 import SkeletonCard from './SkeletonCard';
-import SortDropdown from './SortDropdown';
 import CategoriesModal from './CategoriesModal';
 import CommandPalette from './CommandPalette';
 import AutoCaptureModal from './AutoCaptureModal';
@@ -21,12 +20,12 @@ import {
   GridIcon,
   ListIcon,
   TrophyIcon,
-  LayersIcon,
   SunIcon,
   MoonIcon,
+  LayersIcon,
 } from '../utils/icons';
 import {
-  TOP_CATEGORIES,
+  ALL_CATEGORIES,
   API_BASE_URL,
   ALGOLIA_APP_ID,
   ALGOLIA_SEARCH_KEY,
@@ -40,6 +39,9 @@ import type { Tool, User, SavePopoverConfig } from '../types';
 const searchClient = algoliasearch(ALGOLIA_APP_ID, ALGOLIA_SEARCH_KEY);
 const index = searchClient.initIndex('tools');
 
+// Sidebar categories — "All Tools" + all categories
+const SIDEBAR_CATEGORIES = ['All Tools', ...ALL_CATEGORIES];
+
 // ==============================================
 // MAIN APP COMPONENT
 // ==============================================
@@ -48,7 +50,7 @@ export default function App() {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
 
-  // --- Theme State (default safe values, load from localStorage after hydration) ---
+  // --- Theme State ---
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
@@ -125,9 +127,7 @@ export default function App() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   const debouncedSetQuery = useRef(
-    debounce((q) => {
-      setDebouncedQuery(q);
-    }, APP_CONFIG.DEBOUNCE_MS)
+    debounce((q) => { setDebouncedQuery(q); }, APP_CONFIG.DEBOUNCE_MS)
   ).current;
 
   const handleSearchChange = useCallback(
@@ -152,9 +152,15 @@ export default function App() {
     localStorage.setItem('nexus-view', viewMode);
   }, [viewMode, hydrated]);
 
+  // --- Sort / Filter tabs ---
+  const [activeTab, setActiveTab] = useState<'newest' | 'popular' | 'category'>('newest');
+  const [sortBy, setSortBy] = useState('default');
+
+  // --- Active Category ---
+  const [activeCategory, setActiveCategory] = useState('All Tools');
+
   // --- Tags State ---
   const [activeTags, setActiveTags] = useState([]);
-  const [tagSuggestions, setTagSuggestions] = useState([]);
 
   // --- Pagination State ---
   const [tools, setTools] = useState<Tool[]>([]);
@@ -164,10 +170,7 @@ export default function App() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // --- State ---
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('default');
-
+  // --- Modal State ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -177,8 +180,10 @@ export default function App() {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [savePopoverConfig, setSavePopoverConfig] = useState<SavePopoverConfig | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
-
   const [user, setUser] = useState<User | null>(null);
+
+  // --- Mobile sidebar toggle ---
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // --- Reset focus on filter changes ---
   useEffect(() => {
@@ -187,16 +192,13 @@ export default function App() {
 
   // --- Global keyboard navigation ---
   useEffect(() => {
-    if (
-      isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen ||
-      isCommandPaletteOpen || isCategoryModalOpen || savePopoverConfig
-    )
-      return;
+    if (isModalOpen || isAuthModalOpen || isProfileOpen || isLeaderboardOpen ||
+      isCommandPaletteOpen || isCategoryModalOpen || savePopoverConfig) return;
 
     const handleGlobalKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       const currentTools = tools.filter(
-        (t) => activeCategory === 'All' || t.category === activeCategory
+        (t) => activeCategory === 'All Tools' || t.category === activeCategory
       );
       if (currentTools.length === 0) return;
 
@@ -217,7 +219,7 @@ export default function App() {
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
   }, [focusedIndex, tools, activeCategory, isModalOpen, isAuthModalOpen, isProfileOpen,
-      isLeaderboardOpen, isCommandPaletteOpen, isCategoryModalOpen, savePopoverConfig]);
+    isLeaderboardOpen, isCommandPaletteOpen, isCategoryModalOpen, savePopoverConfig]);
 
   // --- Cmd+K shortcut ---
   useEffect(() => {
@@ -277,17 +279,6 @@ export default function App() {
     return () => observer.disconnect();
   }, [hasMore, isLoading, isLoadingMore, tools]);
 
-  // --- Collect all tags from tools ---
-  useEffect(() => {
-    const allTags = new Set();
-    tools.forEach((t) => {
-      if (t.tags && Array.isArray(t.tags)) {
-        t.tags.forEach((tag) => allTags.add(tag));
-      }
-    });
-    setTagSuggestions(Array.from(allTags).slice(0, 20));
-  }, [tools]);
-
   // --- Fetch tools from Algolia with Pagination ---
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -338,20 +329,10 @@ export default function App() {
     setHasMore(true);
   }, [debouncedQuery, activeCategory, activeTags]);
 
-  // --- Tag toggle ---
-  const toggleTag = useCallback((tag) => {
-    setActiveTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-    playSound('snap');
-  }, []);
-
   // --- Sorting & Filtering ---
   const filteredTools = useMemo(() => {
     let result = tools.filter((tool) => {
-      // Category filter
-      if (activeCategory !== 'All' && tool.category !== activeCategory) return false;
-      // Tags filter
+      if (activeCategory !== 'All Tools' && tool.category !== activeCategory) return false;
       if (activeTags.length > 0) {
         const toolTags = tool.tags || [];
         return activeTags.every((tag) => toolTags.includes(tag));
@@ -374,391 +355,399 @@ export default function App() {
 
   const totalItems = filteredTools.length;
 
+  // --- Category icon map ---
+  const categoryIcons: Record<string, string> = {
+    'All Tools': '⊞',
+    'Design': '🎨',
+    'Development': '⌨️',
+    'AI Tools': '✦',
+    'Productivity': '⚡',
+    'Medicine': '🩺',
+    'Accounting': '📊',
+    'Engineering': '🔧',
+    'Entertainment': '🎬',
+    'Finance': '💰',
+    'Education': '📚',
+    'Marketing': '📣',
+    'Utilities': '🛠',
+    'Crypto': '₿',
+    'Security': '🔒',
+    'Open Source': '🌐',
+  };
+
   return (
     <ErrorBoundary>
-      <div className="relative min-h-screen bg-[#fcfcfc] dark:bg-[#050505] transition-colors duration-500 selection:bg-accent selection:text-white pb-40 overflow-x-hidden">
-      {/* Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div
-          className="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vh] bg-accent/10 dark:bg-accent/20 rounded-[100%] blur-[160px] animate-pulse"
-          style={{ animationDuration: '8s' }}
-        />
-      </div>
+      <div className="relative min-h-screen bg-[#f5f5f5] dark:bg-[#0a0a0a] transition-colors duration-500 overflow-x-hidden">
 
-      <style>{`
-        :root { --global-font: ${fontFamily}; }
-        body, .nexus-app, button, input, select, textarea { font-family: var(--global-font); }
-      `}</style>
+        <style>{`
+          :root { --global-font: ${fontFamily}; }
+          body, .nexus-app, button, input, select, textarea { font-family: var(--global-font); }
+        `}</style>
 
-      {/* ============ HEADER ============ */}
-      <header className="fixed top-0 inset-x-0 z-40 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-2xl border-b border-black/5 dark:border-white/5 h-[72px] flex items-center justify-between px-4 md:px-8 transition-colors duration-500">
-        <div className="flex items-center gap-6">
+        {/* ============ SIDEBAR ============ */}
+        {/* Mobile overlay */}
+        {isSidebarOpen && (
           <div
-            className="w-10 h-10 rounded-[12px] bg-black dark:bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform cursor-pointer"
+            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        <aside
+          className={`
+            fixed top-0 left-0 z-40 h-full w-[200px] bg-white dark:bg-[#111] border-r border-black/[0.06] dark:border-white/[0.06]
+            flex flex-col pt-[72px] pb-6
+            transition-transform duration-300 ease-out
+            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            lg:translate-x-0
+          `}
+        >
+          <nav className="flex-1 overflow-y-auto no-scrollbar px-3 pt-4">
+            {SIDEBAR_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setIsSidebarOpen(false);
+                    playSound('pop');
+                  }}
+                  className={`
+                    w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] font-semibold mb-0.5 transition-all duration-200 text-left
+                    ${isActive
+                      ? 'bg-black text-white dark:bg-white dark:text-black'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:bg-black/[0.05] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white'
+                    }
+                  `}
+                  aria-label={`Category: ${cat}`}
+                >
+                  <span className="text-base leading-none">{categoryIcons[cat] || '•'}</span>
+                  <span className="truncate">{cat}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* ============ HEADER ============ */}
+        <header className="fixed top-0 inset-x-0 z-30 h-[72px] bg-white/90 dark:bg-[#111]/90 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06] flex items-center gap-3 px-4 md:px-6 lg:pl-[216px]">
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-zinc-500 hover:bg-black/[0.06] dark:hover:bg-white/[0.06] transition-all"
+            aria-label="Toggle sidebar"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+
+          {/* Logo */}
+          <div
+            className="w-9 h-9 rounded-[10px] bg-black dark:bg-white flex items-center justify-center shadow-sm hover:scale-105 transition-transform cursor-pointer shrink-0"
             aria-label="Nexus Home"
           >
-            <div className="w-3 h-3 bg-white dark:bg-black rounded-full" />
+            <div className="w-2.5 h-2.5 bg-white dark:bg-black rounded-full" />
           </div>
 
-          <div className="hidden lg:flex items-center gap-1">
-            {TOP_CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  playSound('pop');
-                }}
-                className={`px-4 py-2 rounded-full text-[14px] font-bold transition-all duration-300 ${
-                  activeCategory === cat
-                    ? 'bg-black text-white dark:bg-white dark:text-black shadow-md'
-                    : 'text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white'
-                }`}
-                aria-label={`Category: ${cat}`}
-              >
-                {cat}
-              </button>
-            ))}
-            <div className="w-px h-5 bg-black/10 dark:bg-white/10 mx-2" />
+          {/* Search Bar — centered, grows to fill space */}
+          <div className="flex-1 max-w-[600px] mx-auto">
             <button
-              onClick={() => setIsCategoryModalOpen(true)}
-              className="px-4 py-2 rounded-full text-[14px] font-bold text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all flex items-center gap-1.5"
-              aria-label="More categories"
+              onClick={() => {
+                playSound('woosh');
+                setIsCommandPaletteOpen(true);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-full bg-black/[0.04] dark:bg-white/[0.06] hover:bg-black/[0.07] dark:hover:bg-white/[0.09] border border-black/[0.07] dark:border-white/[0.07] transition-all text-zinc-400 group"
+              aria-label="Open search"
+              id="header-search-btn"
             >
-              More <LayersIcon size={14} />
+              <SearchIcon size={16} />
+              <span className="flex-1 text-left text-[14px] font-medium text-zinc-400">
+                Search resources...
+              </span>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-md border border-black/[0.09] dark:border-white/[0.1] text-zinc-400 bg-white/60 dark:bg-white/[0.04]">
+                ⌘K
+              </kbd>
             </button>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2 md:gap-3">
-          {/* Search */}
-          <button
-            onClick={() => {
-              playSound('woosh');
-              setIsCommandPaletteOpen(true);
-            }}
-            className="flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-all text-zinc-500 hover:text-black dark:hover:text-white group"
-            aria-label="Open search"
-          >
-            <SearchIcon size={18} />
-            <span className="hidden md:block text-[14px] font-bold tracking-tight">
-              Search...
-            </span>
-            <kbd className="hidden md:inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border border-black/10 dark:border-white/10 text-zinc-400">
-              {'\u2318'}K
-            </kbd>
-          </button>
-
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {isDark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-          </button>
-
-          {/* Leaderboard */}
-          <button
-            onClick={() => setIsLeaderboardOpen(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"
-            aria-label="Leaderboard"
-          >
-            <TrophyIcon size={18} />
-          </button>
-
-          {/* View Toggle */}
-          <button
-            onClick={() => {
-              playSound('snap');
-              setViewMode((prev) => (prev === 'grid' ? 'list' : 'grid'));
-            }}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"
-            aria-label={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
-          >
-            {viewMode === 'grid' ? <ListIcon size={18} /> : <GridIcon size={18} />}
-          </button>
-
-          {/* Suggest Tool */}
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="hidden sm:flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-black dark:bg-white text-white dark:text-black text-[14px] font-bold hover:shadow-lg hover:scale-105 transition-all ml-1"
-          >
-            Suggest <PlusIcon size={14} />
-          </button>
-
-          {/* User */}
-          {user ? (
-            <>
-              {(user as User).role === 'admin' && (
-                <button
-                  onClick={() => setIsAdminPanelOpen(true)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"
-                  aria-label="Admin panel"
-                  title="Admin Panel"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  </svg>
-                </button>
-              )}
-              <button
-                onClick={() => setIsProfileOpen(true)}
-                className="ml-1 px-4 h-10 rounded-full border-2 border-black/10 dark:border-white/10 text-[14px] font-bold text-black dark:text-white hover:border-black dark:hover:border-white transition-all flex items-center gap-2"
-                aria-label="Open profile"
-              >
-                <div
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: accentColor }}
-                />
-                <span className="hidden sm:inline">
-                  {user.nickname || user.email.split('@')[0]}
-                </span>
-              </button>
-            </>
-          ) : (
+          {/* Right actions */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Theme Toggle */}
             <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="ml-1 w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition-all"
-              aria-label="Sign in"
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/[0.05] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-all"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              <UserIcon size={18} />
+              {isDark ? <SunIcon size={17} /> : <MoonIcon size={17} />}
             </button>
-          )}
-        </div>
-      </header>
 
-      {/* ============ MAIN CONTENT ============ */}
-      <main
-        className={`relative z-10 max-w-[1600px] mx-auto pt-[120px] ${
-          viewMode === 'list' ? 'w-full px-4 lg:w-[1000px]' : 'px-4 md:px-8'
-        }`}
-      >
-        {/* Mobile Category Button */}
-        <div className="flex lg:hidden justify-center mb-6">
-          <button
-            onClick={() => setIsCategoryModalOpen(true)}
-            className="px-6 py-2.5 rounded-full bg-black text-white dark:bg-white dark:text-black text-[14px] font-bold shadow-lg flex items-center gap-2"
-          >
-            Explore Categories <LayersIcon size={14} />
-          </button>
-        </div>
+            {/* Leaderboard */}
+            <button
+              onClick={() => setIsLeaderboardOpen(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/[0.05] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-all"
+              aria-label="Leaderboard"
+            >
+              <TrophyIcon size={17} />
+            </button>
 
-        {/* Sort Bar */}
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-[14px] text-zinc-500 font-medium">
-            {isLoading ? 'Loading...' : `${totalItems} tools`}
-            {activeTags.length > 0 && ` (${activeTags.length} tags)`}
-          </p>
-          <SortDropdown currentSort={sortBy} onSortChange={setSortBy} />
-        </div>
+            {/* View Toggle */}
+            <button
+              onClick={() => {
+                playSound('snap');
+                setViewMode((prev) => (prev === 'grid' ? 'list' : 'grid'));
+              }}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/[0.05] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-all hidden sm:flex"
+              aria-label={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
+            >
+              {viewMode === 'grid' ? <ListIcon size={17} /> : <GridIcon size={17} />}
+            </button>
 
-        {/* Tags Section - Selection & Active */}
-        {tagSuggestions.length > 0 && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">Tags</span>
-              {activeTags.length > 0 && (
-                <button
-                  onClick={() => setActiveTags([])}
-                  className="text-[11px] text-accent font-bold hover:underline"
-                >
-                  Clear filters
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {tagSuggestions.map((tag) => {
-                const isActive = activeTags.includes(tag);
-                return (
+            {/* Suggest a Site — primary CTA */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full bg-black dark:bg-white text-white dark:text-black text-[13.5px] font-semibold hover:shadow-lg hover:scale-[1.03] transition-all ml-1"
+              id="suggest-site-btn"
+            >
+              Suggest a Site
+            </button>
+
+            {/* User */}
+            {user ? (
+              <>
+                {(user as User).role === 'admin' && (
                   <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
-                      isActive
-                        ? 'bg-accent text-white shadow-sm'
-                        : 'bg-black/5 dark:bg-white/10 text-zinc-500 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/20'
-                    }`}
-                    aria-label={isActive ? `Remove ${tag} filter` : `Filter by ${tag}`}
+                    onClick={() => setIsAdminPanelOpen(true)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-500 hover:bg-black/[0.05] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-all"
+                    aria-label="Admin panel"
+                    title="Admin Panel"
                   >
-                    {tag}
-                    {isActive && (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    )}
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {isLoading ? (
-          viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] md:auto-rows-[240px] gap-3 md:gap-4 lg:gap-5">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <SkeletonCard
-                  key={i}
-                  spanClass={
-                    i === 0 ? 'md:col-span-2 md:row-span-2' : i === 1 ? 'md:col-span-2 md:row-span-1' : 'md:col-span-1 md:row-span-1'
-                  }
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="h-20 bg-zinc-100 dark:bg-zinc-900 rounded-[16px] animate-pulse" />
-              ))}
-            </div>
-          )
-        ) : filteredTools.length > 0 ? (
-          viewMode === 'grid' ? (
-            /* Bento 2.0 Grid - Layout orgánico con variedad visual */
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[220px] md:auto-rows-[240px] gap-3 md:gap-4 lg:gap-5">
-              {filteredTools.map((tool, index) => (
-                <div
-                  key={tool.id}
-                  className="animate-in fade-in duration-500"
-                  style={{ animationDelay: `${(index % 12) * 50}ms` }}
+                )}
+                <button
+                  onClick={() => setIsProfileOpen(true)}
+                  className="ml-1 px-3 h-9 rounded-full border border-black/10 dark:border-white/10 text-[13px] font-semibold text-black dark:text-white hover:border-black dark:hover:border-white transition-all flex items-center gap-2"
+                  aria-label="Open profile"
                 >
-                  <BentoCard
-                    tool={tool}
-                    user={user}
-                    onRequireAuth={() => setIsAuthModalOpen(true)}
-                    isFocused={focusedIndex === index}
-                    index={index}
-                    total={filteredTools.length}
-                    onSaveRequest={setSavePopoverConfig}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* List View */
-            <div className="flex flex-col gap-4">
-              {filteredTools.map((tool, index) => (
-                <div
-                  key={tool.id}
-                  className="animate-in fade-in slide-in-from-top-4 duration-300"
-                  style={{ animationDelay: `${(index % 10) * 30}ms` }}
-                >
-                  <ListCard
-                    tool={tool}
-                    user={user}
-                    onRequireAuth={() => setIsAuthModalOpen(true)}
-                    isFocused={focusedIndex === index}
-                    indexNumber={index}
-                    onSaveRequest={setSavePopoverConfig}
-                  />
-                </div>
-              ))}
-            </div>
-          )
-        ) : (
-          /* Empty State */
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mb-6">
-              <SearchIcon className="text-zinc-400" size={32} />
-            </div>
-            <p className="text-[22px] font-extrabold text-black dark:text-white tracking-tight mb-2">
-              {debouncedQuery
-                ? `No tools found for "${debouncedQuery}"`
-                : 'No tools in this category'}
-            </p>
-            <p className="text-[15px] text-zinc-500 font-medium mb-8 max-w-md">
-              {debouncedQuery
-                ? 'Try a different search term or browse all categories.'
-                : 'Be the first to suggest a tool in this category.'}
-            </p>
-            <div className="flex gap-4">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} />
+                  <span className="hidden sm:inline">
+                    {user.nickname || user.email.split('@')[0]}
+                  </span>
+                </button>
+              </>
+            ) : (
               <button
-                onClick={() => setActiveCategory('All')}
-                className="px-6 py-3 rounded-full bg-black dark:bg-white text-white dark:text-black font-bold text-[14px] hover:scale-105 transition-transform"
+                onClick={() => setIsAuthModalOpen(true)}
+                className="ml-1 w-9 h-9 flex items-center justify-center rounded-full text-zinc-500 hover:bg-black/[0.05] dark:hover:bg-white/[0.06] hover:text-black dark:hover:text-white transition-all"
+                aria-label="Sign in"
               >
-                Browse All
+                <UserIcon size={17} />
               </button>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="px-6 py-3 rounded-full border-2 border-black/10 dark:border-white/10 text-black dark:text-white font-bold text-[14px] hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-              >
-                Suggest Tool
-              </button>
-            </div>
+            )}
           </div>
-        )}
+        </header>
 
-        {/* Load More / Infinite Scroll Sentinel */}
-        {!isLoading && (
-          <div ref={loadMoreRef} className="flex justify-center py-10">
-            {isLoadingMore ? (
-              <div className="flex items-center gap-3 text-zinc-500">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10" />
-                </svg>
-                <span className="text-[14px] font-bold">Loading more...</span>
+        {/* ============ MAIN CONTENT ============ */}
+        <main className="lg:pl-[200px] pt-[72px] min-h-screen">
+          <div className={`mx-auto ${viewMode === 'list' ? 'max-w-[860px] px-4 lg:px-8' : 'max-w-[1400px] px-4 lg:px-8'} py-6`}>
+
+            {/* ---- Filter tabs + count row ---- */}
+            <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+              {/* Tabs: Newest | Popular | Category */}
+              <div className="flex items-center gap-1 bg-black/[0.04] dark:bg-white/[0.05] rounded-full p-1">
+                {(['newest', 'popular', 'category'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      if (tab === 'popular') setSortBy('name');
+                      else if (tab === 'newest') setSortBy('default');
+                      playSound('pop');
+                    }}
+                    className={`px-4 py-1.5 rounded-full text-[13px] font-semibold capitalize transition-all duration-200 ${
+                      activeTab === tab
+                        ? 'bg-white dark:bg-[#1a1a1a] text-black dark:text-white shadow-sm'
+                        : 'text-zinc-500 hover:text-black dark:hover:text-white'
+                    }`}
+                    aria-label={`Sort by ${tab}`}
+                  >
+                    {tab === 'newest' ? 'Newest' : tab === 'popular' ? 'Popular' : 'Category ↓'}
+                  </button>
+                ))}
               </div>
-            ) : hasMore ? (
-              <p className="text-[13px] text-zinc-400 font-medium">Scroll for more</p>
-            ) : tools.length > 0 ? (
-              <p className="text-[13px] text-zinc-400 font-medium">
-                You've seen all {tools.length} tools
-              </p>
-            ) : null}
-          </div>
-        )}
-      </main>
 
-      {/* ============ MODALS ============ */}
-      <SavePopover
-        config={savePopoverConfig}
-        onClose={() => setSavePopoverConfig(null)}
-        user={user}
-        setUser={setUser}
-      />
-      <CategoriesModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        query={searchQuery}
-        setQuery={handleSearchChange}
-        tools={tools}
-      />
-      <AutoCaptureModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        user={user}
-      />
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
-      <UserProfile
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        user={user}
-        onLogout={handleLogout}
-        accentColor={accentColor}
-        setAccentColor={setAccentColor}
-        fontFamily={fontFamily}
-        setFontFamily={setFontFamily}
-      />
-      <LeaderboardModal
-        isOpen={isLeaderboardOpen}
-        onClose={() => setIsLeaderboardOpen(false)}
-      />
-      <AdminPanel
-        isOpen={isAdminPanelOpen}
-        onClose={() => setIsAdminPanelOpen(false)}
-        user={user}
-      />
+              {/* Count */}
+              <p className="text-[13px] text-zinc-400 font-medium">
+                {isLoading ? 'Loading...' : `${totalItems} tools`}
+              </p>
+            </div>
+
+            {/* ---- Grid / List ---- */}
+            {isLoading ? (
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <SkeletonCard key={i} spanClass="" />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-[72px] bg-black/[0.04] dark:bg-white/[0.04] rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              )
+            ) : filteredTools.length > 0 ? (
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {filteredTools.map((tool, i) => (
+                    <div
+                      key={tool.id}
+                      className="animate-in fade-in duration-500"
+                      style={{ animationDelay: `${(i % 12) * 40}ms` }}
+                    >
+                      <BentoCard
+                        tool={tool}
+                        user={user}
+                        onRequireAuth={() => setIsAuthModalOpen(true)}
+                        isFocused={focusedIndex === i}
+                        index={i}
+                        total={filteredTools.length}
+                        onSaveRequest={setSavePopoverConfig}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {filteredTools.map((tool, i) => (
+                    <div
+                      key={tool.id}
+                      className="animate-in fade-in slide-in-from-top-4 duration-300"
+                      style={{ animationDelay: `${(i % 10) * 25}ms` }}
+                    >
+                      <ListCard
+                        tool={tool}
+                        user={user}
+                        onRequireAuth={() => setIsAuthModalOpen(true)}
+                        isFocused={focusedIndex === i}
+                        indexNumber={i}
+                        onSaveRequest={setSavePopoverConfig}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : (
+              /* Empty State */
+              <div className="flex flex-col items-center justify-center py-32 text-center">
+                <div className="w-16 h-16 rounded-full bg-black/[0.05] dark:bg-white/[0.06] flex items-center justify-center mb-5">
+                  <SearchIcon className="text-zinc-400" size={28} />
+                </div>
+                <p className="text-[20px] font-bold text-black dark:text-white tracking-tight mb-2">
+                  {debouncedQuery
+                    ? `No tools found for "${debouncedQuery}"`
+                    : 'No tools in this category'}
+                </p>
+                <p className="text-[14px] text-zinc-500 font-medium mb-7 max-w-sm">
+                  {debouncedQuery
+                    ? 'Try a different search term or browse all categories.'
+                    : 'Be the first to suggest a tool in this category.'}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setActiveCategory('All Tools')}
+                    className="px-5 py-2.5 rounded-full bg-black dark:bg-white text-white dark:text-black font-semibold text-[13.5px] hover:scale-[1.03] transition-transform"
+                  >
+                    Browse All
+                  </button>
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="px-5 py-2.5 rounded-full border border-black/10 dark:border-white/10 text-black dark:text-white font-semibold text-[13.5px] hover:bg-black/[0.04] dark:hover:bg-white/[0.05] transition-all"
+                  >
+                    Suggest Tool
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Infinite scroll sentinel */}
+            {!isLoading && (
+              <div ref={loadMoreRef} className="flex justify-center py-8">
+                {isLoadingMore ? (
+                  <div className="flex items-center gap-2.5 text-zinc-400">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" strokeDasharray="40" strokeDashoffset="10" />
+                    </svg>
+                    <span className="text-[13px] font-medium">Loading more...</span>
+                  </div>
+                ) : hasMore ? (
+                  <p className="text-[12px] text-zinc-400 font-medium">Scroll for more</p>
+                ) : tools.length > 0 ? (
+                  <p className="text-[12px] text-zinc-400 font-medium">
+                    You've seen all {tools.length} tools
+                  </p>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* ============ MODALS ============ */}
+        <SavePopover
+          config={savePopoverConfig}
+          onClose={() => setSavePopoverConfig(null)}
+          user={user}
+          setUser={setUser}
+        />
+        <CategoriesModal
+          isOpen={isCategoryModalOpen}
+          onClose={() => setIsCategoryModalOpen(false)}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
+        <CommandPalette
+          isOpen={isCommandPaletteOpen}
+          onClose={() => setIsCommandPaletteOpen(false)}
+          query={searchQuery}
+          setQuery={handleSearchChange}
+          tools={tools}
+        />
+        <AutoCaptureModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          user={user}
+        />
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+        />
+        <UserProfile
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          user={user}
+          onLogout={handleLogout}
+          accentColor={accentColor}
+          setAccentColor={setAccentColor}
+          fontFamily={fontFamily}
+          setFontFamily={setFontFamily}
+        />
+        <LeaderboardModal
+          isOpen={isLeaderboardOpen}
+          onClose={() => setIsLeaderboardOpen(false)}
+        />
+        <AdminPanel
+          isOpen={isAdminPanelOpen}
+          onClose={() => setIsAdminPanelOpen(false)}
+          user={user}
+        />
       </div>
     </ErrorBoundary>
   );
