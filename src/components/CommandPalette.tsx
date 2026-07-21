@@ -5,6 +5,7 @@ import { SearchIcon, ArrowUpRight } from '../utils/icons';
 const CommandPalette = ({ isOpen, onClose, query, setQuery, tools }) => {
   const inputRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   useEffect(() => {
     if (isOpen) {
@@ -49,94 +50,205 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools }) => {
     }
   };
 
+  const kbdStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontSize: '10px',
+    fontWeight: 700,
+    padding: '3px 7px',
+    borderRadius: '8px',
+    background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.7)',
+    color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(120,90,200,0.55)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(200,190,240,0.5)',
+  };
+
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-2xl p-4 animate-in fade-in duration-300"
+      className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] p-4"
+      style={{
+        background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(180,195,240,0.45)',
+        backdropFilter: 'blur(28px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+      }}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
     >
       <div
-        className="bg-white/90 dark:bg-[#111]/90 backdrop-blur-3xl w-full max-w-2xl rounded-[32px] shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden animate-in zoom-in-95 duration-300"
+        className="animate-scale-in"
+        style={{
+          width: '100%',
+          maxWidth: '680px',
+          background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+          border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderRadius: '2rem',
+          overflow: 'hidden',
+          boxShadow: isDark
+            ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.08)'
+            : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center px-8 py-6 border-b border-black/5 dark:border-white/5">
-          <SearchIcon size={18} />
+        {/* Search header */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '20px 24px',
+            borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.5)',
+            gap: '12px',
+          }}
+        >
+          <SearchIcon
+            size={18}
+            style={{ color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(124,58,237,0.45)', flexShrink: 0 }}
+          />
           <input
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search directory..."
-            className="flex-1 bg-transparent border-none outline-none text-black dark:text-white px-5 text-2xl font-bold tracking-tight placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              fontSize: '20px',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: isDark ? 'rgba(240,235,255,0.92)' : 'rgba(15,10,40,0.88)',
+            }}
             aria-label="Search tools"
           />
-          <div className="flex gap-2">
-            <kbd className="hidden sm:inline-block text-[10px] font-bold px-2 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-zinc-500 border border-black/10 dark:border-white/10">
-              {'\u2191\u2193'}
-            </kbd>
-            <kbd className="hidden sm:inline-block text-[10px] font-bold px-2 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-zinc-500 border border-black/10 dark:border-white/10">
-              {'\u23ce'}
-            </kbd>
-            <kbd className="hidden sm:inline-block text-[10px] font-bold px-2 py-1 rounded-lg bg-black/5 dark:bg-white/10 text-zinc-500 border border-black/10 dark:border-white/10">
-              ESC
-            </kbd>
+          <div style={{ display: 'flex', gap: '5px' }} className="hidden sm:flex">
+            <kbd style={kbdStyle}>{'↑↓'}</kbd>
+            <kbd style={kbdStyle}>{'⏎'}</kbd>
+            <kbd style={kbdStyle}>ESC</kbd>
           </div>
         </div>
-        <div className="max-h-[50vh] overflow-y-auto p-4 no-scrollbar">
+
+        {/* Results */}
+        <div className="no-scrollbar" style={{ maxHeight: '50vh', overflowY: 'auto', padding: '8px' }}>
           {query ? (
             filteredTools.length > 0 ? (
-              <div className="mb-2">
-                {filteredTools.map((tool, idx) => (
-                  <button
-                    key={tool.id}
-                    onClick={() => {
-                      window.open(tool.url, '_blank');
-                      onClose();
-                    }}
-                    className={`w-full text-left px-5 py-4 rounded-[20px] flex items-center justify-between group transition-all ${
-                      idx === selectedIndex
-                        ? 'bg-accent/10 text-accent'
-                        : 'hover:bg-black/5 dark:hover:bg-white/10'
-                    }`}
-                    aria-label={`Open ${tool.name}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-black/10 dark:bg-white/10 flex items-center justify-center">
-                        <img
-                          src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`}
-                          alt=""
-                          className="w-5 h-5 rounded"
-                          aria-hidden="true"
-                        />
-                      </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                {filteredTools.map((tool, idx) => {
+                  const isSelected = idx === selectedIndex;
+                  return (
+                    <button
+                      key={tool.id}
+                      onClick={() => {
+                        window.open(tool.url, '_blank');
+                        onClose();
+                      }}
+                      style={{
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '14px 18px',
+                        borderRadius: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        border: 'none',
+                        transition: 'all 0.15s ease',
+                        background: isSelected
+                          ? isDark ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.1)'
+                          : 'transparent',
+                      }}
+                      onMouseEnter={e => {
+                        if (!isSelected) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.45)';
+                      }}
+                      onMouseLeave={e => {
+                        if (!isSelected) e.currentTarget.style.background = 'transparent';
+                      }}
+                      aria-label={`Open ${tool.name}`}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '12px',
+                            background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.7)',
+                            border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <img
+                            src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`}
+                            alt=""
+                            style={{ width: '20px', height: '20px', borderRadius: '4px' }}
+                            aria-hidden="true"
+                          />
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            letterSpacing: '-0.01em',
+                            color: isSelected
+                              ? isDark ? '#c084fc' : '#7c3aed'
+                              : isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
+                          }}
+                        >
+                          {tool.name}
+                        </span>
+                      </div>
                       <span
-                        className={`text-[18px] font-bold ${
-                          idx === selectedIndex
-                            ? 'text-accent'
-                            : 'text-black dark:text-white'
-                        }`}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          color: isDark ? 'rgba(180,160,255,0.4)' : 'rgba(120,90,200,0.45)',
+                          opacity: isSelected ? 1 : 0,
+                          transition: 'opacity 0.15s ease',
+                        }}
                       >
-                        {tool.name}
+                        Visit <ArrowUpRight />
                       </span>
-                    </div>
-                    <span className="text-[13px] font-bold text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                      Visit <ArrowUpRight />
-                    </span>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             ) : (
-              <div className="py-10 text-center flex flex-col items-center gap-3">
-                <SearchIcon className="text-zinc-300" size={32} />
-                <p className="text-zinc-500 font-bold">No results found.</p>
-                <p className="text-zinc-400 text-[13px]">Try a different search term.</p>
+              <div style={{ padding: '48px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: isDark ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.08)',
+                    border: '1px solid rgba(124,58,237,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <SearchIcon size={22} style={{ color: isDark ? '#a855f7' : '#7c3aed' }} />
+                </div>
+                <p style={{ fontSize: '15px', fontWeight: 700, color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)' }}>
+                  No results found.
+                </p>
+                <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)' }}>
+                  Try a different search term.
+                </p>
               </div>
             )
           ) : (
-            <div className="py-8 text-center text-zinc-400 font-medium">
-              Type to start searching...
+            <div style={{ padding: '40px 0', textAlign: 'center' }}>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: isDark ? 'rgba(180,165,240,0.45)' : 'rgba(100,80,160,0.5)' }}>
+                Type to start searching...
+              </p>
             </div>
           )}
         </div>

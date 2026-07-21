@@ -11,6 +11,7 @@ const SavePopover = ({ config, onClose, user, setUser }) => {
   const numericToolId = Number(tool.id);
   const collections = user.collections || [];
   const isInArsenal = user.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId);
+  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   const popoverWidth = 240;
   let left = rect.left;
@@ -49,30 +50,141 @@ const SavePopover = ({ config, onClose, user, setUser }) => {
 
   return (
     <div className="fixed inset-0 z-[500]" onClick={onClose} role="dialog" aria-modal="true" aria-label="Save tool to collection">
-      <div className="absolute bg-white/80 dark:bg-[#151515]/80 backdrop-blur-3xl border border-black/10 dark:border-white/10 rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] p-2 animate-in fade-in zoom-in-95 duration-200" style={{ top, left, width: popoverWidth }} onClick={e => e.stopPropagation()}>
-        <div className="px-3 pt-3 pb-2 text-[11px] font-extrabold text-zinc-400 uppercase tracking-widest flex items-center justify-between">
-          <span>Save to...</span>
-          {isSaving && <SpinnerIcon className="text-accent" size={12} />}
+      <div
+        className="absolute animate-scale-in"
+        style={{
+          top,
+          left,
+          width: popoverWidth,
+          background: isDark ? 'rgba(18,16,40,0.82)' : 'rgba(255,255,255,0.52)',
+          backdropFilter: 'blur(28px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+          border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.72)',
+          borderRadius: '22px',
+          boxShadow: isDark
+            ? '0 20px 56px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)'
+            : '0 20px 56px rgba(80,60,180,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
+          padding: '6px',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div
+          style={{
+            padding: '10px 14px 6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(120,90,200,0.5)',
+            }}
+          >
+            Save to...
+          </span>
+          {isSaving && <SpinnerIcon style={{ color: isDark ? '#c084fc' : '#7c3aed' }} size={12} />}
         </div>
-        <div className="flex flex-col max-h-[240px] overflow-y-auto no-scrollbar gap-1">
-          <button disabled={isSaving} onClick={() => handleToggleFolder(-1)} className="w-full flex items-center justify-between px-3 py-2.5 rounded-[16px] bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white" aria-label={isInArsenal ? 'Remove from Arsenal' : 'Save to Arsenal'}>
-            <div className="flex items-center gap-3">
-              <div className={'w-8 h-8 rounded-full flex items-center justify-center transition-colors ' + (isInArsenal ? 'bg-accent text-white' : 'bg-black/5 dark:bg-white/10 text-black dark:text-white')}>
+        <div className="no-scrollbar" style={{ display: 'flex', flexDirection: 'column', maxHeight: '240px', overflowY: 'auto', gap: '2px' }}>
+          <button
+            disabled={isSaving}
+            onClick={() => handleToggleFolder(-1)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 12px',
+              borderRadius: '14px',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              color: isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.55)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+            aria-label={isInArsenal ? 'Remove from Arsenal' : 'Save to Arsenal'}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  background: isInArsenal
+                    ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
+                    : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.65)',
+                  border: isInArsenal
+                    ? 'none'
+                    : isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.85)',
+                  color: isInArsenal ? 'white' : isDark ? 'rgba(200,190,255,0.7)' : 'rgba(80,60,140,0.7)',
+                  boxShadow: isInArsenal ? '0 2px 10px rgba(124,58,237,0.35)' : 'none',
+                }}
+              >
                 <HeartIcon isSaved={isInArsenal} size={14} />
               </div>
-              <span className="font-bold text-[14px]">General Arsenal</span>
+              <span style={{ fontSize: '14px', fontWeight: 700 }}>General Arsenal</span>
             </div>
           </button>
           {collections.map((folder, idx) => {
             const toolsInFolder = folder.tools ? folder.tools.map(t => typeof t === 'object' ? t.id : t) : [];
             const isInFolder = toolsInFolder.includes(numericToolId);
             return (
-              <button key={idx} disabled={isSaving} onClick={() => handleToggleFolder(idx)} className="w-full flex items-center justify-between px-3 py-2.5 rounded-[16px] bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-black dark:text-white" aria-label={isInFolder ? 'Remove from ' + folder.name : 'Save to ' + folder.name}>
-                <div className="flex items-center gap-3">
-                  <div className={'w-8 h-8 rounded-full flex items-center justify-center transition-colors ' + (isInFolder ? 'bg-accent text-white' : 'bg-black/5 dark:bg-white/10 text-black dark:text-white')}>
+              <button
+                key={idx}
+                disabled={isSaving}
+                onClick={() => handleToggleFolder(idx)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 12px',
+                  borderRadius: '14px',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  color: isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.55)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                aria-label={isInFolder ? 'Remove from ' + folder.name : 'Save to ' + folder.name}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease',
+                      background: isInFolder
+                        ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
+                        : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.65)',
+                      border: isInFolder
+                        ? 'none'
+                        : isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.85)',
+                      color: isInFolder ? 'white' : isDark ? 'rgba(200,190,255,0.7)' : 'rgba(80,60,140,0.7)',
+                      boxShadow: isInFolder ? '0 2px 10px rgba(124,58,237,0.35)' : 'none',
+                    }}
+                  >
                     <LayersIcon size={14} />
                   </div>
-                  <span className="font-bold text-[14px] truncate max-w-[110px] text-left">{folder.name}</span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
+                    {folder.name}
+                  </span>
                 </div>
               </button>
             );

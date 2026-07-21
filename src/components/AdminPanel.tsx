@@ -11,14 +11,32 @@ const Toast = ({ message, type = 'success', onClose }) => {
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bgColor = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-red-500' : 'bg-zinc-800';
+  const bgGradients = {
+    success: 'linear-gradient(135deg, #10b981, #14b8a6)',
+    error: 'linear-gradient(135deg, #ef4444, #f43f5e)',
+    info: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+  };
   const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
 
   return (
-    <div className={`fixed bottom-6 right-6 z-[999] flex items-center gap-3 ${bgColor} text-white px-5 py-3 rounded-[20px] shadow-2xl animate-in slide-in-from-bottom-4 fade-in duration-300`}>
+    <div
+      className="fixed bottom-6 right-6 z-[999] animate-fade-up"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        background: bgGradients[type] || bgGradients.info,
+        color: 'white',
+        padding: '14px 20px',
+        borderRadius: '18px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.2)',
+      }}
+    >
       <span>{icon}</span>
-      <span className="text-[14px] font-bold">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:opacity-70" aria-label="Dismiss">
+      <span style={{ fontSize: '14px', fontWeight: 700 }}>{message}</span>
+      <button onClick={onClose} style={{ marginLeft: '6px', background: 'none', border: 'none', color: 'white', cursor: 'pointer', opacity: 0.7 }} aria-label="Dismiss">
         <CloseIcon size={14} />
       </button>
     </div>
@@ -26,25 +44,120 @@ const Toast = ({ message, type = 'success', onClose }) => {
 };
 
 // ─── Confirm Dialog ─────────────────────────────────────────────────────
-const ConfirmDialog = ({ message, onConfirm, onCancel, isLoading }) => (
-  <div className="fixed inset-0 z-[600] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onCancel}>
-    <div className="bg-white dark:bg-[#151515] rounded-[24px] p-8 max-w-sm w-full shadow-2xl border border-black/10 dark:border-white/10 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
-      <div className="text-center mb-6">
-        <div className="w-14 h-14 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4 text-3xl">🗑️</div>
-        <h3 className="text-xl font-extrabold text-black dark:text-white mb-2">Confirm Rejection</h3>
-        <p className="text-[14px] text-zinc-500 font-medium">{message}</p>
-      </div>
-      <div className="flex gap-3">
-        <button onClick={onCancel} disabled={isLoading} className="flex-1 py-3 rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white font-bold text-[14px] hover:bg-black/10 dark:hover:bg-white/20 transition-all">
-          Cancel
-        </button>
-        <button onClick={onConfirm} disabled={isLoading} className="flex-1 py-3 rounded-full bg-red-500 text-white font-bold text-[14px] hover:bg-red-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-          {isLoading ? <><SpinnerIcon size={16} /> Rejecting...</> : 'Reject Tool'}
-        </button>
+const ConfirmDialog = ({ message, onConfirm, onCancel, isLoading }) => {
+  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+  return (
+    <div
+      className="fixed inset-0 z-[600] flex items-center justify-center p-4"
+      style={{
+        background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(180,195,240,0.45)',
+        backdropFilter: 'blur(28px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+      }}
+      onClick={onCancel}
+    >
+      <div
+        className="animate-scale-in"
+        style={{
+          maxWidth: '380px',
+          width: '100%',
+          background: isDark ? 'rgba(18,16,40,0.82)' : 'rgba(255,255,255,0.52)',
+          border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderRadius: '2rem',
+          padding: '32px',
+          boxShadow: isDark
+            ? '0 20px 56px rgba(0,0,0,0.55)'
+            : '0 20px 56px rgba(80,60,180,0.14)',
+          textAlign: 'center',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(239,68,68,0.15), rgba(244,63,94,0.15))',
+            border: '1px solid rgba(239,68,68,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px',
+            fontSize: '26px',
+          }}
+        >
+          🗑️
+        </div>
+        <h3
+          style={{
+            fontSize: '20px',
+            fontWeight: 800,
+            color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)',
+            marginBottom: '6px',
+          }}
+        >
+          Confirm Rejection
+        </h3>
+        <p
+          style={{
+            fontSize: '13px',
+            fontWeight: 500,
+            color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)',
+            marginBottom: '24px',
+          }}
+        >
+          {message}
+        </p>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: '14px',
+              border: 'none',
+              background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)',
+              color: isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: '14px',
+              border: 'none',
+              background: 'linear-gradient(135deg, #ef4444, #f43f5e)',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(239,68,68,0.3)',
+              opacity: isLoading ? 0.6 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {isLoading ? <><SpinnerIcon size={16} /> Rejecting...</> : 'Reject Tool'}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ─── Main AdminPanel ────────────────────────────────────────────────────
 const AdminPanel = ({ isOpen, onClose, user }) => {
@@ -54,6 +167,7 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [actionStatus, setActionStatus] = useState({});
+  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   // Toast state
   const [toasts, setToasts] = useState([]);
@@ -128,7 +242,6 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
     setActionStatus((prev) => ({ ...prev, [toolId]: 'rejecting' }));
     const token = localStorage.getItem('payload-token');
     try {
-      // Change status to 'rejected' instead of DELETE
       const res = await fetch(`${API_BASE_URL}/api/tools/${toolId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
@@ -172,84 +285,316 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
         />
       )}
 
-      <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-2xl flex items-center justify-center p-4 lg:p-10 animate-in fade-in duration-300" onClick={onClose} role="dialog" aria-modal="true" aria-label="Admin panel">
-        <div className="w-full max-w-4xl h-full max-h-[850px] bg-[#f5f5f7] dark:bg-[#050505] rounded-[40px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-500" onClick={(e) => e.stopPropagation()}>
-          <div className="px-10 py-8 flex items-center justify-between border-b border-black/5 dark:border-white/5 bg-white dark:bg-[#111]">
-            <div>
-              <h2 className="text-4xl font-extrabold tracking-tighter text-black dark:text-white flex items-center gap-3">
+      <div
+        className="fixed inset-0 z-[300] flex items-center justify-center p-4 lg:p-10"
+        style={{
+          background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(180,195,240,0.45)',
+          backdropFilter: 'blur(28px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+        }}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Admin panel"
+      >
+        {/* Close pill */}
+        <button
+          onClick={onClose}
+          className="absolute top-5 right-5 flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all hover:scale-105"
+          style={{
+            background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.88)',
+            border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.95)',
+            color: isDark ? 'rgba(230,220,255,0.9)' : 'rgba(40,30,70,0.8)',
+            backdropFilter: 'blur(16px)',
+            boxShadow: isDark ? '0 2px 12px rgba(0,0,0,0.3)' : '0 2px 12px rgba(80,60,180,0.12)',
+            zIndex: 10,
+          }}
+          aria-label="Close"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Close
+        </button>
+
+        <div
+          className="animate-scale-in"
+          style={{
+            width: '100%',
+            maxWidth: '900px',
+            maxHeight: '85vh',
+            background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+            border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            borderRadius: '2rem',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: isDark
+              ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.08)'
+              : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div
+            style={{
+              padding: '28px 32px 20px',
+              borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.5)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <h2
+                className="font-display"
+                style={{
+                  fontSize: '32px',
+                  fontWeight: 800,
+                  color: isDark ? 'rgba(240,235,255,0.97)' : 'rgba(10,8,30,0.90)',
+                  letterSpacing: '-0.025em',
+                }}
+              >
                 Curation Panel
-                <span className="px-3 py-1 text-[12px] rounded-full bg-accent text-white font-bold">Admin</span>
               </h2>
-              <p className="text-[15px] font-medium text-zinc-500 mt-2">Review and approve pending tool submissions.</p>
+              <span
+                style={{
+                  padding: '4px 12px',
+                  borderRadius: '100px',
+                  background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                  color: 'white',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  boxShadow: '0 2px 8px rgba(124,58,237,0.3)',
+                }}
+              >
+                Admin
+              </span>
             </div>
-            <button onClick={onClose} className="w-12 h-12 bg-black/5 dark:bg-white/10 rounded-full flex items-center justify-center text-black dark:text-white hover:scale-105 transition-transform" aria-label="Close"><CloseIcon size={24} /></button>
+            <p
+              style={{
+                fontSize: '14px',
+                fontWeight: 500,
+                color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)',
+                marginTop: '6px',
+              }}
+            >
+              Review and approve pending tool submissions.
+            </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 lg:p-10 no-scrollbar">
+          {/* Content */}
+          <div className="no-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
             {!isAdmin ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mb-6 text-4xl">{'🔒'}</div>
-                <p className="text-zinc-500 font-bold text-[20px]">Access Denied</p>
-                <p className="text-zinc-400 text-[14px] mt-2">Admin privileges required.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '20px',
+                    background: isDark ? 'rgba(239,68,68,0.12)' : 'rgba(239,68,68,0.08)',
+                    border: '1px solid rgba(239,68,68,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '16px',
+                    fontSize: '28px',
+                  }}
+                >
+                  🔒
+                </div>
+                <p style={{ fontSize: '18px', fontWeight: 700, color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)' }}>
+                  Access Denied
+                </p>
+                <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)', marginTop: '6px' }}>
+                  Admin privileges required.
+                </p>
               </div>
             ) : isLoading ? (
-              <div className="flex justify-center py-20"><SpinnerIcon className="text-black dark:text-white" size={40} /></div>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
+                <SpinnerIcon style={{ color: isDark ? '#c084fc' : '#7c3aed' }} size={36} />
+              </div>
             ) : pendingTools.length > 0 ? (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[14px] text-zinc-500 font-medium">{pendingTools.length} tool{pendingTools.length !== 1 ? 's' : ''} pending review</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <p
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)',
+                    }}
+                  >
+                    {pendingTools.length} tool{pendingTools.length !== 1 ? 's' : ''} pending review
+                  </p>
                   {page > 1 && (
                     <button
                       onClick={() => fetchPending(1)}
-                      className="text-[12px] text-accent font-bold hover:underline"
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: isDark ? '#c084fc' : '#7c3aed',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                      }}
                       aria-label="Refresh list"
                     >
                       ← Back to first page
                     </button>
                   )}
                 </div>
+
                 {pendingTools.map((tool) => {
                   const status = actionStatus[tool.id];
                   const isBusy = status === 'approving' || status === 'rejecting';
                   return (
-                    <div key={tool.id} className={`bg-white dark:bg-[#111] rounded-[24px] p-6 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md transition-all ${isBusy ? 'opacity-70' : ''}`}>
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-black/5 dark:bg-white/10 flex items-center justify-center overflow-hidden shrink-0">
-                              <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`} alt="" className="w-6 h-6" aria-hidden="true" loading="lazy" />
-                            </div>
-                            <div>
-                              <h3 className="text-[18px] font-bold text-black dark:text-white truncate">{tool.name}</h3>
-                              <span className="text-[12px] text-zinc-500 font-medium">{tool.category} {tool.tags ? `• ${tool.tags}` : ''}</span>
-                            </div>
+                    <div
+                      key={tool.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        gap: '14px',
+                        padding: '18px 20px',
+                        borderRadius: '20px',
+                        background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.55)',
+                        border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.8)',
+                        backdropFilter: 'blur(12px)',
+                        transition: 'all 0.2s ease',
+                        opacity: isBusy ? 0.6 : 1,
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div
+                            style={{
+                              width: '38px',
+                              height: '38px',
+                              borderRadius: '12px',
+                              background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.7)',
+                              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`} alt="" style={{ width: '22px', height: '22px' }} aria-hidden="true" loading="lazy" />
                           </div>
-                          {tool.description && <p className="text-[14px] text-zinc-500 mt-3 ml-[52px]">{tool.description}</p>}
-                          <a href={tool.url} target="_blank" rel="noreferrer" className="text-[13px] text-accent font-bold mt-2 ml-[52px] inline-block hover:underline">{tool.url}</a>
+                          <div>
+                            <h3
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                color: isDark ? 'rgba(240,235,255,0.92)' : 'rgba(15,10,40,0.88)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {tool.name}
+                            </h3>
+                            <span
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                color: isDark ? 'rgba(180,165,235,0.55)' : 'rgba(80,60,140,0.5)',
+                              }}
+                            >
+                              {tool.category} {tool.tags ? `• ${tool.tags}` : ''}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {status === 'error' && (
-                            <span className="text-[10px] font-bold text-red-500 px-2 py-1 bg-red-100 dark:bg-red-900/30 rounded-full">Error</span>
-                          )}
-                          <button
-                            onClick={() => handleApprove(tool.id)}
-                            disabled={isBusy}
-                            className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 hover:bg-emerald-200 dark:hover:bg-emerald-800/40 flex items-center justify-center transition-all disabled:opacity-40"
-                            aria-label="Approve"
-                            title="Approve"
+                        {tool.description && (
+                          <p
+                            style={{
+                              fontSize: '13px',
+                              color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)',
+                              marginTop: '8px',
+                              marginLeft: '48px',
+                            }}
                           >
-                            {status === 'approving' ? <SpinnerIcon size={16} /> : <CheckIcon size={18} />}
-                          </button>
-                          <button
-                            onClick={() => handleReject(tool.id)}
-                            disabled={isBusy}
-                            className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 hover:bg-red-200 dark:hover:bg-red-800/40 flex items-center justify-center transition-all disabled:opacity-40"
-                            aria-label="Reject"
-                            title="Reject"
+                            {tool.description}
+                          </p>
+                        )}
+                        <a
+                          href={tool.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: isDark ? '#c084fc' : '#7c3aed',
+                            marginTop: '6px',
+                            marginLeft: '48px',
+                            display: 'inline-block',
+                          }}
+                          onClick={e => e.stopPropagation()}
+                        >
+                          {tool.url}
+                        </a>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                        {status === 'error' && (
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: '#ef4444',
+                              padding: '3px 8px',
+                              borderRadius: '100px',
+                              background: 'rgba(239,68,68,0.12)',
+                              border: '1px solid rgba(239,68,68,0.2)',
+                            }}
                           >
-                            {status === 'rejecting' ? <SpinnerIcon size={16} /> : <CloseIcon size={18} />}
-                          </button>
-                        </div>
+                            Error
+                          </span>
+                        )}
+                        <button
+                          onClick={() => handleApprove(tool.id)}
+                          disabled={isBusy}
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            background: 'rgba(16,185,129,0.12)',
+                            color: '#10b981',
+                            opacity: isBusy ? 0.4 : 1,
+                          }}
+                          aria-label="Approve"
+                          title="Approve"
+                        >
+                          {status === 'approving' ? <SpinnerIcon size={16} /> : <CheckIcon size={18} />}
+                        </button>
+                        <button
+                          onClick={() => handleReject(tool.id)}
+                          disabled={isBusy}
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                            background: 'rgba(239,68,68,0.12)',
+                            color: '#ef4444',
+                            opacity: isBusy ? 0.4 : 1,
+                          }}
+                          aria-label="Reject"
+                          title="Reject"
+                        >
+                          {status === 'rejecting' ? <SpinnerIcon size={16} /> : <CloseIcon size={18} />}
+                        </button>
                       </div>
                     </div>
                   );
@@ -257,11 +602,25 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
 
                 {/* Load More */}
                 {hasMore && (
-                  <div className="flex justify-center pt-4">
+                  <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '12px' }}>
                     <button
                       onClick={() => fetchPending(page + 1, true)}
                       disabled={isLoadingMore}
-                      className="px-8 py-3 rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white font-bold text-[14px] hover:bg-black/10 dark:hover:bg-white/20 transition-all disabled:opacity-50 flex items-center gap-2"
+                      style={{
+                        padding: '12px 28px',
+                        borderRadius: '16px',
+                        background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.6)',
+                        border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.85)',
+                        color: isDark ? 'rgba(240,235,255,0.85)' : 'rgba(15,10,40,0.8)',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        opacity: isLoadingMore ? 0.5 : 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
                       aria-label="Load more tools"
                     >
                       {isLoadingMore ? (
@@ -274,10 +633,29 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
                 )}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mb-6 text-4xl">{'✅'}</div>
-                <p className="text-zinc-500 font-bold text-[20px]">All caught up!</p>
-                <p className="text-zinc-400 text-[14px] mt-2">No pending tools to review.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '20px',
+                    background: isDark ? 'rgba(16,185,129,0.12)' : 'rgba(16,185,129,0.08)',
+                    border: '1px solid rgba(16,185,129,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '16px',
+                    fontSize: '28px',
+                  }}
+                >
+                  ✅
+                </div>
+                <p style={{ fontSize: '18px', fontWeight: 700, color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)' }}>
+                  All caught up!
+                </p>
+                <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)', marginTop: '6px' }}>
+                  No pending tools to review.
+                </p>
               </div>
             )}
           </div>

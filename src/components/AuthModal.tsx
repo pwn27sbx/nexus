@@ -8,6 +8,7 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   if (!isOpen) return null;
 
@@ -44,37 +45,108 @@ const AuthModal = ({ isOpen, onClose }) => {
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.55)',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.65)',
+    borderRadius: '16px',
+    padding: '14px 18px',
+    outline: 'none',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(20,15,50,0.85)',
+    backdropFilter: 'blur(12px)',
+    transition: 'all 0.2s ease',
+  };
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-white/10 dark:bg-black/40 backdrop-blur-md transition-opacity"
+      className="fixed inset-0 z-[300] flex items-center justify-center"
+      style={{
+        background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(180,195,240,0.45)',
+        backdropFilter: 'blur(28px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+      }}
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={isLogin ? 'Sign in' : 'Create account'}
     >
-      <div className="bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 w-[90%] max-w-[400px] rounded-2xl p-8 shadow-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
-          aria-label="Close"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
+      {/* Close pill */}
+      <button
+        onClick={onClose}
+        className="absolute top-5 right-5 flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all hover:scale-105"
+        style={{
+          background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.88)',
+          border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.95)',
+          color: isDark ? 'rgba(230,220,255,0.9)' : 'rgba(40,30,70,0.8)',
+          backdropFilter: 'blur(16px)',
+          boxShadow: isDark ? '0 2px 12px rgba(0,0,0,0.3)' : '0 2px 12px rgba(80,60,180,0.12)',
+          zIndex: 10,
+        }}
+        aria-label="Close"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+        Close
+      </button>
 
-        <h2 className="text-xl font-semibold text-black dark:text-white tracking-tight mb-1">
+      {/* Glass card */}
+      <div
+        className="animate-scale-in"
+        style={{
+          width: '90%',
+          maxWidth: '420px',
+          background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+          border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderRadius: '2rem',
+          padding: '36px 32px',
+          boxShadow: isDark
+            ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.08)'
+            : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <h2
+          className="font-display"
+          style={{
+            fontSize: '26px',
+            fontWeight: 800,
+            color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)',
+            letterSpacing: '-0.02em',
+            marginBottom: '4px',
+          }}
+        >
           {isLogin ? 'Welcome back' : 'Create an account'}
         </h2>
-        <p className="text-[13px] text-zinc-500 dark:text-zinc-400 mb-6">
+        <p
+          style={{
+            fontSize: '13px',
+            fontWeight: 500,
+            color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)',
+            marginBottom: '28px',
+          }}
+        >
           {isLogin
             ? 'Enter your details to access your account.'
             : 'Join the directory to submit and save tools.'}
         </p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
-            <label className="block text-[12px] font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label
+              style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: isDark ? 'rgba(200,190,255,0.7)' : 'rgba(60,45,120,0.7)',
+                marginBottom: '6px',
+              }}
+            >
               Email
             </label>
             <input
@@ -82,13 +154,21 @@ const AuthModal = ({ isOpen, onClose }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm text-black dark:text-white transition-all"
+              style={inputStyle}
               placeholder="name@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label
+              style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 700,
+                color: isDark ? 'rgba(200,190,255,0.7)' : 'rgba(60,45,120,0.7)',
+                marginBottom: '6px',
+              }}
+            >
               Password
             </label>
             <input
@@ -96,38 +176,68 @@ const AuthModal = ({ isOpen, onClose }) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-zinc-50 dark:bg-black border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-sm text-black dark:text-white transition-all"
-              placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+              style={inputStyle}
+              placeholder="••••••••"
             />
           </div>
 
           {status === 'error' && (
-            <p className="text-red-500 text-[12px] text-center">{errorMessage}</p>
+            <p style={{ color: '#ef4444', fontSize: '12px', fontWeight: 600, textAlign: 'center' }}>
+              {errorMessage}
+            </p>
           )}
 
           <button
             type="submit"
             disabled={status === 'loading' || status === 'success'}
-            className="w-full mt-2 bg-black dark:bg-white text-white dark:text-black text-sm font-medium py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+            style={{
+              width: '100%',
+              marginTop: '8px',
+              padding: '14px',
+              borderRadius: '16px',
+              background: status === 'success'
+                ? 'linear-gradient(135deg, #10b981, #14b8a6)'
+                : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: status === 'loading' ? 'wait' : 'pointer',
+              boxShadow: status === 'success'
+                ? '0 4px 20px rgba(16,185,129,0.35)'
+                : '0 4px 20px rgba(124,58,237,0.35)',
+              transition: 'all 0.2s ease',
+              opacity: status === 'loading' ? 0.6 : 1,
+            }}
           >
             {status === 'loading'
               ? 'Processing...'
               : status === 'success'
-                ? 'Success!'
+                ? '✓ Success!'
                 : isLogin
                   ? 'Sign In'
                   : 'Sign Up'}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div style={{ marginTop: '24px', textAlign: 'center' }}>
           <button
             type="button"
             onClick={() => {
               setIsLogin(!isLogin);
               setErrorMessage('');
             }}
-            className="text-[13px] text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: isDark ? 'rgba(180,165,240,0.6)' : 'rgba(100,80,180,0.6)',
+              cursor: 'pointer',
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c084fc' : '#7c3aed'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = isDark ? 'rgba(180,165,240,0.6)' : 'rgba(100,80,180,0.6)'; }}
           >
             {isLogin
               ? "Don't have an account? Sign up"
