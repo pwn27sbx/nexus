@@ -96,11 +96,11 @@ const HeroCollectionCard = ({ collection, isDark, onRequireAuth, user }) => {
       onMouseLeave={() => setIsHovered(false)}
       style={{
         gridRow: '1 / 3',
-        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.78)',
-        border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.88)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderRadius: '20px',
+        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+        border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        borderRadius: '2rem',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
@@ -108,10 +108,11 @@ const HeroCollectionCard = ({ collection, isDark, onRequireAuth, user }) => {
         boxShadow: isHovered
           ? isDark
             ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15)'
-            : '0 20px 56px rgba(80,60,180,0.2), 0 0 0 1px rgba(124,58,237,0.15)'
+            : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)'
           : isDark
           ? '0 4px 20px rgba(0,0,0,0.35)'
-          : '0 4px 20px rgba(80,60,180,0.1)',
+          : '0 8px 30px rgba(0,0,0,0.04)',
+        padding: '12px',
       }}
     >
       {/* Browser chrome */}
@@ -171,7 +172,7 @@ const HeroCollectionCard = ({ collection, isDark, onRequireAuth, user }) => {
       </div>
 
       {/* Main image */}
-      <div style={{ position: 'relative', width: '100%', paddingBottom: '65%', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', paddingBottom: '65%', overflow: 'hidden', borderRadius: '1.25rem' }}>
         <img
           src={collection.coverImages[0]}
           alt={collection.name}
@@ -243,11 +244,11 @@ const SmallCollectionCard = ({ collection, isDark }) => {
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => playSound('pop')}
       style={{
-        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.78)',
-        border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.88)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderRadius: '16px',
+        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+        border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        borderRadius: '2rem',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
@@ -255,14 +256,15 @@ const SmallCollectionCard = ({ collection, isDark }) => {
         boxShadow: isHovered
           ? isDark
             ? '0 12px 32px rgba(0,0,0,0.5)'
-            : '0 12px 32px rgba(80,60,180,0.16)'
+            : '0 12px 32px rgba(80,60,180,0.12)'
           : isDark
           ? '0 4px 16px rgba(0,0,0,0.3)'
-          : '0 4px 16px rgba(80,60,180,0.08)',
+          : '0 8px 24px rgba(0,0,0,0.04)',
+        padding: '10px',
       }}
     >
       {/* Image */}
-      <div style={{ position: 'relative', width: '100%', paddingBottom: '58%', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', paddingBottom: '58%', overflow: 'hidden', borderRadius: '1.25rem' }}>
         <img
           src={collection.coverImages[0]}
           alt={collection.name}

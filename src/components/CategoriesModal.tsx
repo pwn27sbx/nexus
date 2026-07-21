@@ -28,9 +28,9 @@ const CategoryIcon = ({ category, isActive, isDark }) => {
   return (
     <div
       style={{
-        width: '64px',
-        height: '64px',
-        borderRadius: '18px',
+        width: '72px',
+        height: '72px',
+        borderRadius: '20px',
         background: isActive
           ? 'linear-gradient(135deg, rgba(124,58,237,0.25), rgba(168,85,247,0.2))'
           : isDark
@@ -39,7 +39,7 @@ const CategoryIcon = ({ category, isActive, isDark }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '28px',
+        fontSize: '32px',
         boxShadow: isActive
           ? '0 4px 20px rgba(124,58,237,0.25)'
           : isDark
@@ -167,9 +167,9 @@ const CategoriesModal = ({ isOpen, onClose, activeCategory, setActiveCategory, i
 
         {/* ── Category Grid ── */}
         <div
-          className="w-full grid gap-3 pb-12 animate-fade-up"
+          className="w-full grid gap-4 pb-12 animate-fade-up categories-grid"
           style={{
-            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gridTemplateColumns: 'repeat(5, 1fr)',
             animationDelay: '140ms',
           }}
         >
@@ -184,7 +184,7 @@ const CategoriesModal = ({ isOpen, onClose, activeCategory, setActiveCategory, i
                   playSound('pop');
                   onClose();
                 }}
-                className="category-card-bg flex flex-col items-center gap-3 p-5 rounded-[20px] transition-all duration-250 hover:scale-[1.03] hover:-translate-y-0.5"
+                className="category-card-bg flex flex-col items-center gap-4 p-6 rounded-[22px] transition-all duration-250 hover:scale-[1.03] hover:-translate-y-0.5"
                 style={{
                   background: isActive
                     ? isDark
@@ -238,4 +238,27 @@ const CategoriesModal = ({ isOpen, onClose, activeCategory, setActiveCategory, i
   );
 };
 
-export default CategoriesModal;
+// Responsive grid styles
+const CategoriesModalStyles = () => (
+  <style>{`
+    @media (max-width: 900px) {
+      .categories-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    @media (max-width: 600px) {
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+  `}</style>
+);
+
+export default function CategoriesModalWrapper(props) {
+  return (
+    <>
+      <CategoriesModalStyles />
+      <CategoriesModal {...props} />
+    </>
+  );
+}

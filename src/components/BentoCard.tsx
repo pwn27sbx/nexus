@@ -72,13 +72,13 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
       tabIndex={0}
       onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); window.open(tool.url, '_blank'); } }}
       style={{
-        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.75)',
+        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
         border: isFocused
           ? '1px solid rgba(124,58,237,0.6)'
-          : isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.85)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderRadius: '16px',
+          : isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        borderRadius: '2rem',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
@@ -86,10 +86,11 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
         boxShadow: isHovered
           ? isDark
             ? '0 16px 48px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.15)'
-            : '0 16px 48px rgba(80,60,180,0.18), 0 2px 8px rgba(80,60,180,0.10), 0 0 0 1px rgba(124,58,237,0.15)'
+            : '0 16px 48px rgba(80,60,180,0.12), 0 0 0 1px rgba(255,255,255,0.3)'
           : isDark
             ? '0 4px 20px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.25)'
-            : '0 4px 20px rgba(80,60,180,0.10), 0 1px 4px rgba(80,60,180,0.06)',
+            : '0 8px 30px rgba(0,0,0,0.04)',
+        padding: '10px',
       }}
     >
       {/* ── Browser Chrome Bar ──────────────────────────────── */}
@@ -100,7 +101,8 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           gap: '6px',
           padding: '8px 12px',
           background: isDark ? 'rgba(15,12,32,0.85)' : 'rgba(248,246,255,0.9)',
-          borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(200,190,240,0.35)',
+          borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(200,190,240,0.25)',
+          borderRadius: '1.25rem 1.25rem 0 0',
         }}
       >
         {/* Traffic lights */}
@@ -184,7 +186,7 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
       </div>
 
       {/* ── Screenshot Preview ──────────────────────────────── */}
-      <div style={{ position: 'relative', width: '100%', paddingBottom: '60%', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', paddingBottom: '60%', overflow: 'hidden', borderRadius: '0 0 1.25rem 1.25rem' }}>
         {/* Image */}
         {!imageError && (
           <>
@@ -284,13 +286,14 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           <span
             style={{
               display: 'inline-flex', alignItems: 'center',
-              padding: '2px 8px',
+              padding: '4px 10px',
               borderRadius: '100px',
               fontSize: '10.5px',
-              fontWeight: 700,
-              background: colors.bg,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
+              fontWeight: 500,
+              background: isDark ? colors.bg : 'rgba(255,255,255,0.55)',
+              color: isDark ? colors.text : 'rgba(80,70,120,0.8)',
+              border: isDark ? `1px solid ${colors.border}` : '1px solid rgba(255,255,255,0.55)',
+              boxShadow: isDark ? 'none' : '0 1px 4px rgba(0,0,0,0.04)',
               letterSpacing: '0.01em',
               flexShrink: 0,
             }}
@@ -310,8 +313,8 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
               <circle cx="12" cy="12" r="3"/>
             </svg>
             <span style={{
-              fontSize: '10.5px', fontWeight: 600,
-              color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.4)',
+              fontSize: '10.5px', fontWeight: 500,
+              color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)',
             }}>
               {((numericToolId % 500) + 1).toFixed(1)}k
             </span>
@@ -334,7 +337,7 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
         <div
           style={{
             position: 'absolute', inset: 0,
-            borderRadius: '16px',
+            borderRadius: '2rem',
             boxShadow: 'inset 0 0 0 2px rgba(124,58,237,0.5)',
             pointerEvents: 'none',
             zIndex: 30,

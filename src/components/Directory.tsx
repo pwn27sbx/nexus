@@ -152,13 +152,13 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
       style={{
         height: '100%',
         minHeight: '360px',
-        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.78)',
+        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
         border: isFocused
           ? '1px solid rgba(124,58,237,0.6)'
-          : isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.88)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderRadius: '20px',
+          : isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+        backdropFilter: 'blur(24px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+        borderRadius: '2rem',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
@@ -166,41 +166,48 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
         boxShadow: isHovered
           ? isDark
             ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15)'
-            : '0 20px 56px rgba(80,60,180,0.2), 0 0 0 1px rgba(124,58,237,0.15)'
+            : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)'
           : isDark
           ? '0 4px 24px rgba(0,0,0,0.35)'
-          : '0 4px 24px rgba(80,60,180,0.1)',
+          : '0 8px 30px rgba(0,0,0,0.04)',
         display: 'flex',
         flexDirection: 'column',
+        padding: '12px',
       }}
     >
-      {/* Browser chrome */}
-      <div
-        className="browser-chrome"
-        style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 14px', flexShrink: 0 }}
-      >
-        <div style={{ display: 'flex', gap: '4px' }}>
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57', opacity: 0.85 }} />
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#febc2e', opacity: 0.85 }} />
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840', opacity: 0.85 }} />
+      {/* Screenshot — fills remaining height, inside rounded container */}
+      <div style={{ position: 'relative', flex: 1, overflow: 'hidden', minHeight: '200px', borderRadius: '1.25rem' }}>
+        {/* Browser chrome overlay on image */}
+        <div
+          style={{
+            position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+            display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 14px',
+            background: isDark ? 'rgba(15,12,32,0.75)' : 'rgba(245,244,252,0.85)',
+            borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(200,192,240,0.25)',
+          }}
+        >
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57', opacity: 0.85 }} />
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#febc2e', opacity: 0.85 }} />
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840', opacity: 0.85 }} />
+          </div>
+          <div style={{
+            flex: 1, height: '20px', borderRadius: '5px',
+            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+            border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.06)',
+            display: 'flex', alignItems: 'center', paddingLeft: '10px',
+          }}>
+            <span style={{ fontSize: '10px', color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.45)', fontFamily: 'monospace' }}>
+              {tool.url?.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
+            </span>
+          </div>
         </div>
+
+        {/* Always-visible action buttons — top right */}
         <div style={{
-          flex: 1, height: '20px', borderRadius: '5px',
-          background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-          border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.06)',
-          display: 'flex', alignItems: 'center', paddingLeft: '10px',
-        }}>
-          <span style={{ fontSize: '10px', color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.45)', fontFamily: 'monospace' }}>
-            {tool.url?.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
-          </span>
-        </div>
-        {/* Floating action buttons — visible on hover */}
-        <div style={{
+          position: 'absolute', top: '48px', right: '12px', zIndex: 15,
           display: 'flex', gap: '6px',
-          opacity: isHovered ? 1 : 0,
-          transform: isHovered ? 'scale(1) translateX(0)' : 'scale(0.85) translateX(6px)',
-          transition: 'all 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-          pointerEvents: isHovered ? 'auto' : 'none',
+          transition: 'all 0.2s ease',
         }}>
           <button
             onClick={e => {
@@ -209,13 +216,15 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
               else onRequireAuth();
             }}
             style={{
-              width: '30px', height: '30px', borderRadius: '50%',
-              background: isSaved ? 'linear-gradient(135deg,#f43f5e,#ec4899)' : 'rgba(255,255,255,0.92)',
-              border: isSaved ? 'none' : '1px solid rgba(200,190,240,0.6)',
-              color: isSaved ? 'white' : '#e11d48',
+              width: '40px', height: '40px', borderRadius: '14px',
+              background: isSaved ? 'linear-gradient(135deg,#f43f5e,#ec4899)' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.72)',
+              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.82)',
+              backdropFilter: 'blur(12px)',
+              color: isSaved ? 'white' : '#ef4444',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: '14px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+              cursor: 'pointer', fontSize: '16px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
+              transition: 'all 0.2s ease',
             }}
             aria-label="Save"
           >
@@ -224,22 +233,46 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
           <button
             onClick={e => { e.stopPropagation(); window.open(tool.url, '_blank'); }}
             style={{
-              padding: '6px 14px', borderRadius: '14px',
-              background: 'rgba(255,255,255,0.92)',
-              border: '1px solid rgba(200,190,240,0.5)',
-              color: 'rgba(40,30,70,0.85)',
-              fontSize: '12px', fontWeight: 700,
+              padding: '8px 18px', borderRadius: '14px',
+              background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.72)',
+              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.82)',
+              backdropFilter: 'blur(12px)',
+              color: isDark ? 'rgba(240,240,255,0.9)' : 'rgba(40,30,70,0.85)',
+              fontSize: '13px', fontWeight: 700,
               cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s ease',
             }}
           >
             Visit
           </button>
         </div>
-      </div>
 
-      {/* Screenshot — fills remaining height */}
-      <div style={{ position: 'relative', flex: 1, overflow: 'hidden', minHeight: '200px' }}>
+        {/* Play button center */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '52px', height: '52px',
+          background: 'rgba(0,0,0,0.35)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '1px solid rgba(255,255,255,0.2)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+          zIndex: 12,
+          transition: 'all 0.2s ease',
+          opacity: isHovered ? 1 : 0.85,
+        }}>
+          <div style={{
+            width: 0, height: 0,
+            borderTop: '7px solid transparent',
+            borderLeft: '12px solid white',
+            borderBottom: '7px solid transparent',
+            marginLeft: '2px',
+          }} />
+        </div>
+
         {!imageError && (
           <>
             <img
@@ -273,13 +306,13 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
       </div>
 
       {/* Info */}
-      <div style={{ padding: '16px 18px 18px', flexShrink: 0 }}>
+      <div style={{ padding: '14px 8px 6px', flexShrink: 0 }}>
         <h3
           style={{
-            fontSize: '15.5px',
-            fontWeight: 700,
-            color: isDark ? 'rgba(240,235,255,0.92)' : 'rgba(15,10,40,0.88)',
-            marginBottom: '8px',
+            fontSize: '16px',
+            fontWeight: 500,
+            color: isDark ? 'rgba(240,235,255,0.92)' : 'rgba(30,28,50,0.88)',
+            marginBottom: '12px',
             lineHeight: 1.35,
             letterSpacing: '-0.01em',
             display: '-webkit-box',
@@ -294,20 +327,22 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
           <span
             style={{
               display: 'inline-flex', alignItems: 'center',
-              padding: '3px 10px', borderRadius: '100px',
-              fontSize: '11px', fontWeight: 700,
-              background: colors.bg, color: colors.text,
-              border: `1px solid ${colors.border}`,
+              padding: '5px 14px', borderRadius: '100px',
+              fontSize: '12px', fontWeight: 500,
+              background: isDark ? colors.bg : 'rgba(255,255,255,0.55)',
+              color: isDark ? colors.text : 'rgba(80,70,120,0.8)',
+              border: isDark ? `1px solid ${colors.border}` : '1px solid rgba(255,255,255,0.55)',
+              boxShadow: isDark ? 'none' : '0 1px 4px rgba(0,0,0,0.04)',
             }}
           >
             {tool.category}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.4)'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.4)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 500, color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)' }}>
               {((numericToolId % 500) + 1).toFixed(1)}k
             </span>
           </div>
@@ -324,7 +359,7 @@ export default function App() {
   useEffect(() => { setHydrated(true); }, []);
 
   // ── Theme ──
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -756,7 +791,7 @@ export default function App() {
         {/* ══ MAIN CONTENT ══════════════════════════════════ */}
         <main
           className="relative z-10 flex flex-col items-center"
-          style={{ paddingTop: '60px', paddingBottom: '90px' }}
+          style={{ paddingTop: '60px', paddingBottom: '120px' }}
         >
           {/* ── COMMUNITY VIEW ── */}
           {activeNav === 'community' && (
@@ -931,19 +966,19 @@ export default function App() {
             ) : filteredTools.length > 0 ? (
               viewMode === 'grid' ? (
                 <div
+                  className="bento-grid"
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'minmax(0,1.55fr) minmax(0,1fr) minmax(0,1fr)',
-                    gridTemplateRows: 'auto auto',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gridAutoRows: 'minmax(180px, auto)',
                     gap: '14px',
                   }}
-                  className="bento-grid"
                 >
-                  {/* Hero card — spans 2 rows */}
+                  {/* Hero card — spans 2 cols x 2 rows */}
                   {filteredTools[0] && (
                     <div
                       className="animate-fade-up"
-                      style={{ gridRow: '1 / 3', animationDelay: '0ms' }}
+                      style={{ gridColumn: 'span 2', gridRow: 'span 2', animationDelay: '0ms' }}
                     >
                       <HeroBentoCard
                         tool={filteredTools[0]}
@@ -955,58 +990,50 @@ export default function App() {
                       />
                     </div>
                   )}
-                  {/* Regular cards */}
-                  {filteredTools.slice(1, 5).map((tool, i) => (
-                    <div
-                      key={tool.id}
-                      className="animate-fade-up"
-                      style={{ animationDelay: `${(i + 1) * 60}ms` }}
-                    >
-                      <BentoCard
-                        tool={tool}
-                        user={user}
-                        onRequireAuth={() => setIsAuthModalOpen(true)}
-                        isFocused={focusedIndex === i + 1}
-                        index={i + 1}
-                        total={filteredTools.length}
-                        onSaveRequest={setSavePopoverConfig}
-                        isDark={isDark}
-                      />
-                    </div>
-                  ))}
-                  {/* Remaining tools in standard 4-col grid below */}
-                  {filteredTools.length > 5 && (
-                    <div
-                      style={{ gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginTop: '0' }}
-                      className="rest-grid"
-                    >
-                      {filteredTools.slice(5).map((tool, i) => (
-                        <div
-                          key={tool.id}
-                          className="animate-fade-up"
-                          style={{ animationDelay: `${(i % 12) * 40}ms` }}
-                        >
-                          <BentoCard
-                            tool={tool}
-                            user={user}
-                            onRequireAuth={() => setIsAuthModalOpen(true)}
-                            isFocused={focusedIndex === i + 5}
-                            index={i + 5}
-                            total={filteredTools.length}
-                            onSaveRequest={setSavePopoverConfig}
-                            isDark={isDark}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {/* Cards with varied sizes */}
+                  {filteredTools.slice(1).map((tool, i) => {
+                    // Bento 2.0 pattern: cycle through size variations
+                    const patternIndex = i % 8;
+                    let gridStyle = {};
+                    if (patternIndex === 2) {
+                      // Tall card
+                      gridStyle = { gridRow: 'span 2' };
+                    } else if (patternIndex === 5) {
+                      // Wide card
+                      gridStyle = { gridColumn: 'span 2' };
+                    }
+                    // All others are 1x1
+
+                    return (
+                      <div
+                        key={tool.id}
+                        className="animate-fade-up"
+                        style={{ ...gridStyle, animationDelay: `${(i % 12) * 40}ms` }}
+                      >
+                        <BentoCard
+                          tool={tool}
+                          user={user}
+                          onRequireAuth={() => setIsAuthModalOpen(true)}
+                          isFocused={focusedIndex === i + 1}
+                          index={i + 1}
+                          total={filteredTools.length}
+                          onSaveRequest={setSavePopoverConfig}
+                          isDark={isDark}
+                        />
+                      </div>
+                    );
+                  })}
                   <style>{`
+                    .bento-grid > div > div,
+                    .bento-grid > div > [role="article"] {
+                      height: 100%;
+                    }
                     @media (max-width: 900px) {
-                      .bento-grid { grid-template-columns: 1fr 1fr !important; }
+                      .bento-grid { grid-template-columns: repeat(2, 1fr) !important; }
                     }
                     @media (max-width: 640px) {
                       .bento-grid { grid-template-columns: 1fr !important; }
-                      .rest-grid { grid-template-columns: 1fr 1fr !important; }
+                      .bento-grid > div { grid-column: span 1 !important; }
                     }
                   `}</style>
                 </div>
@@ -1096,68 +1123,74 @@ export default function App() {
           </>)}
         </main>
 
-        {/* ══ BOTTOM NAVIGATION DOCK ════════════════════════ */}
+        {/* ══ BOTTOM NAVIGATION DOCK (Floating Pill — Stitch Style) ════ */}
         <nav
-          className="fixed bottom-0 inset-x-0 z-50 flex items-center justify-around"
-          style={{
-            height: '72px',
-            background: isDark
-              ? 'rgba(13,13,26,0.75)'
-              : 'rgba(225,232,252,0.75)',
-            backdropFilter: 'blur(28px) saturate(200%)',
-            WebkitBackdropFilter: 'blur(28px) saturate(200%)',
-            borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.75)',
-            boxShadow: isDark
-              ? '0 -4px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)'
-              : '0 -4px 32px rgba(100,80,200,0.1), inset 0 1px 0 rgba(255,255,255,0.95)',
-          }}
+          className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-6 pointer-events-none"
+          style={{ paddingLeft: '16px', paddingRight: '16px' }}
         >
-          {NAV_ITEMS.map(item => {
-            const isActive = activeNav === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveNav(item.id);
-                  playSound('pop');
-                  if (item.id === 'submit') setIsModalOpen(true);
-                  else if (item.id === 'categories') setIsCategoryModalOpen(true);
-                  // 'community' and 'collections' are rendered inline — no modal needed
-                }}
-                className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all hover:scale-105"
-                style={{
-                  color: isActive
-                    ? isDark ? '#c084fc' : '#7c3aed'
-                    : isDark ? 'rgba(180,160,255,0.4)' : 'rgba(100,80,160,0.45)',
-                }}
-                aria-label={item.label}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                <span
-                  className="relative flex items-center justify-center w-6 h-6 transition-all"
+          <div
+            className="pointer-events-auto flex items-center gap-1 px-2 py-2 rounded-2xl"
+            style={{
+              background: isDark
+                ? 'rgba(18,16,40,0.55)'
+                : 'rgba(255,255,255,0.50)',
+              backdropFilter: 'blur(28px) saturate(200%)',
+              WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.10)' : '1px solid rgba(255,255,255,0.72)',
+              boxShadow: isDark
+                ? '0 20px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)'
+                : '0 20px 40px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.9)',
+            }}
+          >
+            {NAV_ITEMS.map(item => {
+              const isActive = activeNav === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveNav(item.id);
+                    playSound('pop');
+                    if (item.id === 'submit') setIsModalOpen(true);
+                    else if (item.id === 'categories') setIsCategoryModalOpen(true);
+                  }}
+                  className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all hover:scale-105"
                   style={{
-                    filter: isActive
+                    background: isActive
+                      ? isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.92)'
+                      : 'transparent',
+                    boxShadow: isActive
                       ? isDark
-                        ? 'drop-shadow(0 0 6px rgba(168,85,247,0.6))'
-                        : 'drop-shadow(0 0 4px rgba(124,58,237,0.4))'
+                        ? '0 2px 8px rgba(0,0,0,0.3)'
+                        : '0 2px 8px rgba(0,0,0,0.08)'
                       : 'none',
-                    transform: isActive ? 'translateY(-1px)' : 'none',
+                    border: isActive
+                      ? isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(0,0,0,0.04)'
+                      : '1px solid transparent',
+                    color: isActive
+                      ? isDark ? '#e2e0ff' : '#111111'
+                      : isDark ? 'rgba(180,160,255,0.4)' : 'rgba(100,100,120,0.55)',
+                    minWidth: '70px',
                   }}
+                  aria-label={item.label}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  {item.icon(isActive)}
-                </span>
-                <span
-                  className="text-[10.5px] font-semibold leading-none"
-                  style={{
-                    opacity: isActive ? 1 : 0.6,
-                    letterSpacing: isActive ? '0.01em' : '0',
-                  }}
-                >
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
+                  <span
+                    className="relative flex items-center justify-center w-5 h-5 transition-all"
+                  >
+                    {item.icon(isActive)}
+                  </span>
+                  <span
+                    className="text-[10.5px] font-semibold leading-none"
+                    style={{
+                      opacity: isActive ? 1 : 0.7,
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </nav>
 
         {/* ══ MODALS ════════════════════════════════════════ */}
