@@ -122,8 +122,8 @@ export const Tools: CollectionConfig = {
             if (json.status === 'success' && json.data?.screenshot?.url) {
               data.screenshotUrl = json.data.screenshot.url;
             }
-          } catch { 
-            console.warn(`[Microlink timeout/error] No se pudo obtener screenshot para ${data.url}`); 
+          } catch {
+            console.warn(`[Microlink timeout/error] No se pudo obtener screenshot para ${data.url}`);
           }
         }
         return data;
@@ -162,9 +162,9 @@ export const Tools: CollectionConfig = {
             console.log(`🚀 ¡Sugerencia ${doc.name} aprobada y en vivo!`);
           } catch (error) { console.error("Error Algolia:", error); }
         } else if (operation === 'update' && doc.status === 'pending') {
-            try { 
+            try {
               const idx = getAlgoliaIndex();
-              if (idx) await idx.deleteObject(doc.id.toString()); 
+              if (idx) await idx.deleteObject(doc.id.toString());
             } catch {}
         }
 
