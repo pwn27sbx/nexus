@@ -259,16 +259,12 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
           display: 'flex',
           gap: '8px',
           padding: '6px',
-          background: isDark ? 'rgba(30, 30, 40, 0.45)' : 'rgba(255, 255, 255, 0.4)',
-          border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.7)',
-          boxShadow: isDark
-            ? '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)'
-            : '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
-          backdropFilter: 'blur(24px) saturate(120%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(120%)',
+          background: isDark ? 'rgba(30, 30, 40, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+          border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(200,200,220,0.5)',
+          boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.12)',
           borderRadius: '24px',
           opacity: isHovered ? 1 : 0,
-          transform: isHovered ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(4px)',
+          transform: isHovered ? 'translateY(0)' : 'translateY(4px)',
           transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
           pointerEvents: isHovered ? 'auto' : 'none',
         }}
@@ -297,8 +293,6 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
             justifyContent: 'center',
             cursor: 'pointer',
             fontSize: '18px',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
             boxShadow: isDark
               ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 6px rgba(0,0,0,0.2)'
               : 'inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.06)',
@@ -326,9 +320,6 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
             color: isDark ? 'rgba(240,240,255,0.95)' : '#1f2937',
             fontSize: '15px',
             fontWeight: 500,
-            cursor: 'pointer',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
