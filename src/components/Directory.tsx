@@ -502,7 +502,7 @@ const DirectoryContent: React.FC = () => {
             {/* Search bar */}
             <div className="w-full max-w-[580px] animate-fade-up" style={{ animationDelay: '140ms' }}>
               <div 
-                className="group transition-all duration-300 hover:scale-[1.015] rounded-full p-1 bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(80,60,180,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                className="search-glow-container group cursor-pointer"
               >
                 <button
                   onClick={() => setIsCommandPaletteOpen(true)}

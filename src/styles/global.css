@@ -247,3 +247,71 @@
   border: 2px solid rgba(255,255,255,0.12);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
+
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(255,255,255,0.7), 0 0 8px rgba(255,255,255,0.5); }
+    50% { box-shadow: 0 0 36px rgba(255,255,255,0.9), 0 0 16px rgba(255,255,255,0.7); }
+  }
+  @keyframes dark-glow-pulse {
+    0%, 100% { box-shadow: 0 0 16px rgba(255,255,255,0.05); }
+    50% { box-shadow: 0 0 28px rgba(255,255,255,0.1), 0 0 12px rgba(168,85,247,0.3); }
+  }
+  
+  .search-glow-container {
+    position: relative;
+    padding: 4px;
+    border-radius: 9999px;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: glow-pulse 3.5s ease-in-out infinite;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+  }
+  
+  .dark .search-glow-container {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.15);
+    animation: dark-glow-pulse 3.5s ease-in-out infinite;
+  }
+
+  .search-glow-container:hover {
+    transform: scale(1.025);
+  }
+
+  /* Shiny sweeping light effect */
+  .search-glow-container::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -150%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.6), 
+      transparent
+    );
+    transform: skewX(-25deg);
+    animation: shine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .dark .search-glow-container::before {
+    background: linear-gradient(
+      90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.15), 
+      transparent
+    );
+  }
+
+  @keyframes shine {
+    0% { left: -150%; }
+    20% { left: 150%; }
+    100% { left: 150%; }
+  }
+
