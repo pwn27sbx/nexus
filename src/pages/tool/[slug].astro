@@ -1,7 +1,6 @@
 ---
 import "../../styles/global.css";
 import ToolDetailView from "../../components/ToolDetailView.tsx";
-import { AuthProvider } from "../../contexts/AuthContext.tsx";
 import { API_BASE_URL } from "../../utils/constants";
 
 // Enable SSR for this route
@@ -80,8 +79,6 @@ if (!tool) {
     </script>
   </head>
   <body class="bg-[#f0f4f8] text-[#0f172a] dark:bg-[#050505] dark:text-[#f8fafc] min-h-screen transition-colors duration-300 antialiased overflow-x-hidden">
-    <AuthProvider client:load>
-      <ToolDetailView client:load tool={tool} relatedTools={relatedTools} />
-    </AuthProvider>
+    <ToolDetailView client:load tool={tool} relatedTools={relatedTools} />
   </body>
 </html>

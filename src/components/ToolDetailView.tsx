@@ -13,8 +13,9 @@ import { isAuthModalOpen } from '../stores/modals';
 import ReviewSection from './ReviewSection';
 import BentoCard from './BentoCard';
 import type { Tool } from '../types';
+import { AuthProvider } from '../contexts/AuthContext';
 
-export default function ToolDetailView({
+export function ToolDetailViewContent({
   tool,
   relatedTools,
 }: {
@@ -248,5 +249,13 @@ export default function ToolDetailView({
         )}
       </main>
     </div>
+  );
+}
+
+export default function ToolDetailView(props: { tool: Tool; relatedTools?: Tool[] }) {
+  return (
+    <AuthProvider>
+      <ToolDetailViewContent {...props} />
+    </AuthProvider>
   );
 }
