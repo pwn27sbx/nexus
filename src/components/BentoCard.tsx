@@ -66,7 +66,7 @@ const BentoCard: React.FC<BentoCardProps> = memo(
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.05 }}
-        whileHover={{ y: -4, scale: 1.01, transition: { duration: 0.2 } }}
+        whileHover={{ y: -4, transition: { duration: 0.2 } }}
         onClick={() => window.open(tool.url, '_blank')}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
