@@ -68,7 +68,7 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
         cursor: 'pointer',
         position: 'relative',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
-        transform: isHovered ? 'translateY(-4px) scale(1.01)' : 'none',
+        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
         boxShadow: isHovered
           ? isDark
             ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15)'
