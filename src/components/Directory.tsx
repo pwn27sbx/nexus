@@ -378,6 +378,17 @@ export default function App() {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => { setHydrated(true); }, []);
 
+  // ── Scroll State ──
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    // Initial check
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // ── Theme ──
   const [isDark, setIsDark] = useState(false);
 
@@ -653,40 +664,149 @@ export default function App() {
 
         {/* ══ TOP HEADER BAR ════════════════════════════════ */}
         <header
-          className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-5 md:px-8"
+          className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-5 md:px-8 transition-all duration-300 ${
+            isScrolled ? 'pt-3 pb-3 pointer-events-auto' : 'pt-4 pb-2 pointer-events-none'
+          }`}
           style={{
-            height: '60px',
-            background: isDark ? 'rgba(13,13,26,0.6)' : 'rgba(220,228,248,0.55)',
-            backdropFilter: 'blur(20px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.7)',
+            background: isScrolled
+              ? isDark ? 'rgba(13,13,26,0.6)' : 'rgba(220,228,248,0.55)'
+              : 'transparent',
+            backdropFilter: isScrolled ? 'blur(20px) saturate(180%)' : 'none',
+            WebkitBackdropFilter: isScrolled ? 'blur(20px) saturate(180%)' : 'none',
+            borderBottom: isScrolled
+              ? isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.7)'
+              : '1px solid transparent',
+            boxShadow: isScrolled
+              ? isDark ? '0 4px 24px rgba(0,0,0,0.4)' : '0 4px 24px rgba(80,60,180,0.1)'
+              : 'none',
           }}
         >
-          {/* Logo / Brand */}
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform"
-              style={{
-                background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
-                boxShadow: '0 2px 12px rgba(124,58,237,0.4)',
-              }}
-            >
-              <div className="w-2 h-2 bg-white rounded-full opacity-90" />
+          {/* Left group: Logo + Actions */}
+          <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
+            {/* Logo / Brand */}
+            <div className="flex items-center gap-2.5 mr-1 sm:mr-3">
+              <div
+                className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                  boxShadow: '0 4px 14px rgba(124,58,237,0.4)',
+                }}
+              >
+                <div className="w-2 h-2 bg-white rounded-full opacity-90" />
+              </div>
+              <span
+                className="text-[15px] font-bold tracking-tight hidden sm:block"
+                style={{ color: isDark ? 'rgba(240,240,255,0.9)' : 'rgba(15,15,35,0.85)' }}
+              >
+                Nexus
+              </span>
             </div>
-            <span
-              className="text-[15px] font-bold tracking-tight hidden sm:block"
-              style={{ color: isDark ? 'rgba(240,240,255,0.9)' : 'rgba(15,15,35,0.85)' }}
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md"
+              style={{
+                background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+                color: isDark ? 'rgba(200,190,255,0.8)' : 'rgba(80,60,140,0.8)',
+                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(80,60,160,0.06)',
+              }}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              Nexus
-            </span>
+              {isDark ? <SunIcon size={14} /> : <MoonIcon size={14} />}
+            </button>
+
+            {/* Leaderboard */}
+            <button
+              onClick={() => setIsLeaderboardOpen(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md"
+              style={{
+                background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+                color: isDark ? 'rgba(200,190,255,0.8)' : 'rgba(80,60,140,0.8)',
+                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(80,60,160,0.06)',
+              }}
+              aria-label="Leaderboard"
+            >
+              <TrophyIcon size={14} />
+            </button>
+
+            {/* View toggle */}
+            <button
+              onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 hidden sm:flex backdrop-blur-md"
+              style={{
+                background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+                border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+                color: isDark ? 'rgba(200,190,255,0.8)' : 'rgba(80,60,140,0.8)',
+                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(80,60,160,0.06)',
+              }}
+              aria-label={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
+            >
+              {viewMode === 'grid' ? <ListIcon size={14} /> : <GridIcon size={14} />}
+            </button>
+
+            {/* User / Auth */}
+            {user ? (
+              <>
+                {(user as User).role === 'admin' && (
+                  <button
+                    onClick={() => setIsAdminPanelOpen(true)}
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(124,58,237,0.2), rgba(168,85,247,0.2))',
+                      border: '1px solid rgba(124,58,237,0.4)',
+                      color: '#a855f7',
+                      boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(80,60,160,0.06)',
+                    }}
+                    aria-label="Admin panel"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsProfileOpen(true)}
+                  className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-2 backdrop-blur-md"
+                  style={{
+                    background: isDark ? 'rgba(124,58,237,0.25)' : 'rgba(124,58,237,0.1)',
+                    border: isDark ? '1px solid rgba(124,58,237,0.4)' : '1px solid rgba(124,58,237,0.3)',
+                    color: isDark ? '#d8b4fe' : '#7c3aed',
+                    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(124,58,237,0.1)',
+                  }}
+                  aria-label="Open profile"
+                >
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} />
+                  <span className="hidden sm:inline">{user.nickname || user.email.split('@')[0]}</span>
+                </button>
+              </>
+            ) : (
+               <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-1.5 backdrop-blur-md"
+                style={{
+                  background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+                  color: isDark ? '#d8b4fe' : '#7c3aed',
+                  boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(80,60,160,0.06)',
+                }}
+                aria-label="Sign in"
+              >
+                <UserIcon size={12} />
+                <span className="hidden sm:inline">Sign in</span>
+              </button>
+            )}
           </div>
 
-          {/* Center: mini sort tabs */}
+          {/* Right group: Sort tabs */}
           <div
-            className="hidden md:flex items-center gap-1 rounded-full p-1"
+            className="hidden md:flex items-center gap-1 rounded-full p-1 backdrop-blur-md pointer-events-auto"
             style={{
-              background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.5)',
-              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.8)',
+              background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+              boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.2)' : '0 4px 12px rgba(80,60,160,0.06)',
             }}
           >
             {(['newest', 'popular'] as const).map(tab => (
@@ -700,118 +820,24 @@ export default function App() {
                 className="px-4 py-1.5 rounded-full text-[12.5px] font-semibold capitalize transition-all duration-200"
                 style={{
                   background: activeTab === tab
-                    ? isDark ? 'rgba(124,58,237,0.35)' : 'rgba(255,255,255,0.9)'
+                    ? isDark ? 'rgba(124,58,237,0.35)' : 'rgba(255,255,255,0.95)'
                     : 'transparent',
                   color: activeTab === tab
                     ? isDark ? '#c084fc' : '#7c3aed'
                     : isDark ? 'rgba(200,200,240,0.6)' : 'rgba(80,60,140,0.6)',
-                  boxShadow: activeTab === tab ? '0 1px 6px rgba(124,58,237,0.15)' : 'none',
+                  boxShadow: activeTab === tab ? '0 2px 8px rgba(124,58,237,0.2)' : 'none',
                 }}
               >
                 {tab === 'newest' ? '✦ Newest' : '↑ Popular'}
               </button>
             ))}
           </div>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-2">
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
-                color: isDark ? 'rgba(200,190,255,0.8)' : 'rgba(80,60,140,0.8)',
-              }}
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDark ? <SunIcon size={14} /> : <MoonIcon size={14} />}
-            </button>
-
-            {/* Leaderboard */}
-            <button
-              onClick={() => setIsLeaderboardOpen(true)}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
-                color: isDark ? 'rgba(200,190,255,0.8)' : 'rgba(80,60,140,0.8)',
-              }}
-              aria-label="Leaderboard"
-            >
-              <TrophyIcon size={14} />
-            </button>
-
-            {/* View toggle */}
-            <button
-              onClick={() => { playSound('snap'); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 hidden sm:flex"
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
-                color: isDark ? 'rgba(200,190,255,0.8)' : 'rgba(80,60,140,0.8)',
-              }}
-              aria-label={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
-            >
-              {viewMode === 'grid' ? <ListIcon size={14} /> : <GridIcon size={14} />}
-            </button>
-
-            {/* User / Auth */}
-            {user ? (
-              <>
-                {(user as User).role === 'admin' && (
-                  <button
-                    onClick={() => setIsAdminPanelOpen(true)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                    style={{
-                      background: 'linear-gradient(135deg, #7c3aed22, #a855f722)',
-                      border: '1px solid rgba(124,58,237,0.4)',
-                      color: '#a855f7',
-                    }}
-                    aria-label="Admin panel"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                  </button>
-                )}
-                <button
-                  onClick={() => setIsProfileOpen(true)}
-                  className="px-3 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-2"
-                  style={{
-                    background: isDark ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.1)',
-                    border: '1px solid rgba(124,58,237,0.35)',
-                    color: isDark ? '#c084fc' : '#7c3aed',
-                  }}
-                  aria-label="Open profile"
-                >
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} />
-                  <span className="hidden sm:inline">{user.nickname || user.email.split('@')[0]}</span>
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setIsAuthModalOpen(true)}
-                className="px-3 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-1.5"
-                style={{
-                  background: isDark ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.8)',
-                  border: isDark ? '1px solid rgba(124,58,237,0.35)' : '1px solid rgba(255,255,255,0.9)',
-                  color: isDark ? '#c084fc' : '#7c3aed',
-                }}
-                aria-label="Sign in"
-              >
-                <UserIcon size={12} />
-                <span className="hidden sm:inline">Sign in</span>
-              </button>
-            )}
-          </div>
         </header>
 
         {/* ══ MAIN CONTENT ══════════════════════════════════ */}
         <main
           className="relative z-10 flex flex-col items-center"
-          style={{ paddingTop: '60px', paddingBottom: '120px' }}
+          style={{ paddingTop: '80px', paddingBottom: '120px' }}
         >
           {/* ── COMMUNITY VIEW ── */}
           {activeNav === 'community' && (
