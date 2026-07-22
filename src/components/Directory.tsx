@@ -477,18 +477,18 @@ const DirectoryContent: React.FC = () => {
               : 'pt-4 pb-2 pointer-events-none bg-transparent border-b border-transparent shadow-none'
           }`}
         >
-          {/* Left group: Logo + Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
-            {/* Logo / Brand */}
-            <div className="flex items-center gap-2.5 mr-1 sm:mr-3">
-              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform bg-gradient-to-br from-[#7c3aed] to-[#a855f7] shadow-[0_4px_14px_rgba(124,58,237,0.4)]">
-                <div className="w-2 h-2 bg-white rounded-full opacity-90" />
-              </div>
-              <span className="text-[15px] font-bold tracking-tight hidden sm:block text-[rgba(15,15,35,0.85)] dark:text-[rgba(240,240,255,0.9)]">
-                Nexus
-              </span>
+          {/* Left: Logo / Brand */}
+          <div className="flex items-center gap-2.5 pointer-events-auto">
+            <div className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform bg-gradient-to-br from-[#7c3aed] to-[#a855f7] shadow-[0_4px_14px_rgba(124,58,237,0.4)]">
+              <div className="w-2 h-2 bg-white rounded-full opacity-90" />
             </div>
+            <span className="text-[17px] font-bold tracking-tight text-[rgba(15,15,35,0.85)] dark:text-[rgba(240,240,255,0.9)]">
+              Nexus
+            </span>
+          </div>
 
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
@@ -581,27 +581,27 @@ const DirectoryContent: React.FC = () => {
                 <span className="hidden sm:inline">Sign in</span>
               </button>
             )}
-          </div>
 
-          {/* Right group: Sort tabs */}
-          <div className="hidden md:flex items-center gap-1 rounded-full p-1 backdrop-blur-md pointer-events-auto bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
-            {(['newest', 'popular'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => {
-                  setActiveTab(tab);
-                  setSortBy(tab === 'popular' ? 'name' : 'default');
-                  playSound('pop');
-                }}
-                className={`px-4 py-1.5 rounded-full text-[12.5px] font-semibold capitalize transition-all duration-200 ${
-                  activeTab === tab
-                    ? 'bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(124,58,237,0.35)] text-[#7c3aed] dark:text-[#c084fc] shadow-[0_2px_8px_rgba(124,58,237,0.2)]'
-                    : 'bg-transparent text-[rgba(80,60,140,0.6)] dark:text-[rgba(200,200,240,0.6)] shadow-none'
-                }`}
-              >
-                {tab === 'newest' ? '✦ Newest' : '↑ Popular'}
-              </button>
-            ))}
+            {/* Sort tabs (Moved inside the right actions group for mobile layout harmony, but still hidden on small screens) */}
+            <div className="hidden md:flex items-center gap-1 rounded-full p-1 ml-2 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+              {(['newest', 'popular'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setSortBy(tab === 'popular' ? 'name' : 'default');
+                    playSound('pop');
+                  }}
+                  className={`px-4 py-1.5 rounded-full text-[12.5px] font-semibold capitalize transition-all duration-200 ${
+                    activeTab === tab
+                      ? 'bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(124,58,237,0.35)] text-[#7c3aed] dark:text-[#c084fc] shadow-[0_2px_8px_rgba(124,58,237,0.2)]'
+                      : 'bg-transparent text-[rgba(80,60,140,0.6)] dark:text-[rgba(200,200,240,0.6)] shadow-none'
+                  }`}
+                >
+                  {tab === 'newest' ? '✦ Newest' : '↑ Popular'}
+                </button>
+              ))}
+            </div>
           </div>
         </header>
 

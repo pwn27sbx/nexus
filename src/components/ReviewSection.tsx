@@ -161,13 +161,13 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
           className="mb-12 p-6 rounded-2xl text-center"
           style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}
         >
-          <p className="opacity-70 mb-4">Log in to leave a review</p>
+          <p className="opacity-70 mb-4 font-medium text-[0.95rem]">Join to leave a review</p>
           <button
             onClick={() => isAuthModalOpen.set(true)}
-            className="px-6 py-2 rounded-full font-bold"
-            style={{ background: 'rgba(124,58,237,0.1)', color: '#a78bfa' }}
+            className="px-6 py-2.5 rounded-full font-bold transition-all hover:scale-105 cursor-pointer shadow-[0_4px_14px_0_rgba(168,85,247,0.39)] text-[0.95rem]"
+            style={{ background: 'linear-gradient(to right, #8b5cf6, #a855f7)', color: 'white' }}
           >
-            Log In
+            Sign Up
           </button>
         </div>
       )}

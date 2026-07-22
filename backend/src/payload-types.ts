@@ -179,7 +179,7 @@ export interface Tool {
   slug?: string | null;
   url: string;
   /**
-   * Breve descripción de la herramienta (Máx 100 caracteres).
+   * Breve descripción de la herramienta (Máx 300 caracteres).
    */
   description?: string | null;
   /**
