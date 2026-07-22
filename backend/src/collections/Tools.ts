@@ -60,8 +60,8 @@ export const Tools: CollectionConfig = {
       type: 'text',
       required: false,
       defaultValue: 'High-performance platform for creators.',
-      maxLength: 100,
-      admin: { description: 'Breve descripción de la herramienta (Máx 100 caracteres).' }
+      maxLength: 300,
+      admin: { description: 'Breve descripción de la herramienta (Máx 300 caracteres).' }
     },
 
     {
@@ -194,8 +194,8 @@ export const Tools: CollectionConfig = {
                 
                 if (desc) {
                   desc = desc.trim();
-                  // Max length is 100 in the schema
-                  data.description = desc.length > 100 ? desc.substring(0, 97) + '...' : desc;
+                  // Max length is 300 in the schema
+                  data.description = desc.length > 300 ? desc.substring(0, 297) + '...' : desc;
                 }
               }
             } catch (e) {
