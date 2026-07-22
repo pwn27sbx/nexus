@@ -33,6 +33,7 @@ export const Tools: CollectionConfig = {
           await req.payload.update({
             collection: 'tools',
             id,
+            overrideAccess: true,
             data: {
               clicks: (tool.clicks || 0) + 1,
             }

@@ -174,36 +174,33 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
 
               {/* Browser Content */}
               <div
-                className="aspect-[16/10] relative flex items-center justify-center p-8 overflow-hidden z-10"
+                className="relative w-full aspect-[16/10] overflow-hidden"
                 style={{
                   borderRadius: '0 0 1.25rem 1.25rem',
-                  backgroundImage:
-                    'linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3), linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3)',
-                  backgroundSize: '20px 20px',
-                  backgroundPosition: '0 0, 10px 10px',
-                  backgroundColor: 'white',
                 }}
               >
-                {/* Decorative soft wave at the bottom */}
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-1/3 opacity-80"
-                  style={{
-                    background:
-                      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%233b82f6' fill-opacity='0.3' d='M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,165.3C672,171,768,213,864,229.3C960,245,1056,235,1152,213.3C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E\") bottom/cover no-repeat",
-                  }}
-                ></div>
-
-                {/* Decorative soft circle behind the screenshot */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-80 z-0">
-                  <div className="w-64 h-64 rounded-full bg-pink-500/40 blur-[20px]"></div>
-                </div>
                 <img
                   src={
                     tool.screenshotUrl ||
+                    (tool as any).imageUrl ||
                     'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop'
                   }
                   alt={`Screenshot of ${tool.name}`}
-                  className="w-48 h-48 object-contain relative z-10"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* Bottom fade like BentoCard */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: '80px',
+                    background: isDark
+                      ? 'linear-gradient(to bottom, transparent, rgba(15,12,32,0.6))'
+                      : 'linear-gradient(to bottom, transparent, rgba(248,246,255,0.5))',
+                    pointerEvents: 'none',
+                  }}
                 />
               </div>
             </div>
