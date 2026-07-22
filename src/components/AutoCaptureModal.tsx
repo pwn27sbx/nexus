@@ -130,22 +130,20 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 
       {/* Main content */}
       <div
-        className="relative w-full submit-layout animate-scale-in"
-        style={{ maxWidth: '960px', padding: '0 24px', maxHeight: '90vh', display: 'flex', gap: '20px' }}
+        className="relative w-full submit-layout animate-scale-in flex flex-col md:flex-row"
+        style={{ maxWidth: '960px', padding: '0 16px', maxHeight: '95vh', gap: '16px' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Left — Preview */}
         <div
-          className="submit-preview"
+          className="submit-preview flex-1 min-h-[220px] md:min-h-[400px] flex flex-col p-2.5 md:p-3"
           style={{
-            flex: 1, minHeight: '400px',
             background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
             border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: '2rem', overflow: 'hidden',
             boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.4)' : '0 8px 30px rgba(0,0,0,0.04)',
-            display: 'flex', flexDirection: 'column', padding: '12px',
           }}
         >
           {/* Browser chrome */}
@@ -179,8 +177,8 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
           }}>
             {previewUrl ? (
               <>
-                <img 
-                  src={`https://image.thum.io/get/width/1200/crop/800/${previewUrl}`} 
+                <img
+                  src={`https://image.thum.io/get/width/1200/crop/800/${previewUrl}`}
                   alt="Website Preview"
                   style={{ border: 'none', position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                 />
@@ -197,14 +195,13 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
         </div>
 
         {/* Right — Form */}
-        <div className="submit-form" style={{
-          width: '100%', maxWidth: '380px',
+        <div className="submit-form w-full md:max-w-[380px] p-5 md:p-7 overflow-y-auto no-scrollbar" style={{
           background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
           border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
           backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          borderRadius: '2rem', padding: '28px 24px',
+          borderRadius: '2rem',
           boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.4)' : '0 8px 30px rgba(0,0,0,0.04)',
-          overflowY: 'auto', maxHeight: '90vh',
+          maxHeight: '100%',
         }}>
           <h2 className="font-display" style={{ fontSize: '26px', fontWeight: 800, color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)', letterSpacing: '-0.02em', marginBottom: '4px' }}>Submit Tool</h2>
           <p style={{ fontSize: '13px', fontWeight: 500, color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)', marginBottom: '24px' }}>Add a resource to the directory.</p>
