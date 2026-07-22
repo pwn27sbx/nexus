@@ -22,6 +22,7 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [fetchError, setFetchError] = useState('');
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
   // Debounce search query
   const debouncedSetQuery = useRef(
@@ -83,7 +84,7 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
       }
     };
     fetchTools();
-  }, [debouncedQuery, page]);
+  }, [debouncedQuery, page, refreshCounter]);
 
   // Apply frontend filtering and sorting
   const filteredTools = useMemo(() => {
@@ -108,6 +109,23 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
     setPage((prev) => prev + 1);
   }, []);
 
+  const refresh = useCallback(() => {
+    setPage(0);
+    setTools([]); // Clear current tools to force re-render, or leave them for stale-while-revalidate
+    setPrevQuery(''); // Force a fetch
+    // To implement a true silent refetch:
+    setRefreshCounter((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const onFocus = () => {
+      // Small delay to ensure Algolia is updated if they just switched tabs
+      setTimeout(refresh, 500);
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [refresh]);
+
   return {
     searchQuery,
     debouncedQuery,
@@ -120,5 +138,6 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
     fetchError,
     hasMore,
     loadMore,
+    refresh,
   };
 }
