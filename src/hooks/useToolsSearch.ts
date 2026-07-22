@@ -38,12 +38,14 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
     [debouncedSetQuery]
   );
 
-  // Reset pagination when search or filters change
-  useEffect(() => {
+  const [prevQuery, setPrevQuery] = useState(debouncedQuery);
+
+  if (prevQuery !== debouncedQuery) {
+    setPrevQuery(debouncedQuery);
     setTools([]);
     setPage(0);
     setHasMore(true);
-  }, [debouncedQuery, activeCategory, activeTags]);
+  }
 
   // Fetch tools from Algolia
   useEffect(() => {

@@ -2,12 +2,12 @@ import React, { memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { isAuthModalOpen } from '../stores/modals';
 import type { ListCardProps } from '../types';
 
 const ListCard = memo(({ tool, isFocused, indexNumber, onSaveRequest, delay }: ListCardProps) => {
   const { user } = useAuth();
-  const { setIsAuthModalOpen } = useModals();
+  const setIsAuthModalOpen = isAuthModalOpen.set;
   const onRequireAuth = () => setIsAuthModalOpen(true);
 
   const numericToolId = Number(tool.id);

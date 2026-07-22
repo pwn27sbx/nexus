@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { useStore } from '@nanostores/react';
+import { isAdminPanelOpen } from '../stores/modals';
 import { API_BASE_URL } from '../utils/constants';
 import { CloseIcon, CheckIcon, SpinnerIcon } from '../utils/icons';
 import { playSound } from '../utils/sounds';
@@ -204,7 +205,8 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 // ─── Main AdminPanel ────────────────────────────────────────────────────
 const AdminPanel = () => {
   const { user } = useAuth();
-  const { isAdminPanelOpen: isOpen, setIsAdminPanelOpen } = useModals();
+  const isOpen = useStore(isAdminPanelOpen);
+  const setIsAdminPanelOpen = isAdminPanelOpen.set;
   const onClose = () => setIsAdminPanelOpen(false);
   const [pendingTools, setPendingTools] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(true);

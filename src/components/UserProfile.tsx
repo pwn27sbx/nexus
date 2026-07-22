@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { useStore } from '@nanostores/react';
+import { isProfileOpen } from '../stores/modals';
 import { API_BASE_URL } from '../utils/constants';
 import { playSound } from '../utils/sounds';
 import type { Tool, UserCollection } from '../types';
@@ -21,7 +22,8 @@ const UserProfile = ({
   setFontFamily: (font: string) => void;
 }) => {
   const { user, logout: onLogout } = useAuth();
-  const { isProfileOpen: isOpen, setIsProfileOpen } = useModals();
+  const isOpen = useStore(isProfileOpen);
+  const setIsProfileOpen = isProfileOpen.set;
   const onClose = () => setIsProfileOpen(false);
   const [arsenal, setArsenal] = useState<(Tool | number)[]>([]);
   const [collections, setCollections] = useState<UserCollection[]>([]);

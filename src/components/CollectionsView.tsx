@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { isAuthModalOpen } from '../stores/modals';
 import { playSound } from '../utils/sounds';
 
 // ── Mock featured collections ────────────────────────────────────────────────
@@ -82,7 +82,7 @@ const formatViews = (n: number) => {
 // ── Large Hero Collection Card ────────────────────────────────────────────────
 const HeroCollectionCard = ({ collection, isDark }: { collection: any; isDark: boolean }) => {
   const { user } = useAuth();
-  const { setIsAuthModalOpen } = useModals();
+  const setIsAuthModalOpen = isAuthModalOpen.set;
   const [isHovered, setIsHovered] = useState(false);
 
   return (

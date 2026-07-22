@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { useStore } from '@nanostores/react';
+import { isAuthModalOpen } from '../stores/modals';
 
 const AuthModal = () => {
-  const { isAuthModalOpen: isOpen, setIsAuthModalOpen } = useModals();
+  const isOpen = useStore(isAuthModalOpen);
+  const setIsAuthModalOpen = isAuthModalOpen.set;
   const { setUser } = useAuth();
   const onClose = () => setIsAuthModalOpen(false);
   const [isLogin, setIsLogin] = useState(true);

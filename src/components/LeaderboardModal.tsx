@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useModals } from '../contexts/ModalContext';
+import { useStore } from '@nanostores/react';
+import { isLeaderboardOpen } from '../stores/modals';
 import { API_BASE_URL } from '../utils/constants';
 import { SpinnerIcon } from '../utils/icons';
 import type { User } from '../types';
@@ -46,7 +47,8 @@ const LEVEL_COLORS: Record<string, string> = {
 };
 
 const LeaderboardModal = () => {
-  const { isLeaderboardOpen: isOpen, setIsLeaderboardOpen } = useModals();
+  const isOpen = useStore(isLeaderboardOpen);
+  const setIsLeaderboardOpen = isLeaderboardOpen.set;
   const onClose = () => setIsLeaderboardOpen(false);
   const [leaders, setLeaders] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);

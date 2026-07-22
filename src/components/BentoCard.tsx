@@ -3,7 +3,7 @@ import { ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { isAuthModalOpen } from '../stores/modals';
 import { m } from 'framer-motion';
 import type { BentoCardProps } from '../types';
 
@@ -13,7 +13,7 @@ import { CATEGORY_COLORS, FALLBACK_COLORS } from '../data/categories';
 const BentoCard: React.FC<BentoCardProps> = memo(
   ({ tool, isFocused, index, onSaveRequest, isDark }) => {
     const { user } = useAuth();
-    const { setIsAuthModalOpen } = useModals();
+    const setIsAuthModalOpen = isAuthModalOpen.set;
     const onRequireAuth = () => setIsAuthModalOpen(true);
 
     const cardRef = useRef<HTMLDivElement>(null);
@@ -230,6 +230,8 @@ const BentoCard: React.FC<BentoCardProps> = memo(
               }}
             >
               <img
+                loading="lazy"
+                decoding="async"
                 src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=128`}
                 alt=""
                 style={{ width: '40px', height: '40px', objectFit: 'contain', opacity: 0.35 }}

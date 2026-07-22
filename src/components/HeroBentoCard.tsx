@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { HeroBentoCardProps } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { isAuthModalOpen } from '../stores/modals';
 
 const CATEGORY_COLORS_HERO: Record<string, { bg: string; text: string; border: string }> = {
   Design: {
@@ -21,7 +21,7 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
   isDark,
 }) => {
   const { user } = useAuth();
-  const { setIsAuthModalOpen } = useModals();
+  const setIsAuthModalOpen = isAuthModalOpen.set;
   const onRequireAuth = () => setIsAuthModalOpen(true);
 
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -232,6 +232,8 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
             }}
           >
             <img
+              loading="lazy"
+              decoding="async"
               src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=128`}
               alt=""
               style={{ width: '56px', height: '56px', objectFit: 'contain', opacity: 0.3 }}

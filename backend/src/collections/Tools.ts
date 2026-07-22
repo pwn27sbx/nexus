@@ -122,7 +122,7 @@ export const Tools: CollectionConfig = {
             if (json.status === 'success' && json.data?.screenshot?.url) {
               data.screenshotUrl = json.data.screenshot.url;
             }
-          } catch (error) { 
+          } catch { 
             console.warn(`[Microlink timeout/error] No se pudo obtener screenshot para ${data.url}`); 
           }
         }
@@ -165,7 +165,7 @@ export const Tools: CollectionConfig = {
             try { 
               const idx = getAlgoliaIndex();
               if (idx) await idx.deleteObject(doc.id.toString()); 
-            } catch(e) {}
+            } catch {}
         }
 
         if (doc.status === 'approved' && doc.submittedBy && (!previousDoc || doc.status !== previousDoc.status)) {
@@ -176,7 +176,7 @@ export const Tools: CollectionConfig = {
             let newLevel: 'Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator' = 'Explorer';
             if (totalApproved >= 30) newLevel = 'Master Curator'; else if (totalApproved >= 15) newLevel = 'Expert Curator'; else if (totalApproved >= 5) newLevel = 'Contributor';
             await req.payload.update({ collection: 'users', id: userId, data: { level: newLevel, approvedCount: totalApproved } as any });
-          } catch (error) {}
+          } catch {}
         }
         return doc;
       },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
-import { useModals } from '../contexts/ModalContext';
+import { isAuthModalOpen } from '../stores/modals';
 import type { SpatialCommunityHubProps, User } from '../types';
 
 import { MOCK_CONTRIBUTORS, MOCK_DISCUSSIONS, MOCK_COLLECTIONS } from '../utils/mockData';
@@ -44,7 +44,13 @@ const Avatar: React.FC<AvatarProps> = ({ name, size = 40, src = null, badge = nu
         }}
       >
         {src ? (
-          <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img
+            loading="lazy"
+            decoding="async"
+            src={src}
+            alt={name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         ) : (
           <span>{initials}</span>
         )}
@@ -311,7 +317,7 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
   setIsCommandPaletteOpen,
 }) => {
   const { user } = useAuth();
-  const { setIsAuthModalOpen } = useModals();
+  const setIsAuthModalOpen = isAuthModalOpen.set;
   const onRequireAuth = () => setIsAuthModalOpen(true);
 
   const [leaders, setLeaders] = useState<User[]>([]);

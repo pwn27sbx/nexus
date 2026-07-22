@@ -213,6 +213,8 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({
                           }}
                         >
                           <img
+                            loading="lazy"
+                            decoding="async"
                             src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=32`}
                             alt=""
                             style={{ width: '20px', height: '20px', borderRadius: '4px' }}

@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useModals } from '@/contexts/ModalContext';
+import { useStore } from '@nanostores/react';
+import {
+  isAuthModalOpen,
+  isCategoryModalOpen,
+  isCommandPaletteOpen,
+  isSubmitModalOpen,
+  isProfileOpen,
+  isLeaderboardOpen,
+  isAdminPanelOpen,
+} from '@/stores/modals';
 import { AppProvider } from '@/contexts/AppProvider';
 import { useToolsSearch } from '@/hooks/useToolsSearch';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
@@ -330,21 +339,19 @@ const DirectoryContent: React.FC = () => {
   });
 
   // ── Modals ──
-  const {
-    isAuthModalOpen,
-    setIsAuthModalOpen,
-    isCategoryModalOpen,
-    setIsCategoryModalOpen,
-    isCommandPaletteOpen,
-    setIsCommandPaletteOpen,
-    isSubmitModalOpen: isModalOpen,
-    setIsSubmitModalOpen: setIsModalOpen,
-    isProfileOpen,
-    setIsProfileOpen,
-    isLeaderboardOpen,
-    setIsLeaderboardOpen,
-    setIsAdminPanelOpen,
-  } = useModals();
+  const isAuthModalOpenVal = useStore(isAuthModalOpen);
+  const setIsAuthModalOpen = isAuthModalOpen.set;
+  const isCategoryModalOpenVal = useStore(isCategoryModalOpen);
+  const setIsCategoryModalOpen = isCategoryModalOpen.set;
+  const isCommandPaletteOpenVal = useStore(isCommandPaletteOpen);
+  const setIsCommandPaletteOpen = isCommandPaletteOpen.set;
+  const isModalOpen = useStore(isSubmitModalOpen);
+  const setIsModalOpen = isSubmitModalOpen.set;
+  const isProfileOpenVal = useStore(isProfileOpen);
+  const setIsProfileOpen = isProfileOpen.set;
+  const isLeaderboardOpenVal = useStore(isLeaderboardOpen);
+  const setIsLeaderboardOpen = isLeaderboardOpen.set;
+  const setIsAdminPanelOpen = isAdminPanelOpen.set;
 
   const [savePopoverConfig, setSavePopoverConfig] = useState<SavePopoverConfig | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -361,11 +368,11 @@ const DirectoryContent: React.FC = () => {
   useEffect(() => {
     if (
       isModalOpen ||
-      isAuthModalOpen ||
-      isProfileOpen ||
-      isLeaderboardOpen ||
-      isCommandPaletteOpen ||
-      isCategoryModalOpen ||
+      isAuthModalOpenVal ||
+      isProfileOpenVal ||
+      isLeaderboardOpenVal ||
+      isCommandPaletteOpenVal ||
+      isCategoryModalOpenVal ||
       savePopoverConfig
     )
       return;
@@ -951,7 +958,7 @@ const DirectoryContent: React.FC = () => {
         {/* ══ MODALS ════════════════════════════════════════ */}
         <SavePopover config={savePopoverConfig} onClose={() => setSavePopoverConfig(null)} />
         <CategoriesModal
-          isOpen={isCategoryModalOpen}
+          isOpen={isCategoryModalOpenVal}
           onClose={() => {
             setIsCategoryModalOpen(false);
             if (activeNav === 'categories') setActiveNav('discover');
@@ -961,7 +968,7 @@ const DirectoryContent: React.FC = () => {
           isDark={isDark}
         />
         <CommandPalette
-          isOpen={isCommandPaletteOpen}
+          isOpen={isCommandPaletteOpenVal}
           onClose={() => setIsCommandPaletteOpen(false)}
           query={searchQuery}
           setQuery={handleSearchChange}

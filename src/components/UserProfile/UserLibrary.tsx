@@ -213,6 +213,8 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
               >
                 {arsenal.slice(0, 4).map((tool: any, i) => (
                   <img
+                    loading="lazy"
+                    decoding="async"
                     key={i}
                     src={`https://www.google.com/s2/favicons?domain=${tool.url || ''}&sz=64`}
                     alt=""
@@ -284,6 +286,8 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
                   {folder.tools && folder.tools.length > 0
                     ? folder.tools.slice(0, 4).map((tool: any, i) => (
                         <img
+                          loading="lazy"
+                          decoding="async"
                           key={i}
                           src={`https://www.google.com/s2/favicons?domain=${tool.url || ''}&sz=64`}
                           alt=""
@@ -460,6 +464,8 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
                   }}
                 >
                   <img
+                    loading="lazy"
+                    decoding="async"
                     src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`}
                     alt=""
                     style={{
