@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useModals } from '../contexts/ModalContext';
@@ -51,7 +50,18 @@ const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose }) => 
     >
       <span>{icon}</span>
       <span style={{ fontSize: '14px', fontWeight: 700 }}>{message}</span>
-      <button onClick={onClose} style={{ marginLeft: '6px', background: 'none', border: 'none', color: 'white', cursor: 'pointer', opacity: 0.7 }} aria-label="Dismiss">
+      <button
+        onClick={onClose}
+        style={{
+          marginLeft: '6px',
+          background: 'none',
+          border: 'none',
+          color: 'white',
+          cursor: 'pointer',
+          opacity: 0.7,
+        }}
+        aria-label="Dismiss"
+      >
         <CloseIcon size={14} />
       </button>
     </div>
@@ -66,8 +76,14 @@ interface ConfirmDialogProps {
 }
 
 // ─── Confirm Dialog ─────────────────────────────────────────────────────
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, onCancel, isLoading }) => {
-  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+  message,
+  onConfirm,
+  onCancel,
+  isLoading,
+}) => {
+  const isDark =
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
   return (
     <div
       className="fixed inset-0 z-[600] flex items-center justify-center p-4"
@@ -89,9 +105,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, onCan
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           borderRadius: '2rem',
           padding: '32px',
-          boxShadow: isDark
-            ? '0 20px 56px rgba(0,0,0,0.55)'
-            : '0 20px 56px rgba(80,60,180,0.14)',
+          boxShadow: isDark ? '0 20px 56px rgba(0,0,0,0.55)' : '0 20px 56px rgba(80,60,180,0.14)',
           textAlign: 'center',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -173,7 +187,13 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, onCan
               transition: 'all 0.15s ease',
             }}
           >
-            {isLoading ? <><SpinnerIcon size={16} /> Rejecting...</> : 'Reject Tool'}
+            {isLoading ? (
+              <>
+                <SpinnerIcon size={16} /> Rejecting...
+              </>
+            ) : (
+              'Reject Tool'
+            )}
           </button>
         </div>
       </div>
@@ -191,41 +211,54 @@ const AdminPanel = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; toolId: string | number | null; type: 'approve' | 'reject' | null }>({ isOpen: false, toolId: null, type: null });
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    toolId: string | number | null;
+    type: 'approve' | 'reject' | null;
+  }>({ isOpen: false, toolId: null, type: null });
   const [isProcessing, setIsProcessing] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [expandedToolId, setExpandedToolId] = useState<string | number | null>(null);
   const [actionStatus, setActionStatus] = useState<Record<string | number, string>>({});
-  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+  const isDark =
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
-  const addToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-  }, []);
+  const addToast = useCallback(
+    (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+      const id = Date.now();
+      setToasts((prev) => [...prev, { id, message, type }]);
+    },
+    []
+  );
 
   const isAdmin = user?.role === 'admin' || user?.email?.includes('@admin');
 
-  const fetchPending = useCallback(async (pageNum = 1, append = false) => {
-    if (pageNum === 1) setIsLoading(true);
-    else setIsLoadingMore(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/tools?where[status][equals]=pending&sort=createdAt&limit=20&page=${pageNum}`);
-      const data = await res.json();
-      const tools = data.docs || [];
-      if (append) {
-        setPendingTools((prev) => [...prev, ...tools]);
-      } else {
-        setPendingTools(tools);
+  const fetchPending = useCallback(
+    async (pageNum = 1, append = false) => {
+      if (pageNum === 1) setIsLoading(true);
+      else setIsLoadingMore(true);
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/api/tools?where[status][equals]=pending&sort=createdAt&limit=20&page=${pageNum}`
+        );
+        const data = await res.json();
+        const tools = data.docs || [];
+        if (append) {
+          setPendingTools((prev) => [...prev, ...tools]);
+        } else {
+          setPendingTools(tools);
+        }
+        setHasMore(data.hasNextPage || false);
+        setPage(pageNum);
+      } catch (error) {
+        addToast('Failed to load pending tools', 'error');
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
       }
-      setHasMore(data.hasNextPage || false);
-      setPage(pageNum);
-    } catch (error) {
-      addToast('Failed to load pending tools', 'error');
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [addToast]);
+    },
+    [addToast]
+  );
 
   useEffect(() => {
     if (!isOpen || !isAdmin) return;
@@ -339,7 +372,9 @@ const AdminPanel = () => {
           className="absolute top-5 right-5 flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all hover:scale-105"
           style={{
             background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.88)',
-            border: isDark ? '1px solid rgba(255,255,255,0.18)' : '1px solid rgba(255,255,255,0.95)',
+            border: isDark
+              ? '1px solid rgba(255,255,255,0.18)'
+              : '1px solid rgba(255,255,255,0.95)',
             color: isDark ? 'rgba(230,220,255,0.9)' : 'rgba(40,30,70,0.8)',
             backdropFilter: 'blur(16px)',
             boxShadow: isDark ? '0 2px 12px rgba(0,0,0,0.3)' : '0 2px 12px rgba(80,60,180,0.12)',
@@ -347,7 +382,14 @@ const AdminPanel = () => {
           }}
           aria-label="Close"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -361,7 +403,9 @@ const AdminPanel = () => {
             maxWidth: '900px',
             maxHeight: '85vh',
             background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
-            border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+            border: isDark
+              ? '1px solid rgba(255,255,255,0.09)'
+              : '1px solid rgba(255,255,255,0.62)',
             backdropFilter: 'blur(24px) saturate(180%)',
             WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: '2rem',
@@ -378,7 +422,9 @@ const AdminPanel = () => {
           <div
             style={{
               padding: '28px 32px 20px',
-              borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.5)',
+              borderBottom: isDark
+                ? '1px solid rgba(255,255,255,0.07)'
+                : '1px solid rgba(255,255,255,0.5)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -420,9 +466,21 @@ const AdminPanel = () => {
           </div>
 
           {/* Content */}
-          <div className="no-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+          <div
+            className="no-scrollbar"
+            style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}
+          >
             {!isAdmin ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', textAlign: 'center' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '60px 0',
+                  textAlign: 'center',
+                }}
+              >
                 <div
                   style={{
                     width: '64px',
@@ -439,10 +497,22 @@ const AdminPanel = () => {
                 >
                   🔒
                 </div>
-                <p style={{ fontSize: '18px', fontWeight: 700, color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)' }}>
+                <p
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)',
+                  }}
+                >
                   Access Denied
                 </p>
-                <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)', marginTop: '6px' }}>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)',
+                    marginTop: '6px',
+                  }}
+                >
                   Admin privileges required.
                 </p>
               </div>
@@ -452,7 +522,14 @@ const AdminPanel = () => {
               </div>
             ) : pendingTools.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '6px',
+                  }}
+                >
                   <p
                     style={{
                       fontSize: '13px',
@@ -494,7 +571,9 @@ const AdminPanel = () => {
                         padding: '18px 20px',
                         borderRadius: '20px',
                         background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.55)',
-                        border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.8)',
+                        border: isDark
+                          ? '1px solid rgba(255,255,255,0.07)'
+                          : '1px solid rgba(255,255,255,0.8)',
                         backdropFilter: 'blur(12px)',
                         transition: 'all 0.2s ease',
                         opacity: isBusy ? 0.6 : 1,
@@ -507,8 +586,12 @@ const AdminPanel = () => {
                               width: '38px',
                               height: '38px',
                               borderRadius: '12px',
-                              background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.7)',
-                              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.9)',
+                              background: isDark
+                                ? 'rgba(255,255,255,0.06)'
+                                : 'rgba(255,255,255,0.7)',
+                              border: isDark
+                                ? '1px solid rgba(255,255,255,0.08)'
+                                : '1px solid rgba(255,255,255,0.9)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -516,7 +599,13 @@ const AdminPanel = () => {
                               overflow: 'hidden',
                             }}
                           >
-                            <img src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`} alt="" style={{ width: '22px', height: '22px' }} aria-hidden="true" loading="lazy" />
+                            <img
+                              src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`}
+                              alt=""
+                              style={{ width: '22px', height: '22px' }}
+                              aria-hidden="true"
+                              loading="lazy"
+                            />
                           </div>
                           <div>
                             <h3
@@ -566,12 +655,14 @@ const AdminPanel = () => {
                             marginLeft: '48px',
                             display: 'inline-block',
                           }}
-                          onClick={e => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {tool.url}
                         </a>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                      <div
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}
+                      >
                         {status === 'error' && (
                           <span
                             style={{
@@ -607,7 +698,11 @@ const AdminPanel = () => {
                           aria-label="Approve"
                           title="Approve"
                         >
-                          {status === 'approving' ? <SpinnerIcon size={16} /> : <CheckIcon size={18} />}
+                          {status === 'approving' ? (
+                            <SpinnerIcon size={16} />
+                          ) : (
+                            <CheckIcon size={18} />
+                          )}
                         </button>
                         <button
                           onClick={() => handleReject(tool.id)}
@@ -629,7 +724,11 @@ const AdminPanel = () => {
                           aria-label="Reject"
                           title="Reject"
                         >
-                          {status === 'rejecting' ? <SpinnerIcon size={16} /> : <CloseIcon size={18} />}
+                          {status === 'rejecting' ? (
+                            <SpinnerIcon size={16} />
+                          ) : (
+                            <CloseIcon size={18} />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -646,7 +745,9 @@ const AdminPanel = () => {
                         padding: '12px 28px',
                         borderRadius: '16px',
                         background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.6)',
-                        border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.85)',
+                        border: isDark
+                          ? '1px solid rgba(255,255,255,0.1)'
+                          : '1px solid rgba(255,255,255,0.85)',
                         color: isDark ? 'rgba(240,235,255,0.85)' : 'rgba(15,10,40,0.8)',
                         fontSize: '14px',
                         fontWeight: 700,
@@ -660,7 +761,9 @@ const AdminPanel = () => {
                       aria-label="Load more tools"
                     >
                       {isLoadingMore ? (
-                        <><SpinnerIcon size={16} /> Loading...</>
+                        <>
+                          <SpinnerIcon size={16} /> Loading...
+                        </>
                       ) : (
                         'Load More Tools'
                       )}
@@ -669,7 +772,16 @@ const AdminPanel = () => {
                 )}
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', textAlign: 'center' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '60px 0',
+                  textAlign: 'center',
+                }}
+              >
                 <div
                   style={{
                     width: '64px',
@@ -686,10 +798,22 @@ const AdminPanel = () => {
                 >
                   ✅
                 </div>
-                <p style={{ fontSize: '18px', fontWeight: 700, color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)' }}>
+                <p
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)',
+                  }}
+                >
                   All caught up!
                 </p>
-                <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)', marginTop: '6px' }}>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)',
+                    marginTop: '6px',
+                  }}
+                >
                   No pending tools to review.
                 </p>
               </div>

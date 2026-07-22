@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,7 +12,8 @@ const AuthModal = () => {
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+  const isDark =
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -101,7 +101,14 @@ const AuthModal = () => {
         }}
         aria-label="Close"
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+        >
           <line x1="18" y1="6" x2="6" y2="18" />
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
@@ -124,7 +131,7 @@ const AuthModal = () => {
             ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.08)'
             : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)',
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <h2
           className="font-display"
@@ -151,7 +158,10 @@ const AuthModal = () => {
             : 'Join the directory to submit and save tools.'}
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+        >
           <div>
             <label
               style={{
@@ -210,17 +220,19 @@ const AuthModal = () => {
               marginTop: '8px',
               padding: '14px',
               borderRadius: '16px',
-              background: status === 'success'
-                ? 'linear-gradient(135deg, #10b981, #14b8a6)'
-                : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+              background:
+                status === 'success'
+                  ? 'linear-gradient(135deg, #10b981, #14b8a6)'
+                  : 'linear-gradient(135deg, #7c3aed, #a855f7)',
               color: 'white',
               fontSize: '15px',
               fontWeight: 700,
               border: 'none',
               cursor: status === 'loading' ? 'wait' : 'pointer',
-              boxShadow: status === 'success'
-                ? '0 4px 20px rgba(16,185,129,0.35)'
-                : '0 4px 20px rgba(124,58,237,0.35)',
+              boxShadow:
+                status === 'success'
+                  ? '0 4px 20px rgba(16,185,129,0.35)'
+                  : '0 4px 20px rgba(124,58,237,0.35)',
               transition: 'all 0.2s ease',
               opacity: status === 'loading' ? 0.6 : 1,
             }}
@@ -251,12 +263,16 @@ const AuthModal = () => {
               cursor: 'pointer',
               transition: 'color 0.2s ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = isDark ? '#c084fc' : '#7c3aed'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = isDark ? 'rgba(180,165,240,0.6)' : 'rgba(100,80,180,0.6)'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = isDark ? '#c084fc' : '#7c3aed';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = isDark
+                ? 'rgba(180,165,240,0.6)'
+                : 'rgba(100,80,180,0.6)';
+            }}
           >
-            {isLogin
-              ? "Don't have an account? Sign up"
-              : 'Already have an account? Sign in'}
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
         </div>
       </div>

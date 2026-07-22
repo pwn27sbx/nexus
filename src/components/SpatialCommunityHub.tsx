@@ -81,9 +81,7 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
         width: `${size}px`,
         height: `${size}px`,
         borderRadius: '50%',
-        background: isDark
-          ? 'rgba(25,22,52,0.72)'
-          : 'rgba(255,255,255,0.7)',
+        background: isDark ? 'rgba(25,22,52,0.72)' : 'rgba(255,255,255,0.7)',
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         border: isDark
@@ -102,7 +100,11 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
         flexShrink: 0,
       }}
     >
-      <Avatar name={contributor.name} size={contributor.isTop ? 52 : 42} badge={contributor.isTop ? '🏆' : null} />
+      <Avatar
+        name={contributor.name}
+        size={contributor.isTop ? 52 : 42}
+        badge={contributor.isTop ? '🏆' : null}
+      />
       <div>
         <div
           style={{
@@ -122,7 +124,9 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
             fontWeight: 500,
           }}
         >
-          Contribution of<br />{contributor.contribution} avatars
+          Contribution of
+          <br />
+          {contributor.contribution} avatars
         </div>
       </div>
     </div>
@@ -130,7 +134,7 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
 };
 
 // ── Discussion Card ──────────────────────────────────────────────────────────
-const DiscussionCard: React.FC<{ discussion: any, isDark: boolean }> = ({ discussion, isDark }) => (
+const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discussion, isDark }) => (
   <div
     style={{
       background: isDark ? 'rgba(20,18,42,0.7)' : 'rgba(255,255,255,0.72)',
@@ -182,11 +186,22 @@ const DiscussionCard: React.FC<{ discussion: any, isDark: boolean }> = ({ discus
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         <Avatar name={discussion.author} size={20} />
-        <span style={{ fontSize: '11.5px', fontWeight: 600, color: isDark ? 'rgba(200,190,255,0.65)' : 'rgba(80,60,140,0.65)' }}>
+        <span
+          style={{
+            fontSize: '11.5px',
+            fontWeight: 600,
+            color: isDark ? 'rgba(200,190,255,0.65)' : 'rgba(80,60,140,0.65)',
+          }}
+        >
           {discussion.author}
         </span>
       </div>
-      <span style={{ fontSize: '11px', color: isDark ? 'rgba(160,145,220,0.4)' : 'rgba(120,90,180,0.45)' }}>
+      <span
+        style={{
+          fontSize: '11px',
+          color: isDark ? 'rgba(160,145,220,0.4)' : 'rgba(120,90,180,0.45)',
+        }}
+      >
         {discussion.timeAgo}
       </span>
     </div>
@@ -194,7 +209,7 @@ const DiscussionCard: React.FC<{ discussion: any, isDark: boolean }> = ({ discus
 );
 
 // ── Collection Card ──────────────────────────────────────────────────────────
-const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collection, isDark }) => (
+const CollectionCard: React.FC<{ collection: any; isDark: boolean }> = ({ collection, isDark }) => (
   <div
     style={{
       background: isDark ? 'rgba(20,18,42,0.7)' : 'rgba(255,255,255,0.72)',
@@ -208,13 +223,27 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
     {/* Header */}
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
       <Avatar name={collection.author} size={24} />
-      <span style={{ fontSize: '12px', fontWeight: 700, color: isDark ? 'rgba(225,220,255,0.88)' : 'rgba(20,15,50,0.82)' }}>
+      <span
+        style={{
+          fontSize: '12px',
+          fontWeight: 700,
+          color: isDark ? 'rgba(225,220,255,0.88)' : 'rgba(20,15,50,0.82)',
+        }}
+      >
         {collection.title}
       </span>
     </div>
 
     {/* Image grid */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', borderRadius: '10px', overflow: 'hidden' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '4px',
+        borderRadius: '10px',
+        overflow: 'hidden',
+      }}
+    >
       {collection.images.slice(0, 3).map((img: string, i: number) => (
         <div
           key={i}
@@ -229,8 +258,16 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
             src={img}
             alt=""
             loading="lazy"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-            onError={e => { e.currentTarget.style.display = 'none'; }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
           />
         </div>
       ))}
@@ -245,7 +282,11 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
             width: '22px',
             height: '22px',
             borderRadius: '50%',
-            background: ['linear-gradient(135deg,#7c3aed,#a855f7)', 'linear-gradient(135deg,#3b82f6,#6366f1)', 'linear-gradient(135deg,#ec4899,#f43f5e)'][i % 3],
+            background: [
+              'linear-gradient(135deg,#7c3aed,#a855f7)',
+              'linear-gradient(135deg,#3b82f6,#6366f1)',
+              'linear-gradient(135deg,#ec4899,#f43f5e)',
+            ][i % 3],
             border: isDark ? '2px solid rgba(20,18,42,1)' : '2px solid rgba(255,255,255,1)',
             display: 'flex',
             alignItems: 'center',
@@ -264,11 +305,15 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
 );
 
 // ── Main Community Component ─────────────────────────────────────────────────
-const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searchQuery, setIsCommandPaletteOpen }) => {
+const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
+  isDark,
+  searchQuery,
+  setIsCommandPaletteOpen,
+}) => {
   const { user } = useAuth();
   const { setIsAuthModalOpen } = useModals();
   const onRequireAuth = () => setIsAuthModalOpen(true);
-  
+
   const [leaders, setLeaders] = useState<User[]>([]);
 
   useEffect(() => {
@@ -289,17 +334,44 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
   }, []);
 
   // Map API leaders to display format, fall back to mock
-  const displayContributors = leaders.length >= 3
-    ? [
-        { id: leaders[0].id, name: leaders[0].nickname || leaders[0].email?.split('@')[0] || 'Top Contributor', contribution: `${leaders[0].approvedCount || 23}k`, avatarUrl: null, isTop: true },
-        { id: leaders[1].id, name: leaders[1].nickname || leaders[1].email?.split('@')[0] || 'Maria Caroan', contribution: `${leaders[1].approvedCount || 10}k`, avatarUrl: null, isTop: false },
-        { id: leaders[2].id, name: leaders[2].nickname || leaders[2].email?.split('@')[0] || 'Marty Kenton', contribution: `${leaders[2].approvedCount || 142}k`, avatarUrl: null, isTop: false },
-      ]
-    : MOCK_CONTRIBUTORS;
+  const displayContributors =
+    leaders.length >= 3
+      ? [
+          {
+            id: leaders[0].id,
+            name: leaders[0].nickname || leaders[0].email?.split('@')[0] || 'Top Contributor',
+            contribution: `${leaders[0].approvedCount || 23}k`,
+            avatarUrl: null,
+            isTop: true,
+          },
+          {
+            id: leaders[1].id,
+            name: leaders[1].nickname || leaders[1].email?.split('@')[0] || 'Maria Caroan',
+            contribution: `${leaders[1].approvedCount || 10}k`,
+            avatarUrl: null,
+            isTop: false,
+          },
+          {
+            id: leaders[2].id,
+            name: leaders[2].nickname || leaders[2].email?.split('@')[0] || 'Marty Kenton',
+            contribution: `${leaders[2].approvedCount || 142}k`,
+            avatarUrl: null,
+            isTop: false,
+          },
+        ]
+      : MOCK_CONTRIBUTORS;
 
   return (
-    <div style={{ width: '100%', minHeight: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '40px' }}>
-
+    <div
+      style={{
+        width: '100%',
+        minHeight: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingBottom: '40px',
+      }}
+    >
       {/* ── Header ── */}
       <section style={{ textAlign: 'center', width: '100%', padding: '40px 24px 28px' }}>
         <h1
@@ -327,7 +399,10 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
         </p>
 
         {/* Search */}
-        <div className="animate-fade-up" style={{ maxWidth: '540px', margin: '0 auto', animationDelay: '100ms' }}>
+        <div
+          className="animate-fade-up"
+          style={{ maxWidth: '540px', margin: '0 auto', animationDelay: '100ms' }}
+        >
           <button
             onClick={() => setIsCommandPaletteOpen(true)}
             style={{
@@ -338,18 +413,35 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
               padding: '13px 18px',
               borderRadius: '16px',
               background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.75)',
-              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.92)',
+              border: isDark
+                ? '1px solid rgba(255,255,255,0.12)'
+                : '1px solid rgba(255,255,255,0.92)',
               backdropFilter: 'blur(20px)',
               boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.25)' : '0 4px 20px rgba(80,60,160,0.1)',
               cursor: 'pointer',
               textAlign: 'left',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,180,0.45)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,180,0.45)'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span style={{ fontSize: '14px', color: isDark ? 'rgba(180,165,255,0.45)' : 'rgba(100,80,160,0.5)', fontWeight: 500 }}>
+            <span
+              style={{
+                fontSize: '14px',
+                color: isDark ? 'rgba(180,165,255,0.45)' : 'rgba(100,80,160,0.5)',
+                fontWeight: 500,
+              }}
+            >
               Search for spatial experiences, tools, and resources...
             </span>
           </button>
@@ -388,15 +480,33 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
           <div style={{ position: 'relative', height: '320px' }}>
             {/* Orb 1 — Top Contributor (largest, center-left) */}
             <div className="animate-orbit" style={{ position: 'absolute', left: '0', top: '60px' }}>
-              <UserOrb contributor={displayContributors[0]} animClass="" size={160} isDark={isDark} />
+              <UserOrb
+                contributor={displayContributors[0]}
+                animClass=""
+                size={160}
+                isDark={isDark}
+              />
             </div>
             {/* Orb 2 — Maria (top right) */}
             <div className="animate-orbit-2" style={{ position: 'absolute', right: '0', top: '0' }}>
-              <UserOrb contributor={displayContributors[1]} animClass="" size={130} isDark={isDark} />
+              <UserOrb
+                contributor={displayContributors[1]}
+                animClass=""
+                size={130}
+                isDark={isDark}
+              />
             </div>
             {/* Orb 3 — Marty (bottom right) */}
-            <div className="animate-orbit-3" style={{ position: 'absolute', right: '10px', bottom: '0' }}>
-              <UserOrb contributor={displayContributors[2]} animClass="" size={140} isDark={isDark} />
+            <div
+              className="animate-orbit-3"
+              style={{ position: 'absolute', right: '10px', bottom: '0' }}
+            >
+              <UserOrb
+                contributor={displayContributors[2]}
+                animClass=""
+                size={140}
+                isDark={isDark}
+              />
             </div>
           </div>
         </section>
@@ -415,7 +525,7 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
             Latest Discussions
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {MOCK_DISCUSSIONS.map(d => (
+            {MOCK_DISCUSSIONS.map((d) => (
               <DiscussionCard key={d.id} discussion={d} isDark={isDark} />
             ))}
           </div>
@@ -435,7 +545,7 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
             User Collections
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {MOCK_COLLECTIONS.map(c => (
+            {MOCK_COLLECTIONS.map((c) => (
               <CollectionCard key={c.id} collection={c} isDark={isDark} />
             ))}
           </div>
@@ -444,7 +554,7 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
 
       {/* ── Join CTA (bottom right floating) ── */}
       <button
-        onClick={() => user ? null : onRequireAuth()}
+        onClick={() => (user ? null : onRequireAuth())}
         className="animate-pulse-glow"
         style={{
           position: 'fixed',
@@ -463,8 +573,12 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searc
           zIndex: 100,
           letterSpacing: '-0.01em',
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'none';
+        }}
       >
         Join the Conversation
       </button>

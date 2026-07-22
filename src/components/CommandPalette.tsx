@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { SearchIcon, ArrowUpRight } from '../utils/icons';
 import type { Tool } from '../types';
@@ -11,10 +10,17 @@ interface CommandPaletteProps {
   tools: Tool[];
 }
 
-const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query, setQuery, tools }) => {
+const CommandPalette: React.FC<CommandPaletteProps> = ({
+  isOpen,
+  onClose,
+  query,
+  setQuery,
+  tools,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+  const isDark =
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   useEffect(() => {
     if (isOpen) {
@@ -107,13 +113,18 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
             display: 'flex',
             alignItems: 'center',
             padding: '20px 24px',
-            borderBottom: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(255,255,255,0.5)',
+            borderBottom: isDark
+              ? '1px solid rgba(255,255,255,0.07)'
+              : '1px solid rgba(255,255,255,0.5)',
             gap: '12px',
           }}
         >
           <SearchIcon
             size={18}
-            style={{ color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(124,58,237,0.45)', flexShrink: 0 }}
+            style={{
+              color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(124,58,237,0.45)',
+              flexShrink: 0,
+            }}
           />
           <input
             ref={inputRef}
@@ -141,7 +152,10 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
         </div>
 
         {/* Results */}
-        <div className="no-scrollbar" style={{ maxHeight: '50vh', overflowY: 'auto', padding: '8px' }}>
+        <div
+          className="no-scrollbar"
+          style={{ maxHeight: '50vh', overflowY: 'auto', padding: '8px' }}
+        >
           {query ? (
             filteredTools.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -166,13 +180,18 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
                         border: 'none',
                         transition: 'all 0.15s ease',
                         background: isSelected
-                          ? isDark ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.1)'
+                          ? isDark
+                            ? 'rgba(124,58,237,0.2)'
+                            : 'rgba(124,58,237,0.1)'
                           : 'transparent',
                       }}
-                      onMouseEnter={e => {
-                        if (!isSelected) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.45)';
+                      onMouseEnter={(e) => {
+                        if (!isSelected)
+                          e.currentTarget.style.background = isDark
+                            ? 'rgba(255,255,255,0.06)'
+                            : 'rgba(255,255,255,0.45)';
                       }}
-                      onMouseLeave={e => {
+                      onMouseLeave={(e) => {
                         if (!isSelected) e.currentTarget.style.background = 'transparent';
                       }}
                       aria-label={`Open ${tool.name}`}
@@ -184,7 +203,9 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
                             height: '36px',
                             borderRadius: '12px',
                             background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.7)',
-                            border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
+                            border: isDark
+                              ? '1px solid rgba(255,255,255,0.1)'
+                              : '1px solid rgba(255,255,255,0.9)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -204,8 +225,12 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
                             fontWeight: 700,
                             letterSpacing: '-0.01em',
                             color: isSelected
-                              ? isDark ? '#c084fc' : '#7c3aed'
-                              : isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
+                              ? isDark
+                                ? '#c084fc'
+                                : '#7c3aed'
+                              : isDark
+                                ? 'rgba(240,235,255,0.9)'
+                                : 'rgba(15,10,40,0.85)',
                           }}
                         >
                           {tool.name}
@@ -230,7 +255,16 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
                 })}
               </div>
             ) : (
-              <div style={{ padding: '48px 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  padding: '48px 0',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '10px',
+                }}
+              >
                 <div
                   style={{
                     width: '48px',
@@ -245,17 +279,34 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query,
                 >
                   <SearchIcon size={22} style={{ color: isDark ? '#a855f7' : '#7c3aed' }} />
                 </div>
-                <p style={{ fontSize: '15px', fontWeight: 700, color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)' }}>
+                <p
+                  style={{
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    color: isDark ? 'rgba(240,235,255,0.8)' : 'rgba(15,10,40,0.7)',
+                  }}
+                >
                   No results found.
                 </p>
-                <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)' }}>
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: isDark ? 'rgba(180,165,235,0.5)' : 'rgba(80,60,140,0.5)',
+                  }}
+                >
                   Try a different search term.
                 </p>
               </div>
             )
           ) : (
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
-              <p style={{ fontSize: '14px', fontWeight: 600, color: isDark ? 'rgba(180,165,240,0.45)' : 'rgba(100,80,160,0.5)' }}>
+              <p
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: isDark ? 'rgba(180,165,240,0.45)' : 'rgba(100,80,160,0.5)',
+                }}
+              >
                 Type to start searching...
               </p>
             </div>

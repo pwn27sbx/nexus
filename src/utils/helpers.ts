@@ -102,20 +102,31 @@ export const getBentoSpan = (i: number, total: number) => {
 
   // Patrón orgánico repetitivo para el resto
   switch (pattern) {
-    case 0: return 'md:col-span-2 md:row-span-2';
-    case 1: return 'md:col-span-1 md:row-span-1';
-    case 2: return 'md:col-span-1 md:row-span-2';
-    case 3: return 'md:col-span-2 md:row-span-1';
-    case 4: return 'md:col-span-1 md:row-span-1';
-    case 5: return 'md:col-span-1 md:row-span-1';
-    case 6: return 'md:col-span-1 md:row-span-2';
-    case 7: return 'md:col-span-2 md:row-span-1';
-    case 8: return 'md:col-span-1 md:row-span-1';
-    case 9: return 'md:col-span-1 md:row-span-1';
-    case 10: return 'md:col-span-2 md:row-span-2';
-    case 11: return 'md:col-span-1 md:row-span-1';
-    default: return 'md:col-span-1 md:row-span-1';
+    case 0:
+      return 'md:col-span-2 md:row-span-2';
+    case 1:
+      return 'md:col-span-1 md:row-span-1';
+    case 2:
+      return 'md:col-span-1 md:row-span-2';
+    case 3:
+      return 'md:col-span-2 md:row-span-1';
+    case 4:
+      return 'md:col-span-1 md:row-span-1';
+    case 5:
+      return 'md:col-span-1 md:row-span-1';
+    case 6:
+      return 'md:col-span-1 md:row-span-2';
+    case 7:
+      return 'md:col-span-2 md:row-span-1';
+    case 8:
+      return 'md:col-span-1 md:row-span-1';
+    case 9:
+      return 'md:col-span-1 md:row-span-1';
+    case 10:
+      return 'md:col-span-2 md:row-span-2';
+    case 11:
+      return 'md:col-span-1 md:row-span-1';
+    default:
+      return 'md:col-span-1 md:row-span-1';
   }
 };
-
-

@@ -20,3 +20,7 @@ Consult these guides before working on related tasks:
 - [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
 - [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
 - [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+
+## Package Manager
+
+- **CRITICAL RULE**: ALWAYS use `bun` instead of `npm`. Do not run `npm install`, `npm run`, or use `npx` commands unless strictly necessary. Use `bun add`, `bun run`, `bunx`, etc.

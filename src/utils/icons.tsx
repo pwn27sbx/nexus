@@ -13,7 +13,13 @@ interface IconWrapperProps extends IconProps {
   label?: string;
   strokeWidth?: string;
 }
-const IconWrapper: React.FC<IconWrapperProps> = ({ children, className = '', size = 18, label = '', strokeWidth = '2.5' }) => (
+const IconWrapper: React.FC<IconWrapperProps> = ({
+  children,
+  className = '',
+  size = 18,
+  label = '',
+  strokeWidth = '2.5',
+}) => (
   <svg
     width={size}
     height={size}

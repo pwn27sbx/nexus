@@ -1,4 +1,3 @@
-
 export const MOCK_CONTRIBUTORS = [
   { id: '1', name: 'Top Contributor', contribution: '23k', avatarUrl: null, isTop: true },
   { id: '2', name: 'Maria Caroan', contribution: '10k', avatarUrl: null, isTop: false },

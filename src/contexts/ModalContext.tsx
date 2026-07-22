@@ -32,13 +32,20 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return (
     <ModalContext.Provider
       value={{
-        isAuthModalOpen, setIsAuthModalOpen,
-        isCategoryModalOpen, setIsCategoryModalOpen,
-        isCommandPaletteOpen, setIsCommandPaletteOpen,
-        isSubmitModalOpen, setIsSubmitModalOpen,
-        isProfileOpen, setIsProfileOpen,
-        isLeaderboardOpen, setIsLeaderboardOpen,
-        isAdminPanelOpen, setIsAdminPanelOpen,
+        isAuthModalOpen,
+        setIsAuthModalOpen,
+        isCategoryModalOpen,
+        setIsCategoryModalOpen,
+        isCommandPaletteOpen,
+        setIsCommandPaletteOpen,
+        isSubmitModalOpen,
+        setIsSubmitModalOpen,
+        isProfileOpen,
+        setIsProfileOpen,
+        isLeaderboardOpen,
+        setIsLeaderboardOpen,
+        isAdminPanelOpen,
+        setIsAdminPanelOpen,
       }}
     >
       {children}

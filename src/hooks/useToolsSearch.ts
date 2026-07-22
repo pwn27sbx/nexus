@@ -30,10 +30,13 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
     }, APP_CONFIG.DEBOUNCE_MS)
   ).current;
 
-  const handleSearchChange = useCallback((val: string) => {
-    setSearchQuery(val);
-    debouncedSetQuery(val);
-  }, [debouncedSetQuery]);
+  const handleSearchChange = useCallback(
+    (val: string) => {
+      setSearchQuery(val);
+      debouncedSetQuery(val);
+    },
+    [debouncedSetQuery]
+  );
 
   // Reset pagination when search or filters change
   useEffect(() => {
@@ -59,7 +62,9 @@ export function useToolsSearch({ activeCategory, activeTags, sortBy }: UseToolsS
           name: tool.name,
           category: tool.category,
           url: tool.url,
-          imageUrl: tool.screenshotUrl || 'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop',
+          imageUrl:
+            tool.screenshotUrl ||
+            'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2340&auto=format&fit=crop',
           description: tool.description || 'High-performance platform.',
           tags: tool.tags || [],
         }));

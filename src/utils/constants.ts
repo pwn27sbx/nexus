@@ -1,9 +1,11 @@
 // Configuración del Backend
-export const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://nexus-production-8dca.up.railway.app';
+export const API_BASE_URL =
+  import.meta.env.PUBLIC_API_URL || 'https://nexus-production-8dca.up.railway.app';
 
 // Algolia - usar variables de entorno
 export const ALGOLIA_APP_ID = import.meta.env.PUBLIC_ALGOLIA_APP_ID || 'P34W7YOD99';
-export const ALGOLIA_SEARCH_KEY = import.meta.env.PUBLIC_ALGOLIA_SEARCH_KEY || '0d8c3e7f27ab2d9f69f63b96b064a2a4';
+export const ALGOLIA_SEARCH_KEY =
+  import.meta.env.PUBLIC_ALGOLIA_SEARCH_KEY || '0d8c3e7f27ab2d9f69f63b96b064a2a4';
 
 // Categorías
 export const TOP_CATEGORIES = ['All', 'Design', 'Development', 'AI Tools'];
@@ -38,7 +40,7 @@ export const ACCENTS = [
 // Fuentes disponibles
 export const AVAILABLE_FONTS = [
   { id: 'inter', name: 'Inter', value: "'Inter', sans-serif" },
-  { id: 'system', name: 'System', value: "system-ui, -apple-system, sans-serif" },
+  { id: 'system', name: 'System', value: 'system-ui, -apple-system, sans-serif' },
   { id: 'outfit', name: 'Outfit', value: "'Outfit', sans-serif" },
   { id: 'jetbrains', name: 'JetBrains', value: "'JetBrains Mono', monospace" },
   { id: 'geist', name: 'Geist Mono', value: "'Geist Mono', monospace" },

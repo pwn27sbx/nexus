@@ -27,8 +27,11 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
   const { tool, rect } = config;
   const numericToolId = Number(tool.id);
   const collections = user.collections || [];
-  const isInArsenal = user.bookmarks?.some(b => (typeof b === 'object' ? b.id : b) === numericToolId);
-  const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+  const isInArsenal = user.bookmarks?.some(
+    (b) => (typeof b === 'object' ? b.id : b) === numericToolId
+  );
+  const isDark =
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
   const popoverWidth = 240;
   let left = rect.left;
@@ -42,16 +45,27 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
     const token = localStorage.getItem('payload-token');
     const updatedUser = JSON.parse(JSON.stringify(user));
     if (folderIndex === -1) {
-      let currentBookmarks = updatedUser.bookmarks ? updatedUser.bookmarks.map((b: any) => typeof b === 'object' ? b.id : b) : [];
-      if (isInArsenal) currentBookmarks = currentBookmarks.filter((id: number) => id !== numericToolId);
-      else { currentBookmarks.push(numericToolId); playSound('pop'); }
+      let currentBookmarks = updatedUser.bookmarks
+        ? updatedUser.bookmarks.map((b: any) => (typeof b === 'object' ? b.id : b))
+        : [];
+      if (isInArsenal)
+        currentBookmarks = currentBookmarks.filter((id: number) => id !== numericToolId);
+      else {
+        currentBookmarks.push(numericToolId);
+        playSound('pop');
+      }
       updatedUser.bookmarks = currentBookmarks;
     } else {
       const folder = updatedUser.collections[folderIndex];
-      let toolsInFolder = folder.tools ? folder.tools.map((t: any) => typeof t === 'object' ? t.id : t) : [];
+      let toolsInFolder = folder.tools
+        ? folder.tools.map((t: any) => (typeof t === 'object' ? t.id : t))
+        : [];
       const isInFolder = toolsInFolder.includes(numericToolId);
       if (isInFolder) toolsInFolder = toolsInFolder.filter((id: number) => id !== numericToolId);
-      else { toolsInFolder.push(numericToolId); playSound('pop'); }
+      else {
+        toolsInFolder.push(numericToolId);
+        playSound('pop');
+      }
       updatedUser.collections[folderIndex].tools = toolsInFolder;
     }
     try {
@@ -61,12 +75,20 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
         body: JSON.stringify(updatedUser),
       });
       if (res.ok) setUser(updatedUser);
-    } catch (err) {}
-    finally { setIsSaving(false); }
+    } catch (err) {
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-[500]" onClick={onClose} role="dialog" aria-modal="true" aria-label="Save tool to collection">
+    <div
+      className="fixed inset-0 z-[500]"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Save tool to collection"
+    >
       <div
         className="absolute animate-scale-in"
         style={{
@@ -83,7 +105,7 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
             : '0 20px 56px rgba(80,60,180,0.18), inset 0 1px 0 rgba(255,255,255,0.9)',
           padding: '6px',
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <div
           style={{
@@ -106,7 +128,16 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
           </span>
           {isSaving && <SpinnerIcon style={{ color: isDark ? '#c084fc' : '#7c3aed' }} size={12} />}
         </div>
-        <div className="no-scrollbar" style={{ display: 'flex', flexDirection: 'column', maxHeight: '240px', overflowY: 'auto', gap: '2px' }}>
+        <div
+          className="no-scrollbar"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '240px',
+            overflowY: 'auto',
+            gap: '2px',
+          }}
+        >
           <button
             disabled={isSaving}
             onClick={() => handleToggleFolder(-1)}
@@ -123,8 +154,14 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
               transition: 'all 0.15s ease',
               color: isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.55)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = isDark
+                ? 'rgba(255,255,255,0.08)'
+                : 'rgba(255,255,255,0.55)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
             aria-label={isInArsenal ? 'Remove from Arsenal' : 'Save to Arsenal'}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -139,11 +176,19 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
                   transition: 'all 0.2s ease',
                   background: isInArsenal
                     ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
-                    : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.65)',
+                    : isDark
+                      ? 'rgba(255,255,255,0.08)'
+                      : 'rgba(255,255,255,0.65)',
                   border: isInArsenal
                     ? 'none'
-                    : isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.85)',
-                  color: isInArsenal ? 'white' : isDark ? 'rgba(200,190,255,0.7)' : 'rgba(80,60,140,0.7)',
+                    : isDark
+                      ? '1px solid rgba(255,255,255,0.1)'
+                      : '1px solid rgba(255,255,255,0.85)',
+                  color: isInArsenal
+                    ? 'white'
+                    : isDark
+                      ? 'rgba(200,190,255,0.7)'
+                      : 'rgba(80,60,140,0.7)',
                   boxShadow: isInArsenal ? '0 2px 10px rgba(124,58,237,0.35)' : 'none',
                 }}
               >
@@ -153,7 +198,9 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
             </div>
           </button>
           {collections.map((folder, idx) => {
-            const toolsInFolder = folder.tools ? folder.tools.map(t => typeof t === 'object' ? t.id : t) : [];
+            const toolsInFolder = folder.tools
+              ? folder.tools.map((t) => (typeof t === 'object' ? t.id : t))
+              : [];
             const isInFolder = toolsInFolder.includes(numericToolId);
             return (
               <button
@@ -173,8 +220,14 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
                   transition: 'all 0.15s ease',
                   color: isDark ? 'rgba(240,235,255,0.9)' : 'rgba(15,10,40,0.85)',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.55)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = isDark
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(255,255,255,0.55)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
                 aria-label={isInFolder ? 'Remove from ' + folder.name : 'Save to ' + folder.name}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -189,17 +242,35 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
                       transition: 'all 0.2s ease',
                       background: isInFolder
                         ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
-                        : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.65)',
+                        : isDark
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(255,255,255,0.65)',
                       border: isInFolder
                         ? 'none'
-                        : isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.85)',
-                      color: isInFolder ? 'white' : isDark ? 'rgba(200,190,255,0.7)' : 'rgba(80,60,140,0.7)',
+                        : isDark
+                          ? '1px solid rgba(255,255,255,0.1)'
+                          : '1px solid rgba(255,255,255,0.85)',
+                      color: isInFolder
+                        ? 'white'
+                        : isDark
+                          ? 'rgba(200,190,255,0.7)'
+                          : 'rgba(80,60,140,0.7)',
                       boxShadow: isInFolder ? '0 2px 10px rgba(124,58,237,0.35)' : 'none',
                     }}
                   >
                     <LayersIcon size={14} />
                   </div>
-                  <span style={{ fontSize: '14px', fontWeight: 700, maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'left' }}>
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      maxWidth: '110px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      textAlign: 'left',
+                    }}
+                  >
                     {folder.name}
                   </span>
                 </div>

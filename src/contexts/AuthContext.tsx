@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Wait, Directory.tsx has const API_BASE_URL = 'http://localhost:3000';
         const API_BASE_URL = 'http://localhost:3000'; // Hardcoding for now based on Directory.tsx
         const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-          headers: { Authorization: `JWT ${token}` }
+          headers: { Authorization: `JWT ${token}` },
         });
         if (res.ok) {
           const data = await res.json();
@@ -43,11 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(null);
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, setUser, logout }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
