@@ -169,6 +169,10 @@ export interface User {
 export interface Tool {
   id: number;
   name: string;
+  /**
+   * URL amigable (generado auto)
+   */
+  slug?: string | null;
   url: string;
   /**
    * Breve descripción de la herramienta (Máx 100 caracteres).
@@ -186,6 +190,9 @@ export interface Tool {
    */
   status?: ('pending' | 'approved' | 'rejected') | null;
   submittedBy?: (number | null) | User;
+  clicks?: number | null;
+  averageRating?: number | null;
+  reviewCount?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -344,6 +351,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ToolsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
   url?: T;
   description?: T;
   tags?: T;
@@ -352,6 +360,9 @@ export interface ToolsSelect<T extends boolean = true> {
   screenshotUrl?: T;
   status?: T;
   submittedBy?: T;
+  clicks?: T;
+  averageRating?: T;
+  reviewCount?: T;
   updatedAt?: T;
   createdAt?: T;
 }

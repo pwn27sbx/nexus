@@ -21,8 +21,36 @@ export const Tools: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
+  endpoints: [
+    {
+      path: '/:id/track-click',
+      method: 'post',
+      handler: async (req) => {
+        const id = req.routeParams?.id as string;
+        try {
+          const tool = await req.payload.findByID({ collection: 'tools', id });
+          await req.payload.update({
+            collection: 'tools',
+            id,
+            data: {
+              clicks: (tool.clicks || 0) + 1,
+            }
+          });
+          return new Response(JSON.stringify({ success: true }), { status: 200 });
+        } catch (error) {
+          return new Response(JSON.stringify({ error: 'Failed' }), { status: 500 });
+        }
+      }
+    }
+  ],
   fields: [
     { name: 'name', type: 'text', required: true },
+    { 
+      name: 'slug', 
+      type: 'text', 
+      unique: true, 
+      admin: { position: 'sidebar', description: 'URL amigable (generado auto)' } 
+    },
     { name: 'url', type: 'text', required: true },
 
     {
@@ -62,6 +90,24 @@ export const Tools: CollectionConfig = {
       hasMany: false,
       admin: { position: 'sidebar' }
     },
+    {
+      name: 'clicks',
+      type: 'number',
+      defaultValue: 0,
+      admin: { readOnly: true, position: 'sidebar' }
+    },
+    {
+      name: 'averageRating',
+      type: 'number',
+      defaultValue: 0,
+      admin: { readOnly: true, position: 'sidebar' }
+    },
+    {
+      name: 'reviewCount',
+      type: 'number',
+      defaultValue: 0,
+      admin: { readOnly: true, position: 'sidebar' }
+    },
   ],
   hooks: {
     afterRead: [
@@ -87,6 +133,20 @@ export const Tools: CollectionConfig = {
     ],
     beforeChange: [
       async ({ data, operation }) => {
+        // Generar slug si no existe y tenemos nombre
+        if (data.name && (!data.slug || data.slug.trim() === '')) {
+          data.slug = data.name
+            .toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
+            .replace(/[^a-z0-9]+/g, '-') // replace non-alphanumeric with dash
+            .replace(/^-+|-+$/g, ''); // remove leading/trailing dashes
+          
+          // Añadir random string corto para evitar colisiones comunes
+          if (operation === 'create') {
+            data.slug += '-' + Math.random().toString(36).substring(2, 6);
+          }
+        }
+
         // Normalizar tags: siempre guardar como JSON string para consistencia
         if (data.tags !== undefined && data.tags !== null) {
           if (Array.isArray(data.tags)) {
@@ -150,12 +210,16 @@ export const Tools: CollectionConfig = {
             const algoliaRecord = {
               objectID: doc.id.toString(),
               name: doc.name,
+              slug: doc.slug,
               category: doc.category,
               url: doc.url,
               screenshotUrl: doc.screenshotUrl,
               gridHeight: doc.gridHeight,
               description: doc.description,
-              tags
+              tags,
+              clicks: doc.clicks || 0,
+              averageRating: doc.averageRating || 0,
+              reviewCount: doc.reviewCount || 0
             };
             const idx = getAlgoliaIndex();
             if (idx) await idx.saveObject(algoliaRecord);

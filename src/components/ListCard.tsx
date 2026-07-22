@@ -23,7 +23,7 @@ const ListCard = memo(({ tool, isFocused, indexNumber, onSaveRequest, delay }: L
   return (
     <div
       className="animate-fade-up"
-      onClick={() => window.open(tool.url, '_blank')}
+      onClick={() => (window.location.href = `/tool/${tool.slug || tool.id}`)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       role="article"
@@ -32,7 +32,7 @@ const ListCard = memo(({ tool, isFocused, indexNumber, onSaveRequest, delay }: L
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          window.open(tool.url, '_blank');
+          window.location.href = `/tool/${tool.slug || tool.id}`;
         }
       }}
       style={{

@@ -364,17 +364,91 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
             Back to Library
           </button>
 
-          <h3
+          <div
             style={{
-              fontSize: '26px',
-              fontWeight: 800,
-              letterSpacing: '-0.02em',
-              color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               marginBottom: '24px',
             }}
           >
-            {activeFolder === 'all' ? 'All Saved Tools' : (activeFolder as UserCollection)?.name}
-          </h3>
+            <h3
+              style={{
+                fontSize: '26px',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)',
+              }}
+            >
+              {activeFolder === 'all' ? 'All Saved Tools' : (activeFolder as UserCollection)?.name}
+            </h3>
+
+            {activeFolder !== 'all' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    color: isDark ? '#ccc' : '#555',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={(activeFolder as UserCollection)?.isPublic || false}
+                    onChange={async (e) => {
+                      const isPublic = e.target.checked;
+                      const folderName = (activeFolder as UserCollection).name;
+                      const updatedCollections = collections.map((c) =>
+                        c.name === folderName ? { ...c, isPublic } : c
+                      );
+                      // optimistic update
+                      setActiveFolder({ ...(activeFolder as UserCollection), isPublic });
+                      try {
+                        const token = localStorage.getItem('payload-token');
+                        await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
+                          method: 'PATCH',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `JWT ${token}`,
+                          },
+                          body: JSON.stringify({ collections: updatedCollections }),
+                        });
+                      } catch (err) {
+                        console.error('Failed to update public status');
+                      }
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  Public
+                </label>
+                {(activeFolder as UserCollection)?.isPublic &&
+                  (activeFolder as UserCollection)?.slug && (
+                    <button
+                      onClick={() => {
+                        const url = `${window.location.origin}/collection/${user.id}/${(activeFolder as UserCollection).slug}`;
+                        navigator.clipboard.writeText(url);
+                        alert('Link copied to clipboard!');
+                      }}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        background: 'rgba(124,58,237,0.1)',
+                        color: '#7c3aed',
+                        border: '1px solid rgba(124,58,237,0.2)',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Copy Link
+                    </button>
+                  )}
+              </div>
+            )}
+          </div>
 
           <div
             style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}

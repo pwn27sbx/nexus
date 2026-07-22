@@ -87,6 +87,16 @@ export const Users: CollectionConfig = {
           required: true,
         },
         {
+          name: 'isPublic',
+          type: 'checkbox',
+          defaultValue: false,
+        },
+        {
+          name: 'slug',
+          type: 'text',
+          admin: { readOnly: true }
+        },
+        {
           name: 'tools', // Las herramientas dentro de esta carpeta
           type: 'relationship',
           relationTo: 'tools',
@@ -111,6 +121,20 @@ export const Users: CollectionConfig = {
             }
           }
         }
+        
+        // Generar slug para colecciones si no existe
+        if (data.collections && Array.isArray(data.collections)) {
+          data.collections.forEach((col: any) => {
+            if (col.name && (!col.slug || col.slug.trim() === '')) {
+              col.slug = col.name
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '') + '-' + Math.random().toString(36).substring(2, 6);
+            }
+          });
+        }
+        
         return data;
       },
     ],

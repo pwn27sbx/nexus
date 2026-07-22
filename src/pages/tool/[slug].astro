@@ -1,0 +1,79 @@
+---
+import "../../styles/global.css";
+import ToolDetailView from "../../components/ToolDetailView.tsx";
+import { API_BASE_URL } from "../../utils/constants";
+
+// Enable SSR for this route
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+// Fetch the tool from Payload CMS using the REST API
+let tool = null;
+let relatedTools = [];
+
+try {
+  // We search for the tool by its auto-generated slug
+  const response = await fetch(`${API_BASE_URL}/api/tools?where[slug][equals]=${slug}&depth=1`);
+  const data = await response.json();
+  
+  if (data.docs && data.docs.length > 0) {
+    tool = data.docs[0];
+    
+    // Fetch related tools (same category)
+    if (tool.category) {
+      const relatedRes = await fetch(`${API_BASE_URL}/api/tools?where[category][equals]=${tool.category}&where[id][not_equals]=${tool.id}&limit=4&depth=0`);
+      const relatedData = await relatedRes.json();
+      relatedTools = relatedData.docs || [];
+    }
+  }
+} catch (e) {
+  console.error("Error fetching tool details:", e);
+}
+
+if (!tool) {
+  // If not found, return 404
+  return Astro.redirect('/404');
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tool.name} — Nexus Directory</title>
+    <meta name="description" content={tool.description} />
+    <meta property="og:title" content={`${tool.name} — Nexus Directory`} />
+    <meta property="og:description" content={tool.description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop"} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${tool.name} — Nexus Directory`} />
+    <meta name="twitter:description" content={tool.description} />
+    <meta name="twitter:image" content={tool.screenshotUrl || "https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop"} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
+    <script is:inline>
+      (function() {
+        try {
+          var isDark = false;
+          var stored = localStorage.getItem("nexus-theme");
+          if (stored === "dark" || stored === "light") {
+            isDark = stored === "dark";
+          } else {
+            isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          }
+          if (isDark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-[#f0f4f8] text-[#0f172a] dark:bg-[#050505] dark:text-[#f8fafc] min-h-screen transition-colors duration-300 antialiased overflow-x-hidden">
+    <ToolDetailView client:load tool={tool} relatedTools={relatedTools} />
+  </body>
+</html>

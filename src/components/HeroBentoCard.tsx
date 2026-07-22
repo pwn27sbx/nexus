@@ -41,7 +41,7 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
 
   return (
     <div
-      onClick={() => window.open(tool.url, '_blank')}
+      onClick={() => (window.location.href = `/tool/${tool.slug || tool.id}`)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       role="article"
@@ -50,7 +50,7 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          window.open(tool.url, '_blank');
+          window.location.href = `/tool/${tool.slug || tool.id}`;
         }
       }}
       style={{
@@ -390,7 +390,7 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
                 color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)',
               }}
             >
-              {((numericToolId % 500) + 1).toFixed(1)}k
+              {tool.clicks > 1000 ? (tool.clicks / 1000).toFixed(1) + 'k' : tool.clicks || 0}
             </span>
           </div>
         </div>

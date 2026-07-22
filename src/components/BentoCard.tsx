@@ -67,7 +67,7 @@ const BentoCard: React.FC<BentoCardProps> = memo(
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.05 }}
         whileHover={{ y: -4, transition: { duration: 0.2 } }}
-        onClick={() => window.open(tool.url, '_blank')}
+        onClick={() => (window.location.href = `/tool/${tool.slug || tool.id}`)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         role="article"
@@ -76,7 +76,7 @@ const BentoCard: React.FC<BentoCardProps> = memo(
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
-            window.open(tool.url, '_blank');
+            window.location.href = `/tool/${tool.slug || tool.id}`;
           }
         }}
         style={{
@@ -355,7 +355,7 @@ const BentoCard: React.FC<BentoCardProps> = memo(
                   color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)',
                 }}
               >
-                {((numericToolId % 500) + 1).toFixed(1)}k
+                {tool.clicks > 1000 ? (tool.clicks / 1000).toFixed(1) + 'k' : tool.clicks || 0}
               </span>
               <span
                 style={{
