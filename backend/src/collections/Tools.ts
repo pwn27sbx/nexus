@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import algoliasearch from 'algoliasearch'
+import * as cheerio from 'cheerio'
 
 let algoliaIndex: any = null;
 const getAlgoliaIndex = () => {
@@ -170,6 +171,38 @@ export const Tools: CollectionConfig = {
         }
 
         if (data.url && (operation === 'create' || operation === 'update')) {
+          // Obtener descripcion de la pagina si no la tiene o es la por defecto
+          if (!data.description || data.description === 'High-performance platform for creators.') {
+            try {
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+              const htmlRes = await fetch(data.url, {
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+              
+              if (htmlRes.ok) {
+                const html = await htmlRes.text();
+                const $ = cheerio.load(html);
+                let desc = $('meta[name="description"]').attr('content') || 
+                           $('meta[property="og:description"]').attr('content') ||
+                           $('title').text();
+                
+                if (desc) {
+                  desc = desc.trim();
+                  // Max length is 100 in the schema
+                  data.description = desc.length > 100 ? desc.substring(0, 97) + '...' : desc;
+                }
+              }
+            } catch (e) {
+              console.warn(`[Scraper timeout/error] No se pudo obtener la descripcion de ${data.url}`);
+            }
+          }
+
+          // Obtener screenshot via Microlink
           try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout

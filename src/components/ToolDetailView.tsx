@@ -88,56 +88,61 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
           {/* Left Column: Browser Mockup + About */}
           <div className="space-y-10">
             {/* Browser Window Mockup */}
-            <div className="rounded-3xl overflow-hidden flex flex-col shadow-xl" style={glassStyle}>
-              {/* Browser Header */}
-              <div
-                className="h-12 px-4 flex items-center justify-between border-b"
-                style={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
-              >
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                  <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-                </div>
-                <div className="flex-1 flex justify-center">
-                  <div className="px-4 py-1 rounded text-xs font-medium opacity-60 truncate max-w-[200px]">
-                    {getDomain(tool.url)}
-                  </div>
-                </div>
-                <div className="w-[52px]"></div> {/* Spacer */}
-              </div>
-              {/* Browser Content */}
-              <div
-                className="aspect-[16/10] relative flex items-center justify-center p-8 overflow-hidden"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3), linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3)',
-                  backgroundSize: '20px 20px',
-                  backgroundPosition: '0 0, 10px 10px',
-                  backgroundColor: 'white',
-                }}
-              >
-                {/* Decorative soft wave at the bottom */}
+            <div className="rounded-[2rem] p-3 shadow-xl" style={glassStyle}>
+              <div className="rounded-2xl flex flex-col overflow-hidden border border-black/5 dark:border-white/10 bg-white dark:bg-black/20">
+                {/* Browser Header */}
                 <div
-                  className="absolute bottom-0 left-0 right-0 h-1/3 opacity-80"
+                  className="h-12 px-4 flex items-center justify-between border-b relative z-20"
                   style={{
-                    background:
-                      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%233b82f6' fill-opacity='0.3' d='M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,165.3C672,171,768,213,864,229.3C960,245,1056,235,1152,213.3C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E\") bottom/cover no-repeat",
+                    background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.7)',
+                    borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
                   }}
-                ></div>
-
-                {/* Decorative soft circle behind the screenshot */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-80">
-                  <div className="w-64 h-64 rounded-full bg-pink-500/40 blur-[20px]"></div>
+                >
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                  </div>
+                  <div className="flex-1 flex justify-center">
+                    <div className="px-4 py-1 rounded text-xs font-medium opacity-60 truncate max-w-[200px]">
+                      {getDomain(tool.url)}
+                    </div>
+                  </div>
+                  <div className="w-[52px]"></div> {/* Spacer */}
                 </div>
-                <img
-                  src={
-                    tool.screenshotUrl ||
-                    'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop'
-                  }
-                  alt={`Screenshot of ${tool.name}`}
-                  className="w-48 h-48 object-contain relative z-10"
-                />
+                {/* Browser Content */}
+                <div
+                  className="aspect-[16/10] relative flex items-center justify-center p-8 overflow-hidden z-10"
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3), linear-gradient(45deg, #f3f3f3 25%, transparent 25%, transparent 75%, #f3f3f3 75%, #f3f3f3)',
+                    backgroundSize: '20px 20px',
+                    backgroundPosition: '0 0, 10px 10px',
+                    backgroundColor: 'white',
+                  }}
+                >
+                  {/* Decorative soft wave at the bottom */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-1/3 opacity-80"
+                    style={{
+                      background:
+                        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%233b82f6' fill-opacity='0.3' d='M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,165.3C672,171,768,213,864,229.3C960,245,1056,235,1152,213.3C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E\") bottom/cover no-repeat",
+                    }}
+                  ></div>
+
+                  {/* Decorative soft circle behind the screenshot */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-80 z-0">
+                    <div className="w-64 h-64 rounded-full bg-pink-500/40 blur-[20px]"></div>
+                  </div>
+                  <img
+                    src={
+                      tool.screenshotUrl ||
+                      'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop'
+                    }
+                    alt={`Screenshot of ${tool.name}`}
+                    className="w-48 h-48 object-contain relative z-10"
+                  />
+                </div>
               </div>
             </div>
 
