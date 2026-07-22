@@ -1,6 +1,5 @@
 // Configuración del Backend
-export const API_BASE_URL =
-  import.meta.env.PUBLIC_API_URL || 'https://nexus-production-8dca.up.railway.app';
+export const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://nexus-xdwz.vercel.app';
 
 // Algolia - usar variables de entorno
 export const ALGOLIA_APP_ID = import.meta.env.PUBLIC_ALGOLIA_APP_ID || 'P34W7YOD99';
