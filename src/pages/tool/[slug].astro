@@ -13,8 +13,13 @@ let tool = null;
 let relatedTools = [];
 
 try {
-  // We search for the tool by its auto-generated slug
-  const response = await fetch(`${API_BASE_URL}/api/tools?where[slug][equals]=${slug}&depth=1`);
+  const isNumeric = /^\d+$/.test(slug);
+  const query = isNumeric
+    ? `where[id][equals]=${slug}`
+    : `where[slug][equals]=${slug}`;
+
+  // We search for the tool by its auto-generated slug or ID
+  const response = await fetch(`${API_BASE_URL}/api/tools?${query}&depth=1`);
   const data = await response.json();
   
   if (data.docs && data.docs.length > 0) {
