@@ -1,11 +1,16 @@
 import type { CollectionConfig } from 'payload'
 import algoliasearch from 'algoliasearch'
 
-const client = algoliasearch(
-  process.env.ALGOLIA_APP_ID || '',
-  process.env.ALGOLIA_API_KEY || ''
-)
-const index = client.initIndex('tools')
+let algoliaIndex: any = null;
+const getAlgoliaIndex = () => {
+  if (algoliaIndex) return algoliaIndex;
+  const appId = process.env.ALGOLIA_APP_ID;
+  const apiKey = process.env.ALGOLIA_API_KEY;
+  if (!appId || !apiKey) return null;
+  const client = algoliasearch(appId, apiKey);
+  algoliaIndex = client.initIndex('tools');
+  return algoliaIndex;
+};
 
 export const Tools: CollectionConfig = {
   slug: 'tools',
@@ -106,18 +111,26 @@ export const Tools: CollectionConfig = {
 
         if (data.url && (operation === 'create' || operation === 'update')) {
           try {
-            const response = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(data.url)}&screenshot=true&meta=false`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+            const response = await fetch(
+              `https://api.microlink.io/?url=${encodeURIComponent(data.url)}&screenshot=true&meta=false`,
+              { signal: controller.signal }
+            );
+            clearTimeout(timeoutId);
             const json = await response.json();
             if (json.status === 'success' && json.data?.screenshot?.url) {
               data.screenshotUrl = json.data.screenshot.url;
             }
-          } catch (error) { console.error('Error Microlink:', error); }
+          } catch (error) { 
+            console.warn(`[Microlink timeout/error] No se pudo obtener screenshot para ${data.url}`); 
+          }
         }
         return data;
       },
     ],
     afterChange: [
-      async ({ doc, req, operation }) => {
+      async ({ doc, req, previousDoc, operation }) => {
         if (doc.status === 'approved') {
           try {
             // Normalizar tags: beforeChange garantiza que es JSON string, pero soportamos CSV legacy por si hay datos antiguos
@@ -144,14 +157,18 @@ export const Tools: CollectionConfig = {
               description: doc.description,
               tags
             };
-            await index.saveObject(algoliaRecord);
+            const idx = getAlgoliaIndex();
+            if (idx) await idx.saveObject(algoliaRecord);
             console.log(`🚀 ¡Sugerencia ${doc.name} aprobada y en vivo!`);
           } catch (error) { console.error("Error Algolia:", error); }
         } else if (operation === 'update' && doc.status === 'pending') {
-            try { await index.deleteObject(doc.id.toString()); } catch(e) {}
+            try { 
+              const idx = getAlgoliaIndex();
+              if (idx) await idx.deleteObject(doc.id.toString()); 
+            } catch(e) {}
         }
 
-        if (doc.status === 'approved' && doc.submittedBy) {
+        if (doc.status === 'approved' && doc.submittedBy && (!previousDoc || doc.status !== previousDoc.status)) {
           try {
             const userId = typeof doc.submittedBy === 'object' ? doc.submittedBy.id : doc.submittedBy;
             const userTools = await req.payload.find({ collection: 'tools', where: { and: [ { submittedBy: { equals: userId } }, { status: { equals: 'approved' } } ] }, depth: 0, limit: 1 });

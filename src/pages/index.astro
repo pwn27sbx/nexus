@@ -18,6 +18,26 @@ import "../styles/global.css";
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
+    <script is:inline>
+      (function() {
+        try {
+          var isDark = false;
+          var saved = localStorage.getItem('nexus-theme');
+          if (saved) {
+            isDark = saved === 'dark';
+          } else {
+            isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          }
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.background = 'linear-gradient(135deg, #0d0d1a 0%, #111128 50%, #16102e 100%)';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.background = 'linear-gradient(135deg, #c7d7f5 0%, #d5c8f0 50%, #e8d5f5 100%)';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="spatial-bg overflow-x-hidden">
     <Directory client:load />

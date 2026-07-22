@@ -19,17 +19,58 @@ import ErrorBoundary from './ErrorBoundary';
 import SpatialCommunityHub from './SpatialCommunityHub';
 import CollectionsView from './CollectionsView';
 import HeroBentoCard from './HeroBentoCard';
-import {
-  SearchIcon,
-  UserIcon,
-  PlusIcon,
-  GridIcon,
-  ListIcon,
-  TrophyIcon,
-  SunIcon,
-  MoonIcon,
-  LayersIcon,
-} from '@/utils/icons';
+import { SearchIcon, UserIcon, PlusIcon } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
+
+// ── VIRTUALIZATION WRAPPERS ──
+const VirtualBentoWrapper = ({
+  tool,
+  index,
+  total,
+  focusedIndex,
+  isDark,
+  gridStyle,
+  onSaveRequest,
+}: any) => {
+  const { ref, inView } = useInView({ rootMargin: '400px', triggerOnce: false });
+  return (
+    <div
+      ref={ref}
+      className="animate-fade-up"
+      style={{ ...gridStyle, animationDelay: `${(index % 12) * 40}ms`, minHeight: '180px' }}
+    >
+      {inView ? (
+        <BentoCard
+          tool={tool}
+          isFocused={focusedIndex === index}
+          index={index}
+          total={total}
+          onSaveRequest={onSaveRequest}
+          isDark={isDark}
+        />
+      ) : null}
+    </div>
+  );
+};
+
+const VirtualListWrapper = ({ tool, index, focusedIndex, onSaveRequest }: any) => {
+  const { ref, inView } = useInView({ rootMargin: '400px', triggerOnce: false });
+  return (
+    <div ref={ref} style={{ minHeight: '72px' }}>
+      {inView ? (
+        <ListCard
+          tool={tool}
+          isFocused={focusedIndex === index}
+          indexNumber={index}
+          onSaveRequest={onSaveRequest}
+          delay={`${(index % 10) * 25}ms`}
+        />
+      ) : null}
+    </div>
+  );
+};
+
+import { GridIcon, ListIcon, TrophyIcon, SunIcon, MoonIcon, LayersIcon } from '@/utils/icons';
 import { ALL_CATEGORIES } from '@/utils/constants';
 import { playSound } from '@/utils/sounds';
 
@@ -750,33 +791,25 @@ const DirectoryContent: React.FC = () => {
                       )}
                       {/* Cards with varied sizes */}
                       {filteredTools.slice(1).map((tool, i) => {
-                        // Bento 2.0 pattern: cycle through size variations
                         const patternIndex = i % 8;
                         let gridStyle: any = {};
                         if (patternIndex === 2) {
-                          // Tall card
                           gridStyle = { gridRow: 'span 2' };
                         } else if (patternIndex === 5) {
-                          // Wide card
                           gridStyle = { gridColumn: 'span 2' };
                         }
-                        // All others are 1x1
 
                         return (
-                          <div
+                          <VirtualBentoWrapper
                             key={tool.id}
-                            className="animate-fade-up"
-                            style={{ ...gridStyle, animationDelay: `${(i % 12) * 40}ms` }}
-                          >
-                            <BentoCard
-                              tool={tool}
-                              isFocused={focusedIndex === i + 1}
-                              index={i + 1}
-                              total={filteredTools.length}
-                              onSaveRequest={setSavePopoverConfig}
-                              isDark={isDark}
-                            />
-                          </div>
+                            tool={tool}
+                            index={i + 1}
+                            total={filteredTools.length}
+                            focusedIndex={focusedIndex}
+                            isDark={isDark}
+                            gridStyle={gridStyle}
+                            onSaveRequest={setSavePopoverConfig}
+                          />
                         );
                       })}
                       <style>{`
@@ -796,13 +829,12 @@ const DirectoryContent: React.FC = () => {
                   ) : (
                     <div className="flex flex-col gap-3 max-w-[860px] mx-auto">
                       {filteredTools.map((tool, i) => (
-                        <ListCard
+                        <VirtualListWrapper
                           key={tool.id}
                           tool={tool}
-                          isFocused={focusedIndex === i}
-                          indexNumber={i}
+                          index={i}
+                          focusedIndex={focusedIndex}
                           onSaveRequest={setSavePopoverConfig}
-                          delay={`${(i % 10) * 25}ms`}
                         />
                       ))}
                     </div>

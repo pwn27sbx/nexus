@@ -4,7 +4,7 @@ import { getDomain } from '../utils/helpers';
 import ShareButton from './ShareButton';
 import { useAuth } from '../contexts/AuthContext';
 import { useModals } from '../contexts/ModalContext';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import type { BentoCardProps } from '../types';
 
 import { CATEGORY_COLORS, FALLBACK_COLORS } from '../data/categories';
@@ -60,7 +60,7 @@ const BentoCard: React.FC<BentoCardProps> = memo(
     }, [isFocused, user, tool, onSaveRequest, onRequireAuth]);
 
     return (
-      <motion.div
+      <m.div
         ref={cardRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -482,7 +482,7 @@ const BentoCard: React.FC<BentoCardProps> = memo(
             Visit
           </button>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 );
