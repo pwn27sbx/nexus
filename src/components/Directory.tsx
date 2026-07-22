@@ -884,6 +884,7 @@ export default function App() {
             {/* Search bar */}
             <div className="w-full max-w-[580px] animate-fade-up" style={{ animationDelay: '140ms' }}>
               <div 
+                className="group transition-all duration-300 hover:scale-[1.015]"
                 style={{
                   padding: '4px',
                   borderRadius: '9999px',
@@ -898,7 +899,7 @@ export default function App() {
               >
                 <button
                   onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }}
-                  className="w-full flex items-center gap-3 px-5 py-3 transition-all hover:scale-[1.01] group"
+                  className="w-full flex items-center gap-3 px-5 py-3 transition-all"
                   style={{
                     borderRadius: '9999px',
                     background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.4)',
