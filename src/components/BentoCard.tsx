@@ -51,7 +51,9 @@ const BentoCard: React.FC<BentoCardProps> = memo(
             const btn = cardRef.current.querySelector('[data-save-btn]');
             if (btn) {
               const rect = btn.getBoundingClientRect();
-              onSaveRequest({ tool, rect });
+              if (onSaveRequest) {
+                onSaveRequest({ tool, rect });
+              }
             }
           } else onRequireAuth();
         }
@@ -355,7 +357,9 @@ const BentoCard: React.FC<BentoCardProps> = memo(
                   color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)',
                 }}
               >
-                {tool.clicks > 1000 ? (tool.clicks / 1000).toFixed(1) + 'k' : tool.clicks || 0}
+                {(tool.clicks || 0) > 1000
+                  ? ((tool.clicks || 0) / 1000).toFixed(1) + 'k'
+                  : tool.clicks || 0}
               </span>
               <span
                 style={{
@@ -417,8 +421,12 @@ const BentoCard: React.FC<BentoCardProps> = memo(
             onClick={(e) => {
               e.stopPropagation();
               if (user) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                onSaveRequest({ tool, rect });
+                if (onSaveRequest) {
+                  onSaveRequest({
+                    tool,
+                    rect: e.currentTarget.getBoundingClientRect(),
+                  });
+                }
               } else onRequireAuth();
             }}
             style={{

@@ -4,9 +4,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import { API_BASE_URL } from '../utils/constants';
 
-export default function ReviewSection({ toolId }) {
+interface Review {
+  id: string;
+  user: any;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
+export default function ReviewSection({ toolId }: { toolId: string | number }) {
   const { user } = useAuth();
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDark, setIsDark] = useState(false);
 
@@ -31,7 +39,7 @@ export default function ReviewSection({ toolId }) {
       setReviews(data.docs || []);
 
       if (user && data.docs) {
-        const found = data.docs.some((r) => r.user?.id === user.id || r.user === user.id);
+        const found = data.docs.some((r: any) => r.user?.id === user.id || r.user === user.id);
         setHasReviewed(found);
       }
     } catch (e) {
@@ -45,7 +53,7 @@ export default function ReviewSection({ toolId }) {
     fetchReviews();
   }, [toolId, user]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       isAuthModalOpen.set(true);

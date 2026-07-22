@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     tools: Tool;
+    reviews: Review;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     tools: ToolsSelect<false> | ToolsSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -139,6 +141,8 @@ export interface User {
   collections?:
     | {
         name: string;
+        isPublic?: boolean | null;
+        slug?: string | null;
         tools?: (number | Tool)[] | null;
         id?: string | null;
       }[]
@@ -217,6 +221,19 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  tool: number | Tool;
+  user: number | User;
+  rating: number;
+  comment?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -250,6 +267,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tools';
         value: number | Tool;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -307,6 +328,8 @@ export interface UsersSelect<T extends boolean = true> {
     | T
     | {
         name?: T;
+        isPublic?: T;
+        slug?: T;
         tools?: T;
         id?: T;
       };
@@ -363,6 +386,18 @@ export interface ToolsSelect<T extends boolean = true> {
   clicks?: T;
   averageRating?: T;
   reviewCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  tool?: T;
+  user?: T;
+  rating?: T;
+  comment?: T;
   updatedAt?: T;
   createdAt?: T;
 }

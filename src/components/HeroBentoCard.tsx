@@ -390,7 +390,9 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
                 color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,100,140,0.45)',
               }}
             >
-              {tool.clicks > 1000 ? (tool.clicks / 1000).toFixed(1) + 'k' : tool.clicks || 0}
+              {(tool.clicks || 0) > 1000
+                ? ((tool.clicks || 0) / 1000).toFixed(1) + 'k'
+                : tool.clicks || 0}
             </span>
           </div>
         </div>

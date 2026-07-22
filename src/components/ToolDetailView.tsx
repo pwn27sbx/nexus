@@ -12,8 +12,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import ReviewSection from './ReviewSection';
 import BentoCard from './BentoCard';
+import type { Tool } from '../types';
 
-export default function ToolDetailView({ tool, relatedTools }) {
+export default function ToolDetailView({
+  tool,
+  relatedTools,
+}: {
+  tool: Tool;
+  relatedTools?: Tool[];
+}) {
   const { user } = useAuth();
   const [isDark, setIsDark] = useState(false);
 
@@ -203,7 +210,7 @@ export default function ToolDetailView({ tool, relatedTools }) {
                       Tags
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {tool.tags.map((tag) => (
+                      {tool.tags.map((tag: string) => (
                         <span
                           key={tag}
                           className="px-3 py-1 rounded-full text-sm"
@@ -233,7 +240,7 @@ export default function ToolDetailView({ tool, relatedTools }) {
               Similar in {tool.category}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedTools.map((relatedTool, i) => (
+              {relatedTools.map((relatedTool: Tool, i: number) => (
                 <BentoCard key={relatedTool.id} tool={relatedTool} index={i} />
               ))}
             </div>

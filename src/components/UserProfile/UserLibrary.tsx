@@ -1,5 +1,7 @@
 import React from 'react';
 import type { Tool, UserCollection } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
+import { API_BASE_URL } from '../../utils/constants';
 
 interface UserLibraryProps {
   arsenal: (Tool | number)[];
@@ -28,6 +30,11 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
   isLoading,
   isDark,
 }) => {
+  const { user } = useAuth();
+
+  const getFaviconUrl = (url: string) =>
+    `${API_BASE_URL}/api/favicon?url=${encodeURIComponent(url)}`;
+
   const glassCard = {
     background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
     border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
@@ -406,6 +413,7 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
                       );
                       // optimistic update
                       setActiveFolder({ ...(activeFolder as UserCollection), isPublic });
+                      if (!user) return;
                       try {
                         const token = localStorage.getItem('payload-token');
                         await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
@@ -428,7 +436,7 @@ const UserLibrary: React.FC<UserLibraryProps> = ({
                   (activeFolder as UserCollection)?.slug && (
                     <button
                       onClick={() => {
-                        const url = `${window.location.origin}/collection/${user.id}/${(activeFolder as UserCollection).slug}`;
+                        const url = `${window.location.origin}/collection/${user?.id}/${(activeFolder as UserCollection).slug}`;
                         navigator.clipboard.writeText(url);
                         alert('Link copied to clipboard!');
                       }}

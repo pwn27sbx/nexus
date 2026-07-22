@@ -5,9 +5,13 @@ export interface Tool {
   category: string;
   url: string;
   imageUrl: string;
-  description: string;
+  description?: string;
   tags?: string[];
   gridHeight?: 'normal' | 'tall';
+  slug?: string;
+  clicks?: number;
+  averageRating?: number;
+  reviewCount?: number;
   screenshotUrl?: string;
   status?: 'pending' | 'approved';
   submittedBy?: number | User | null;
@@ -32,6 +36,8 @@ export interface UserCollection {
   name: string;
   tools?: (number | Tool)[];
   id?: string;
+  isPublic?: boolean;
+  slug?: string;
 }
 
 // === UI Types ===
@@ -77,10 +83,10 @@ export interface Badge {
 // === Props Types ===
 export interface BentoCardProps {
   tool: Tool;
-  isFocused: boolean;
+  isFocused?: boolean;
   index: number;
-  total: number;
-  onSaveRequest: (config: SavePopoverConfig) => void;
+  total?: number;
+  onSaveRequest?: (config: SavePopoverConfig) => void;
   isDark?: boolean;
 }
 
