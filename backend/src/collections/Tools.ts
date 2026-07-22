@@ -19,8 +19,8 @@ export const Tools: CollectionConfig = {
   access: {
     read: () => true,
     create: () => true,
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
   },
   endpoints: [
     {
@@ -58,7 +58,7 @@ export const Tools: CollectionConfig = {
     {
       name: 'description',
       type: 'text',
-      required: true,
+      required: false,
       defaultValue: 'High-performance platform for creators.',
       maxLength: 100,
       admin: { description: 'Breve descripción de la herramienta (Máx 100 caracteres).' }
