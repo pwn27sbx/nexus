@@ -86,11 +86,7 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
   };
 
   return (
-    <div className="mt-16">
-      <h3 className="text-2xl font-bold mb-8" style={{ color: isDark ? '#fff' : '#000' }}>
-        Reviews
-      </h3>
-
+    <div className="w-full">
       {user && !hasReviewed && (
         <form
           onSubmit={handleSubmit}

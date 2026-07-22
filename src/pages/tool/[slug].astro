@@ -1,5 +1,6 @@
 ---
 import "../../styles/global.css";
+import { ViewTransitions } from 'astro:transitions';
 import ToolDetailView from "../../components/ToolDetailView.tsx";
 import { API_BASE_URL } from "../../utils/constants";
 
@@ -10,7 +11,6 @@ const { slug } = Astro.params;
 
 // Fetch the tool from Payload CMS using the REST API
 let tool = null;
-let relatedTools = [];
 
 try {
   const isNumeric = /^\d+$/.test(slug);
@@ -24,13 +24,6 @@ try {
   
   if (data.docs && data.docs.length > 0) {
     tool = data.docs[0];
-    
-    // Fetch related tools (same category)
-    if (tool.category) {
-      const relatedRes = await fetch(`${API_BASE_URL}/api/tools?where[category][equals]=${tool.category}&where[id][not_equals]=${tool.id}&limit=4&depth=0`);
-      const relatedData = await relatedRes.json();
-      relatedTools = relatedData.docs || [];
-    }
   }
 } catch (e) {
   console.error("Error fetching tool details:", e);
@@ -59,6 +52,7 @@ if (!tool) {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
+    <ViewTransitions />
     <script is:inline>
       (function() {
         try {
@@ -78,7 +72,7 @@ if (!tool) {
       })();
     </script>
   </head>
-  <body class="bg-[#f0f4f8] text-[#0f172a] dark:bg-[#050505] dark:text-[#f8fafc] min-h-screen transition-colors duration-300 antialiased overflow-x-hidden">
-    <ToolDetailView client:load tool={tool} relatedTools={relatedTools} />
+  <body class="spatial-bg overflow-x-hidden min-h-screen transition-colors duration-300 antialiased">
+    <ToolDetailView client:load tool={tool} />
   </body>
 </html>

@@ -1,29 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  MessageSquare,
-  Star,
-  ExternalLink,
-  Link as LinkIcon,
-} from 'lucide-react';
+import { ArrowLeft, Star, ExternalLink } from 'lucide-react';
 import { getDomain } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
-import { isAuthModalOpen } from '../stores/modals';
 import ReviewSection from './ReviewSection';
 import BentoCard from './BentoCard';
 import type { Tool } from '../types';
 import { AuthProvider } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../utils/constants';
 
-export function ToolDetailViewContent({
-  tool,
-  relatedTools,
-}: {
-  tool: Tool;
-  relatedTools?: Tool[];
-}) {
+export function ToolDetailViewContent({ tool }: { tool: Tool }) {
   const { user } = useAuth();
   const [isDark, setIsDark] = useState(false);
+  const [relatedTools, setRelatedTools] = useState<Tool[]>([]);
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
@@ -34,11 +22,22 @@ export function ToolDetailViewContent({
     return () => observer.disconnect();
   }, []);
 
-  const handleVisit = async () => {
-    // 1. Abre la pestaña
-    window.open(tool.url, '_blank');
+  // Fetch related tools client-side to improve initial page load performance
+  useEffect(() => {
+    if (tool.category) {
+      fetch(
+        `${API_BASE_URL}/api/tools?where[category][equals]=${tool.category}&where[id][not_equals]=${tool.id}&limit=4&depth=0`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.docs) setRelatedTools(data.docs);
+        })
+        .catch((err) => console.error('Error fetching related tools', err));
+    }
+  }, [tool.category, tool.id]);
 
-    // 2. Trackea el clic en background
+  const handleVisit = async () => {
+    window.open(tool.url, '_blank');
     try {
       await fetch('/api/track-click', {
         method: 'POST',
@@ -50,196 +49,201 @@ export function ToolDetailViewContent({
     }
   };
 
+  const glassStyle = {
+    background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.4)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.5)',
+    boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(31, 38, 135, 0.05)',
+  };
+
+  const cardInnerGlass = {
+    background: isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.6)',
+    border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(255, 255, 255, 0.6)',
+  };
+
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header / Navbar simple */}
-      <header
-        className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between"
-        style={{
-          background: isDark ? 'rgba(5, 5, 5, 0.8)' : 'rgba(240, 244, 248, 0.8)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
-        }}
-      >
+    <div className="min-h-screen pb-20 relative">
+      {/* Background blobs for the glassmorphism effect (visible primarily in light mode due to page background) */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden hidden dark:block">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-purple-900/20 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-900/20 blur-[120px]" />
+      </div>
+
+      <header className="px-6 py-8 max-w-6xl mx-auto">
         <button
           onClick={() => window.history.back()}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors"
-          style={{
-            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-            color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)',
-          }}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105"
+          style={glassStyle}
         >
           <ArrowLeft size={16} />
           Back to directory
         </button>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 pt-12">
-        {/* Hero Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
-          {/* Col 1: Imagen y descripción */}
-          <div className="space-y-8">
-            <div
-              className="w-full aspect-[16/10] rounded-3xl overflow-hidden relative"
-              style={{
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
-                boxShadow: isDark ? '0 24px 64px rgba(0,0,0,0.4)' : '0 24px 64px rgba(0,0,0,0.08)',
-              }}
-            >
-              <img
-                src={tool.screenshotUrl}
-                alt={`Screenshot of ${tool.name}`}
-                className="w-full h-full object-cover"
-              />
+      <main className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Left Column: Browser Mockup + About */}
+          <div className="space-y-10">
+            {/* Browser Window Mockup */}
+            <div className="rounded-3xl overflow-hidden flex flex-col shadow-xl" style={glassStyle}>
+              {/* Browser Header */}
+              <div
+                className="h-12 px-4 flex items-center justify-between border-b"
+                style={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
+              >
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                  <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-4 py-1 rounded text-xs font-medium opacity-60 truncate max-w-[200px]">
+                    {getDomain(tool.url)}
+                  </div>
+                </div>
+                <div className="w-[52px]"></div> {/* Spacer */}
+              </div>
+              {/* Browser Content */}
+              <div className="aspect-[16/10] relative bg-white dark:bg-black/20 flex items-center justify-center p-8">
+                {/* A decorative soft circle behind the screenshot */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+                  <div className="w-64 h-64 rounded-full bg-pink-400/40 blur-[40px]"></div>
+                </div>
+                <img
+                  src={
+                    tool.screenshotUrl ||
+                    'https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1200&auto=format&fit=crop'
+                  }
+                  alt={`Screenshot of ${tool.name}`}
+                  className="w-full h-full object-contain relative z-10 rounded shadow-sm"
+                />
+              </div>
             </div>
 
-            <div>
-              <h2 className="text-2xl font-bold mb-4" style={{ color: isDark ? '#fff' : '#000' }}>
-                About {tool.name}
-              </h2>
-              <p
-                className="text-lg leading-relaxed"
-                style={{ color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)' }}
-              >
+            {/* About Section */}
+            <div className="px-2 pt-4">
+              <h2 className="text-lg font-bold mb-2 font-sans">About</h2>
+              <h3 className="text-3xl font-serif mb-6">{`About ${tool.name}`}</h3>
+              <p className="text-[1.05rem] leading-relaxed opacity-80 font-medium">
                 {tool.description}
               </p>
             </div>
           </div>
 
-          {/* Col 2: Info Card */}
-          <div>
-            <div
-              className="sticky top-28 rounded-3xl p-8 space-y-8"
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.6)',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
-              }}
-            >
-              <div className="flex items-center gap-4">
+          {/* Right Column: Info Card + Reviews */}
+          <div className="space-y-10">
+            {/* Main Info Card */}
+            <div className="rounded-[2.5rem] p-8 space-y-8" style={glassStyle}>
+              <div className="flex flex-col items-center gap-4 pt-2">
                 <img
-                  src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`}
-                  className="w-12 h-12 rounded-xl"
+                  src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=128`}
+                  className="w-16 h-16 rounded-2xl shadow-sm"
                   alt={`${tool.name} icon`}
+                  style={{ background: '#fff' }}
                 />
-                <div>
-                  <h1 className="text-3xl font-bold" style={{ color: isDark ? '#fff' : '#000' }}>
-                    {tool.name}
-                  </h1>
-                  <a
-                    href={tool.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1 text-sm mt-1 hover:underline"
-                    style={{ color: '#7c3aed' }}
-                  >
-                    <LinkIcon size={14} />
-                    {getDomain(tool.url)}
-                  </a>
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div
-                  className="p-4 rounded-2xl"
-                  style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}
-                >
-                  <div
-                    className="text-sm mb-1"
-                    style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
-                  >
-                    Rating
-                  </div>
-                  <div className="text-2xl font-bold flex items-center gap-2">
-                    {tool.averageRating || 0}
-                    <Star size={20} fill="#f59e0b" color="#f59e0b" />
-                  </div>
-                  <div className="text-xs mt-1 opacity-50">{tool.reviewCount || 0} reviews</div>
-                </div>
-                <div
-                  className="p-4 rounded-2xl"
-                  style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}
-                >
-                  <div
-                    className="text-sm mb-1"
-                    style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
-                  >
-                    Visits
-                  </div>
-                  <div className="text-2xl font-bold">{tool.clicks || 0}</div>
-                  <div className="text-xs mt-1 opacity-50">Total clicks</div>
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-1">{tool.name}</h1>
+                  <p className="text-sm opacity-70">{getDomain(tool.url)}</p>
                 </div>
               </div>
 
               <button
                 onClick={handleVisit}
-                className="w-full py-4 rounded-2xl text-lg font-bold flex items-center justify-center gap-2 transition-transform hover:scale-[1.02]"
+                className="w-full py-4 rounded-full text-lg font-bold flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-xl"
                 style={{
-                  background: '#7c3aed',
+                  background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 24px rgba(124,58,237,0.3)',
                 }}
               >
                 Visit Website <ExternalLink size={20} />
               </button>
 
-              <div
-                className="space-y-4 pt-6 border-t"
-                style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
-              >
-                <div>
-                  <div
-                    className="text-sm mb-2"
-                    style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
-                  >
-                    Category
+              <div className="grid grid-cols-2 gap-4">
+                {/* Rating */}
+                <div className="rounded-2xl p-4" style={cardInnerGlass}>
+                  <div className="text-sm font-semibold opacity-70 mb-2">Rating</div>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={16}
+                        fill={star <= (tool.averageRating || 0) ? '#f59e0b' : 'transparent'}
+                        color={
+                          star <= (tool.averageRating || 0)
+                            ? '#f59e0b'
+                            : isDark
+                              ? 'rgba(255,255,255,0.2)'
+                              : 'rgba(0,0,0,0.2)'
+                        }
+                      />
+                    ))}
+                    <span className="ml-1 text-sm font-semibold opacity-70">
+                      {tool.reviewCount || 0}
+                    </span>
                   </div>
+                </div>
+
+                {/* Visits */}
+                <div className="rounded-2xl p-4" style={cardInnerGlass}>
+                  <div className="text-sm font-semibold opacity-70 mb-2">Visits</div>
+                  <div className="text-xl font-bold">
+                    {tool.clicks ? tool.clicks.toLocaleString() : 0}
+                  </div>
+                </div>
+
+                {/* Category */}
+                <div className="rounded-2xl p-4" style={cardInnerGlass}>
+                  <div className="text-sm font-semibold opacity-70 mb-2">Category</div>
                   <span
-                    className="inline-block px-3 py-1 rounded-full text-sm"
-                    style={{ background: 'rgba(124,58,237,0.1)', color: '#c084fc' }}
+                    className="inline-block px-3 py-1 rounded-full text-xs font-medium border"
+                    style={{
+                      background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    }}
                   >
                     {tool.category}
                   </span>
                 </div>
 
-                {tool.tags && tool.tags.length > 0 && (
-                  <div>
-                    <div
-                      className="text-sm mb-2"
-                      style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}
-                    >
-                      Tags
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {tool.tags.map((tag: string) => (
+                {/* Tags */}
+                <div className="rounded-2xl p-4" style={cardInnerGlass}>
+                  <div className="text-sm font-semibold opacity-70 mb-2">Tags</div>
+                  <div className="flex flex-wrap gap-2">
+                    {tool.tags && tool.tags.length > 0 ? (
+                      tool.tags.slice(0, 3).map((tag: string) => (
                         <span
                           key={tag}
-                          className="px-3 py-1 rounded-full text-sm"
+                          className="px-2 py-1 rounded-full text-xs font-medium border"
                           style={{
-                            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                           }}
                         >
                           #{tag}
                         </span>
-                      ))}
-                    </div>
+                      ))
+                    ) : (
+                      <span className="text-sm opacity-50">No tags</span>
+                    )}
                   </div>
-                )}
+                </div>
+              </div>
+            </div>
+
+            {/* Reviews Section Wrapper */}
+            <div className="px-2 pt-4">
+              <h2 className="text-lg font-bold mb-4 font-sans">Reviews</h2>
+              <div className="rounded-[2.5rem] p-6" style={glassStyle}>
+                <ReviewSection toolId={tool.id} />
               </div>
             </div>
           </div>
         </div>
 
-        <ReviewSection toolId={tool.id} />
-
         {relatedTools && relatedTools.length > 0 && (
-          <div
-            className="mt-20 border-t pt-12"
-            style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
-          >
-            <h3 className="text-2xl font-bold mb-8" style={{ color: isDark ? '#fff' : '#000' }}>
-              Similar in {tool.category}
-            </h3>
+          <div className="mt-24 pb-12">
+            <h3 className="text-2xl font-bold mb-8 opacity-90">Similar in {tool.category}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedTools.map((relatedTool: Tool, i: number) => (
                 <BentoCard key={relatedTool.id} tool={relatedTool} index={i} />
@@ -252,7 +256,7 @@ export function ToolDetailViewContent({
   );
 }
 
-export default function ToolDetailView(props: { tool: Tool; relatedTools?: Tool[] }) {
+export default function ToolDetailView(props: { tool: Tool }) {
   return (
     <AuthProvider>
       <ToolDetailViewContent {...props} />
