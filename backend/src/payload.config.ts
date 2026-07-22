@@ -2,6 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
@@ -19,8 +20,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  cors: ['https://nexusallinone.vercel.app', 'https://nexus-production-8dca.up.railway.app'],
-  csrf: ['https://nexusallinone.vercel.app', 'https://nexus-production-8dca.up.railway.app'],
+  cors: ['https://nexusallinone.vercel.app', process.env.SERVER_URL || ''].filter(Boolean),
+  csrf: ['https://nexusallinone.vercel.app', process.env.SERVER_URL || ''].filter(Boolean),
   collections: [Users, Media, Tools],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -34,5 +35,20 @@ export default buildConfig({
     push: true,
   }),
   sharp,
-  plugins: [],
+  plugins: [
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+        },
+        region: process.env.S3_REGION || 'auto',
+        endpoint: process.env.S3_ENDPOINT || '',
+      },
+    }),
+  ],
 })
