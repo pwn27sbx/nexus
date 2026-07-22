@@ -90,15 +90,20 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
       {user && !hasReviewed && (
         <form
           onSubmit={handleSubmit}
-          className="mb-12 p-6 rounded-2xl"
+          className="mb-8 p-6 rounded-[2rem] space-y-4"
           style={{
-            background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-            border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
+            background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.5)',
+            backdropFilter: 'blur(30px)',
+            WebkitBackdropFilter: 'blur(30px)',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.1)'
+              : '1px solid rgba(255, 255, 255, 0.7)',
+            boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.04)',
           }}
         >
-          <div className="mb-4">
-            <label className="block text-sm mb-2 opacity-70">Your Rating</label>
-            <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[0.95rem] font-semibold text-black dark:text-white">Rating</span>
+            <div className="flex gap-0.5">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
@@ -107,45 +112,47 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
                   className="transition-transform hover:scale-110"
                 >
                   <Star
-                    size={28}
-                    fill={star <= rating ? '#f59e0b' : 'transparent'}
+                    size={22}
+                    fill={star <= rating ? '#facc15' : 'transparent'}
                     color={
                       star <= rating
-                        ? '#f59e0b'
+                        ? '#facc15'
                         : isDark
-                          ? 'rgba(255,255,255,0.2)'
-                          : 'rgba(0,0,0,0.2)'
+                          ? 'rgba(255,255,255,0.3)'
+                          : 'rgba(0,0,0,0.15)'
                     }
                   />
                 </button>
               ))}
             </div>
           </div>
-          <div className="mb-4">
+          <div>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="What do you think about this tool?"
-              className="w-full p-4 rounded-xl resize-none outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full p-4 rounded-xl resize-none outline-none text-[0.95rem] transition-colors"
               rows={3}
               style={{
-                background: isDark ? 'rgba(0,0,0,0.3)' : '#fff',
+                background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.6)',
                 color: isDark ? '#fff' : '#000',
-                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+                border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)',
               }}
             />
           </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="px-6 py-2 rounded-full font-bold transition-all disabled:opacity-50"
-            style={{
-              background: '#7c3aed',
-              color: 'white',
-            }}
-          >
-            {submitting ? 'Posting...' : 'Post Review'}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 disabled:opacity-50 shadow-[0_4px_14px_0_rgba(168,85,247,0.39)]"
+              style={{
+                background: 'linear-gradient(to right, #8b5cf6, #a855f7)',
+                color: 'white',
+              }}
+            >
+              {submitting ? 'Posting...' : 'Post Review'}
+            </button>
+          </div>
         </form>
       )}
 
@@ -166,9 +173,22 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
       )}
 
       {loading ? (
-        <div className="opacity-50">Loading reviews...</div>
+        <div className="opacity-50 px-2">Loading reviews...</div>
       ) : reviews.length === 0 ? (
-        <div className="opacity-50 text-center py-12">No reviews yet. Be the first!</div>
+        <div
+          className="text-center py-4 rounded-full text-[0.95rem] font-medium text-black dark:text-white"
+          style={{
+            background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.5)',
+            backdropFilter: 'blur(30px)',
+            WebkitBackdropFilter: 'blur(30px)',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.1)'
+              : '1px solid rgba(255, 255, 255, 0.7)',
+            boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.04)',
+          }}
+        >
+          No reviews yet. Be the first!
+        </div>
       ) : (
         <div className="space-y-6">
           {reviews.map((review) => (
