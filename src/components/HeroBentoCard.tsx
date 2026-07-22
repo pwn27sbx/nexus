@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { HeroBentoCardProps } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
+import { Heart } from 'lucide-react';
 
 const CATEGORY_COLORS_HERO: Record<string, { bg: string; text: string; border: string }> = {
   Design: {
@@ -305,7 +306,11 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
           }}
           aria-label={isSaved ? 'Remove from saved' : 'Save tool'}
         >
-          ♥
+          <Heart
+            size={18}
+            fill={isSaved ? 'currentColor' : 'none'}
+            strokeWidth={isSaved ? 0 : 2.5}
+          />
         </button>
         <button
           onClick={(e) => {

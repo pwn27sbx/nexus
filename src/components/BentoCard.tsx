@@ -5,6 +5,7 @@ import { getDomain } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import { m } from 'framer-motion';
+import { Heart } from 'lucide-react';
 import type { BentoCardProps } from '../types';
 
 import { CATEGORY_COLORS, FALLBACK_COLORS } from '../data/categories';
@@ -451,7 +452,11 @@ const BentoCard: React.FC<BentoCardProps> = memo(
             }}
             aria-label={isSavedAnywhere ? 'Remove from saved' : 'Save tool'}
           >
-            ♥
+            <Heart
+              size={18}
+              fill={isSavedAnywhere ? 'currentColor' : 'none'}
+              strokeWidth={isSavedAnywhere ? 0 : 2.5}
+            />
           </button>
           <button
             onClick={(e) => {
