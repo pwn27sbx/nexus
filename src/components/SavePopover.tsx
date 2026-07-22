@@ -1,11 +1,21 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeartIcon, LayersIcon, SpinnerIcon } from '../utils/icons';
 import { API_BASE_URL } from '../utils/constants';
 import { playSound } from '../utils/sounds';
 
 const SavePopover = ({ config, onClose, user, setUser }) => {
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!config) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [config, onClose]);
+
   if (!config || !user) return null;
   const { tool, rect } = config;
   const numericToolId = Number(tool.id);

@@ -3,7 +3,7 @@ import React, { memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 
-const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveRequest }) => {
+const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveRequest, delay }) => {
   const numericToolId = Number(tool.id);
   const [isHovered, setIsHovered] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
@@ -14,6 +14,7 @@ const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSa
 
   return (
     <div
+      className="animate-fade-up"
       onClick={() => window.open(tool.url, '_blank')}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -22,6 +23,9 @@ const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSa
       tabIndex={0}
       onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); window.open(tool.url, '_blank'); } }}
       style={{
+        animationDelay: delay || '0ms',
+        position: 'relative',
+        zIndex: isHovered ? 50 : 1,
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto',
         gap: '16px',
@@ -151,18 +155,55 @@ const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSa
         transform: isHovered ? 'translate(0,-50%) scale(1) rotate(0deg)' : 'translate(0,-50%) scale(0.85) rotate(2deg)',
         opacity: isHovered ? 1 : 0,
         transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-        zIndex: 50,
+        zIndex: 100,
         pointerEvents: 'none',
       }}>
         <div style={{
-          width: '280px', height: '175px',
+          width: '300px', height: '190px',
           borderRadius: '12px', overflow: 'hidden',
+          display: 'flex', flexDirection: 'column',
           border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.9)',
           boxShadow: isDark
             ? '0 20px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,58,237,0.15)'
             : '0 20px 48px rgba(80,60,180,0.25)',
         }}>
-          <img src={tool.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+          {/* Mac Browser Chrome */}
+          <div
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '6px 12px',
+              background: isDark ? 'rgba(15,12,32,0.95)' : 'rgba(248,246,255,0.95)',
+              borderBottom: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(200,190,240,0.25)',
+            }}
+          >
+            {/* Traffic lights */}
+            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ff5f57', opacity: 0.8 }} />
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#febc2e', opacity: 0.8 }} />
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#28c840', opacity: 0.8 }} />
+            </div>
+            {/* URL bar */}
+            <div
+              style={{
+                flex: 1, height: '16px', borderRadius: '4px',
+                background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid rgba(0,0,0,0.06)',
+                display: 'flex', alignItems: 'center', paddingLeft: '8px', overflow: 'hidden',
+              }}
+            >
+              <span style={{
+                fontSize: '8px', color: isDark ? 'rgba(180,160,255,0.35)' : 'rgba(100,80,180,0.4)',
+                fontFamily: 'monospace', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              }}>
+                {getDomain(tool.url) || tool.url}
+              </span>
+            </div>
+          </div>
+          
+          {/* Screenshot */}
+          <div style={{ flex: 1, position: 'relative' }}>
+            <img src={tool.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+          </div>
         </div>
       </div>
     </div>

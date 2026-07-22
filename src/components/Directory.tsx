@@ -159,8 +159,8 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
         backdropFilter: 'blur(24px) saturate(180%)',
         WebkitBackdropFilter: 'blur(24px) saturate(180%)',
         borderRadius: '2rem',
-        overflow: 'hidden',
         cursor: 'pointer',
+        position: 'relative',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
         transform: isHovered ? 'translateY(-4px) scale(1.01)' : 'none',
         boxShadow: isHovered
@@ -203,50 +203,6 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
           </div>
         </div>
 
-        {/* Always-visible action buttons — top right */}
-        <div style={{
-          position: 'absolute', top: '48px', right: '12px', zIndex: 15,
-          display: 'flex', gap: '6px',
-          transition: 'all 0.2s ease',
-        }}>
-          <button
-            onClick={e => {
-              e.stopPropagation();
-              if (user) { const rect = e.currentTarget.getBoundingClientRect(); onSaveRequest({ tool, rect }); }
-              else onRequireAuth();
-            }}
-            style={{
-              width: '40px', height: '40px', borderRadius: '14px',
-              background: isSaved ? 'linear-gradient(135deg,#f43f5e,#ec4899)' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.72)',
-              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.82)',
-              backdropFilter: 'blur(12px)',
-              color: isSaved ? 'white' : '#ef4444',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', fontSize: '16px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.12)',
-              transition: 'all 0.2s ease',
-            }}
-            aria-label="Save"
-          >
-            ♥
-          </button>
-          <button
-            onClick={e => { e.stopPropagation(); window.open(tool.url, '_blank'); }}
-            style={{
-              padding: '8px 18px', borderRadius: '14px',
-              background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.72)',
-              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.82)',
-              backdropFilter: 'blur(12px)',
-              color: isDark ? 'rgba(240,240,255,0.9)' : 'rgba(40,30,70,0.85)',
-              fontSize: '13px', fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            Visit
-          </button>
-        </div>
 
         {/* Play button center */}
         <div style={{
@@ -303,6 +259,70 @@ function HeroBentoCard({ tool, user, onRequireAuth, isFocused, onSaveRequest, is
         )}
         {/* Bottom gradient overlay */}
         <div className="hero-card-overlay" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
+      </div>
+
+      {/* Floating action menu — overlapping top right, on hover */}
+      <div style={{
+        position: 'absolute', top: '-10px', right: '-10px', zIndex: 100,
+        display: 'flex', gap: '8px',
+        padding: '6px',
+        background: isDark ? 'rgba(30, 30, 40, 0.45)' : 'rgba(255, 255, 255, 0.4)',
+        border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.7)',
+        boxShadow: isDark 
+          ? '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)' 
+          : '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
+        backdropFilter: 'blur(24px) saturate(120%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(120%)',
+        borderRadius: '24px',
+        opacity: isHovered ? 1 : 0,
+        transform: isHovered ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(4px)',
+        transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        pointerEvents: isHovered ? 'auto' : 'none',
+      }}>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            if (user) { const rect = e.currentTarget.getBoundingClientRect(); onSaveRequest({ tool, rect }); }
+            else onRequireAuth();
+          }}
+          style={{
+            width: '38px', height: '38px', borderRadius: '12px',
+            background: isSaved ? 'linear-gradient(135deg,#f43f5e,#ec4899)' : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+            border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.7)',
+            color: isSaved ? 'white' : '#f43f5e',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', fontSize: '18px',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: isDark 
+              ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 6px rgba(0,0,0,0.2)' 
+              : 'inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.06)',
+            transition: 'all 0.2s ease',
+          }}
+          aria-label="Save"
+        >
+          ♥
+        </button>
+        <button
+          onClick={e => { e.stopPropagation(); window.open(tool.url, '_blank'); }}
+          style={{
+            padding: '0 20px', height: '38px', borderRadius: '9999px',
+            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+            border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.7)',
+            color: isDark ? 'rgba(240,240,255,0.95)' : '#1f2937',
+            fontSize: '15px', fontWeight: 500,
+            cursor: 'pointer',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: isDark 
+              ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 6px rgba(0,0,0,0.2)' 
+              : 'inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.06)',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Visit
+        </button>
       </div>
 
       {/* Info */}
@@ -605,27 +625,27 @@ export default function App() {
 
         {/* ══ ATMOSPHERIC ORBS ══════════════════════════════ */}
         <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="orb w-[600px] h-[600px] -top-32 -left-32 opacity-60"
+          <div className="orb w-[800px] h-[800px] -top-32 -left-32 opacity-70"
             style={{
               background: isDark
                 ? 'radial-gradient(circle, rgba(124,58,237,0.35) 0%, rgba(99,102,241,0.12) 70%, transparent 100%)'
-                : 'radial-gradient(circle, rgba(199,215,245,0.9) 0%, rgba(213,200,240,0.6) 70%, transparent 100%)',
+                : 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 40%, transparent 80%)',
               animation: 'float 12s ease-in-out infinite',
             }}
           />
-          <div className="orb w-[500px] h-[500px] top-1/3 -right-24 opacity-50"
+          <div className="orb w-[700px] h-[700px] top-1/4 -right-24 opacity-60"
             style={{
               background: isDark
                 ? 'radial-gradient(circle, rgba(147,51,234,0.30) 0%, rgba(124,58,237,0.08) 70%, transparent 100%)'
-                : 'radial-gradient(circle, rgba(232,213,245,0.95) 0%, rgba(213,200,240,0.5) 70%, transparent 100%)',
+                : 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 50%, transparent 80%)',
               animation: 'float2 16s ease-in-out infinite 2s',
             }}
           />
-          <div className="orb w-[400px] h-[400px] bottom-0 left-1/3 opacity-40"
+          <div className="orb w-[900px] h-[900px] -bottom-32 left-1/4 opacity-70"
             style={{
               background: isDark
                 ? 'radial-gradient(circle, rgba(79,70,229,0.25) 0%, rgba(99,102,241,0.06) 70%, transparent 100%)'
-                : 'radial-gradient(circle, rgba(199,215,245,0.7) 0%, rgba(232,213,245,0.4) 70%, transparent 100%)',
+                : 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 50%, transparent 80%)',
               animation: 'float 18s ease-in-out infinite 4s',
             }}
           />
@@ -837,39 +857,50 @@ export default function App() {
 
             {/* Search bar */}
             <div className="w-full max-w-[580px] animate-fade-up" style={{ animationDelay: '140ms' }}>
-              <button
-                onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }}
-                className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all hover:scale-[1.01] group"
+              <div 
                 style={{
-                  background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.72)',
-                  border: isDark ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(255,255,255,0.9)',
-                  backdropFilter: 'blur(24px) saturate(200%)',
-                  WebkitBackdropFilter: 'blur(24px) saturate(200%)',
-                  boxShadow: isDark
-                    ? '0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)'
-                    : '0 4px 24px rgba(100,80,200,0.12), inset 0 1px 0 rgba(255,255,255,0.9)',
+                  padding: '4px',
+                  borderRadius: '9999px',
+                  background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.15)',
+                  border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1.5px solid rgba(255,255,255,1)',
+                  boxShadow: isDark 
+                    ? '0 0 16px rgba(255,255,255,0.05)'
+                    : '0 0 24px rgba(255,255,255,0.7), 0 0 8px rgba(255,255,255,0.5)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
                 }}
-                id="hero-search-btn"
-                aria-label="Open search"
               >
-                <SearchIcon size={16} className="" style={{ color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(124,58,237,0.4)' }} />
-                <span
-                  className="flex-1 text-left text-[14.5px] font-medium"
-                  style={{ color: isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,160,0.5)' }}
-                >
-                  Search for spatial experiences, tools, and resources...
-                </span>
-                <kbd
-                  className="hidden sm:inline-flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-md"
+                <button
+                  onClick={() => { playSound('woosh'); setIsCommandPaletteOpen(true); }}
+                  className="w-full flex items-center gap-3 px-5 py-3 transition-all hover:scale-[1.01] group"
                   style={{
-                    border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(200,190,240,0.6)',
-                    color: isDark ? 'rgba(180,160,255,0.45)' : 'rgba(120,90,200,0.5)',
-                    background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.7)',
+                    borderRadius: '9999px',
+                    background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.4)',
+                    border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.6)',
+                    boxShadow: isDark ? 'inset 0 2px 5px rgba(0,0,0,0.3)' : 'inset 0 1px 4px rgba(0,0,0,0.05)',
                   }}
+                  id="hero-search-btn"
+                  aria-label="Open search"
                 >
-                  ⌘K
-                </kbd>
-              </button>
+                  <SearchIcon size={16} className="" style={{ color: isDark ? 'rgba(180,160,255,0.5)' : 'rgba(100,80,160,0.6)' }} />
+                  <span
+                    className="flex-1 text-left text-[14.5px] font-medium"
+                    style={{ color: isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,160,0.7)' }}
+                  >
+                    Search for spatial experiences, tools, and resources...
+                  </span>
+                  <kbd
+                    className="hidden sm:inline-flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-md"
+                    style={{
+                      border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(200,190,240,0.6)',
+                      color: isDark ? 'rgba(180,160,255,0.45)' : 'rgba(120,90,200,0.5)',
+                      background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.6)',
+                    }}
+                  >
+                    ⌘K
+                  </kbd>
+                </button>
+              </div>
             </div>
 
             {/* Category pills */}
@@ -971,6 +1002,7 @@ export default function App() {
                     display: 'grid',
                     gridTemplateColumns: 'repeat(4, 1fr)',
                     gridAutoRows: 'minmax(180px, auto)',
+                    gridAutoFlow: 'dense',
                     gap: '14px',
                   }}
                 >
@@ -1040,20 +1072,16 @@ export default function App() {
               ) : (
                 <div className="flex flex-col gap-3 max-w-[860px] mx-auto">
                   {filteredTools.map((tool, i) => (
-                    <div
+                    <ListCard
                       key={tool.id}
-                      className="animate-fade-up"
-                      style={{ animationDelay: `${(i % 10) * 25}ms` }}
-                    >
-                      <ListCard
-                        tool={tool}
-                        user={user}
-                        onRequireAuth={() => setIsAuthModalOpen(true)}
-                        isFocused={focusedIndex === i}
-                        indexNumber={i}
-                        onSaveRequest={setSavePopoverConfig}
-                      />
-                    </div>
+                      tool={tool}
+                      user={user}
+                      onRequireAuth={() => setIsAuthModalOpen(true)}
+                      isFocused={focusedIndex === i}
+                      indexNumber={i}
+                      onSaveRequest={setSavePopoverConfig}
+                      delay={`${(i % 10) * 25}ms`}
+                    />
                   ))}
                 </div>
               )
@@ -1195,9 +1223,9 @@ export default function App() {
 
         {/* ══ MODALS ════════════════════════════════════════ */}
         <SavePopover config={savePopoverConfig} onClose={() => setSavePopoverConfig(null)} user={user} setUser={setUser} />
-        <CategoriesModal isOpen={isCategoryModalOpen} onClose={() => setIsCategoryModalOpen(false)} activeCategory={activeCategory} setActiveCategory={setActiveCategory} isDark={isDark} />
+        <CategoriesModal isOpen={isCategoryModalOpen} onClose={() => { setIsCategoryModalOpen(false); if (activeNav === 'categories') setActiveNav('discover'); }} activeCategory={activeCategory} setActiveCategory={setActiveCategory} isDark={isDark} />
         <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} query={searchQuery} setQuery={handleSearchChange} tools={tools} />
-        <AutoCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={user} />
+        <AutoCaptureModal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); if (activeNav === 'submit') setActiveNav('discover'); }} user={user} />
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         <UserProfile isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={handleLogout} accentColor={accentColor} setAccentColor={setAccentColor} fontFamily={fontFamily} setFontFamily={setFontFamily} />
         <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => setIsLeaderboardOpen(false)} />

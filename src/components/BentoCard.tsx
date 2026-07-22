@@ -79,8 +79,8 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
         backdropFilter: 'blur(24px) saturate(180%)',
         WebkitBackdropFilter: 'blur(24px) saturate(180%)',
         borderRadius: '2rem',
-        overflow: 'hidden',
         cursor: 'pointer',
+        position: 'relative',
         transition: 'all 0.28s cubic-bezier(0.34,1.56,0.64,1)',
         transform: isHovered ? 'translateY(-4px) scale(1.008)' : 'translateY(0) scale(1)',
         boxShadow: isHovered
@@ -91,6 +91,9 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
             ? '0 4px 20px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.25)'
             : '0 8px 30px rgba(0,0,0,0.04)',
         padding: '10px',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
       {/* ── Browser Chrome Bar ──────────────────────────────── */}
@@ -137,56 +140,12 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           </span>
         </div>
 
-        {/* Action buttons — top right, on hover */}
-        <div style={{
-          display: 'flex',
-          gap: '4px',
-          opacity: isHovered ? 1 : 0,
-          transform: isHovered ? 'scale(1)' : 'scale(0.85)',
-          transition: 'all 0.2s ease',
-        }}>
-          {/* Share */}
-          <div style={{
-            width: '22px', height: '22px', borderRadius: '50%',
-            background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.9)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(200,190,240,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            backdropFilter: 'blur(8px)',
-          }}>
-            <ShareButton url={tool.url} name={tool.name} />
-          </div>
-
-          {/* Save / Heart */}
-          <button
-            data-save-btn
-            onClick={e => {
-              e.stopPropagation();
-              if (user) { const rect = e.currentTarget.getBoundingClientRect(); onSaveRequest({ tool, rect }); }
-              else onRequireAuth();
-            }}
-            style={{
-              width: '22px', height: '22px', borderRadius: '50%',
-              background: isSavedAnywhere
-                ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
-                : isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.9)',
-              border: isSavedAnywhere
-                ? '1px solid rgba(124,58,237,0.5)'
-                : isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(200,190,240,0.5)',
-              color: isSavedAnywhere ? 'white' : isDark ? 'rgba(200,180,255,0.7)' : 'rgba(100,80,180,0.6)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              backdropFilter: 'blur(8px)',
-            }}
-            aria-label={isSavedAnywhere ? 'Remove from saved' : 'Save tool'}
-          >
-            <HeartIcon isSaved={isSavedAnywhere} size={10} />
-          </button>
-        </div>
+        {/* Action buttons removed from here */}
       </div>
 
       {/* ── Screenshot Preview ──────────────────────────────── */}
-      <div style={{ position: 'relative', width: '100%', paddingBottom: '60%', overflow: 'hidden', borderRadius: '0 0 1.25rem 1.25rem' }}>
+      <div style={{ position: 'relative', width: '100%', flex: 1, minHeight: '120px', overflow: 'hidden', borderRadius: '0 0 1.25rem 1.25rem' }}>
+        
         {/* Image */}
         {!imageError && (
           <>
@@ -345,6 +304,70 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
           aria-hidden="true"
         />
       )}
+
+      {/* Floating action menu — overlapping top right, on hover */}
+      <div style={{
+        position: 'absolute', top: '-10px', right: '-10px', zIndex: 100,
+        display: 'flex', gap: '8px',
+        padding: '6px',
+        background: isDark ? 'rgba(30, 30, 40, 0.45)' : 'rgba(255, 255, 255, 0.4)',
+        border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.7)',
+        boxShadow: isDark 
+          ? '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)' 
+          : '0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
+        backdropFilter: 'blur(24px) saturate(120%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(120%)',
+        borderRadius: '24px',
+        opacity: isHovered ? 1 : 0,
+        transform: isHovered ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(4px)',
+        transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        pointerEvents: isHovered ? 'auto' : 'none',
+      }}>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            if (user) { const rect = e.currentTarget.getBoundingClientRect(); onSaveRequest({ tool, rect }); }
+            else onRequireAuth();
+          }}
+          style={{
+            width: '38px', height: '38px', borderRadius: '12px',
+            background: isSavedAnywhere ? 'linear-gradient(135deg,#f43f5e,#ec4899)' : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+            border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.7)',
+            color: isSavedAnywhere ? 'white' : '#f43f5e',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', fontSize: '18px',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: isDark 
+              ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 6px rgba(0,0,0,0.2)' 
+              : 'inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.06)',
+            transition: 'all 0.2s ease',
+          }}
+          aria-label={isSavedAnywhere ? 'Remove from saved' : 'Save tool'}
+        >
+          ♥
+        </button>
+        <button
+          onClick={e => { e.stopPropagation(); window.open(tool.url, '_blank'); }}
+          style={{
+            padding: '0 20px', height: '38px', borderRadius: '9999px',
+            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)',
+            border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.7)',
+            color: isDark ? 'rgba(240,240,255,0.95)' : '#1f2937',
+            fontSize: '15px', fontWeight: 500,
+            cursor: 'pointer',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: isDark 
+              ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 2px 6px rgba(0,0,0,0.2)' 
+              : 'inset 0 1px 2px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.02), 0 2px 8px rgba(0,0,0,0.06)',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          Visit
+        </button>
+      </div>
     </div>
   );
 });

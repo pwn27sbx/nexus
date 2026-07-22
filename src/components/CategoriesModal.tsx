@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ALL_CATEGORIES } from '../utils/constants';
 import { playSound } from '../utils/sounds';
 
@@ -61,6 +61,16 @@ const CategoryIcon = ({ category, isActive, isDark }) => {
 
 const CategoriesModal = ({ isOpen, onClose, activeCategory, setActiveCategory, isDark = false }) => {
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const filtered = ALL_CATEGORIES.filter(cat =>

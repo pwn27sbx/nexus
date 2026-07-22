@@ -13,9 +13,9 @@
     --global-font: 'Inter', sans-serif;
 
     /* Spatial palette */
-    --bg-from: #c7d7f5;
-    --bg-mid:  #d5c8f0;
-    --bg-to:   #e8d5f5;
+    --bg-from: #d4e5ff;
+    --bg-mid:  #e5deff;
+    --bg-to:   #d4e5ff;
     --surface: rgba(255,255,255,0.72);
     --surface-hover: rgba(255,255,255,0.88);
     --border: rgba(255,255,255,0.6);
