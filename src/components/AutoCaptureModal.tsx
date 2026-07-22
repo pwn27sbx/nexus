@@ -179,9 +179,10 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
           }}>
             {previewUrl ? (
               <>
-                <iframe src={previewUrl} title="Website Preview"
-                  style={{ border: 'none', position: 'absolute', inset: 0, transform: 'scale(0.75)', transformOrigin: 'top left', width: '133.33%', height: '133.33%' }}
-                  sandbox="allow-scripts allow-same-origin"
+                <img 
+                  src={`https://image.thum.io/get/width/1200/crop/800/${previewUrl}`} 
+                  alt="Website Preview"
+                  style={{ border: 'none', position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                 />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60px', background: isDark ? 'linear-gradient(to top, rgba(10,8,20,0.8), transparent)' : 'linear-gradient(to top, rgba(240,238,248,0.6), transparent)', pointerEvents: 'none' }} />
               </>
