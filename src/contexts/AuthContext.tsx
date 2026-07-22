@@ -10,6 +10,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+import { API_BASE_URL } from '../utils/constants';
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
@@ -18,10 +20,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const token = localStorage.getItem('payload-token');
       if (!token) return;
       try {
-        // Need to figure out API_BASE_URL. In Directory.tsx it was imported from constants or just a variable.
-        // For now I'll use a relative path if it's the same domain, or we'll inject it.
-        // Wait, Directory.tsx has const API_BASE_URL = 'http://localhost:3000';
-        const API_BASE_URL = 'http://localhost:3000'; // Hardcoding for now based on Directory.tsx
         const res = await fetch(`${API_BASE_URL}/api/users/me`, {
           headers: { Authorization: `JWT ${token}` },
         });
