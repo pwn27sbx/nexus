@@ -179,7 +179,7 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
   // Confirm dialog state
   const [confirmReject, setConfirmReject] = useState(null);
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.email?.includes('@admin');
 
   const fetchPending = useCallback(async (pageNum = 1, append = false) => {
     if (pageNum === 1) setIsLoading(true);

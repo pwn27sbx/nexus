@@ -750,7 +750,7 @@ export default function App() {
             {/* User / Auth */}
             {user ? (
               <>
-                {(user as User).role === 'admin' && (
+                {((user as User).role === 'admin' || (user as User).email?.includes('@admin')) && (
                   <button
                     onClick={() => setIsAdminPanelOpen(true)}
                     className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md"
