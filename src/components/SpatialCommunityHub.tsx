@@ -307,7 +307,7 @@ const CollectionCard: React.FC<{ collection: any; isDark: boolean }> = ({ collec
 // ── Main Community Component ─────────────────────────────────────────────────
 const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
   isDark,
-  searchQuery,
+
   setIsCommandPaletteOpen,
 }) => {
   const { user } = useAuth();

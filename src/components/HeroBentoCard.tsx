@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Tool, User, SavePopoverConfig, HeroBentoCardProps } from '../types';
+import type { HeroBentoCardProps } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useModals } from '../contexts/ModalContext';
 

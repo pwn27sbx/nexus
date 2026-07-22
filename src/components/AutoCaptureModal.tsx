@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GlobeIcon, DescIcon, CloseIcon, CheckIcon, SpinnerIcon, PlusIcon } from '../utils/icons';
+import { GlobeIcon, DescIcon, CheckIcon, SpinnerIcon } from '../utils/icons';
 import { ALL_CATEGORIES, API_BASE_URL, APP_CONFIG, COMMON_TAGS } from '../utils/constants';
 import { isValidUrl } from '../utils/helpers';
 import { playSound } from '../utils/sounds';

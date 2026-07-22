@@ -218,7 +218,7 @@ const AdminPanel = () => {
   }>({ isOpen: false, toolId: null, type: null });
   const [isProcessing, setIsProcessing] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const [expandedToolId, setExpandedToolId] = useState<string | number | null>(null);
+
   const [actionStatus, setActionStatus] = useState<Record<string | number, string>>({});
   const isDark =
     typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
@@ -250,7 +250,7 @@ const AdminPanel = () => {
         }
         setHasMore(data.hasNextPage || false);
         setPage(pageNum);
-      } catch (error) {
+      } catch {
         addToast('Failed to load pending tools', 'error');
       } finally {
         setIsLoading(false);
@@ -282,7 +282,7 @@ const AdminPanel = () => {
         setActionStatus((prev) => ({ ...prev, [toolId]: 'error' }));
         addToast('Failed to approve tool', 'error');
       }
-    } catch (error) {
+    } catch {
       setActionStatus((prev) => ({ ...prev, [toolId]: 'error' }));
       addToast('Network error', 'error');
     }
@@ -312,7 +312,7 @@ const AdminPanel = () => {
         setActionStatus((prev) => ({ ...prev, [toolId]: 'error' }));
         addToast('Failed to reject tool', 'error');
       }
-    } catch (error) {
+    } catch {
       setActionStatus((prev) => ({ ...prev, [toolId]: 'error' }));
       addToast('Network error', 'error');
     } finally {

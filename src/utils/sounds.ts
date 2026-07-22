@@ -64,7 +64,7 @@ export const playSound = (type: string = 'pop') => {
       default:
         break;
     }
-  } catch (e) {
+  } catch {
     // Silently fail - audio is not critical
   }
 };

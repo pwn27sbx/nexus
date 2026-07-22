@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModals } from '@/contexts/ModalContext';
 import { AppProvider } from '@/contexts/AppProvider';
@@ -70,11 +70,11 @@ const VirtualListWrapper = ({ tool, index, focusedIndex, onSaveRequest }: any) =
   );
 };
 
-import { GridIcon, ListIcon, TrophyIcon, SunIcon, MoonIcon, LayersIcon } from '@/utils/icons';
+import { GridIcon, ListIcon, TrophyIcon, SunIcon, MoonIcon } from '@/utils/icons';
 import { ALL_CATEGORIES } from '@/utils/constants';
 import { playSound } from '@/utils/sounds';
 
-import type { Tool, SavePopoverConfig } from '@/types';
+import type { SavePopoverConfig } from '@/types';
 
 // Nav items for bottom dock
 const NAV_ITEMS = [
@@ -305,7 +305,7 @@ const DirectoryContent: React.FC = () => {
 
   // ── Category / Tags ──
   const [activeCategory, setActiveCategory] = useState('All Tools');
-  const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [activeTags] = useState<string[]>([]);
 
   // ── Search & Pagination (Custom Hooks) ──
   const {
@@ -343,13 +343,12 @@ const DirectoryContent: React.FC = () => {
     setIsProfileOpen,
     isLeaderboardOpen,
     setIsLeaderboardOpen,
-    isAdminPanelOpen,
     setIsAdminPanelOpen,
   } = useModals();
 
   const [savePopoverConfig, setSavePopoverConfig] = useState<SavePopoverConfig | null>(null);
   const [focusedIndex, setFocusedIndex] = useState(-1);
-  const { user, logout: handleLogout } = useAuth();
+  const { user } = useAuth();
 
   // ── Nav / sidebar ──
   const [activeNav, setActiveNav] = useState('discover');

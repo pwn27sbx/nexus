@@ -54,7 +54,7 @@ const AuthModal = () => {
         setStatus('error');
         setErrorMessage(data.errors?.[0]?.message || 'An error occurred.');
       }
-    } catch (error) {
+    } catch {
       setStatus('error');
       setErrorMessage('Network error. Please try again.');
     }

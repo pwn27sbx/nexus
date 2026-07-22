@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useModals } from '../contexts/ModalContext';
-import { API_BASE_URL, SCORE_THRESHOLDS } from '../utils/constants';
+import { API_BASE_URL } from '../utils/constants';
 import { SpinnerIcon } from '../utils/icons';
 import type { User } from '../types';
 
@@ -61,7 +61,7 @@ const LeaderboardModal = () => {
         const res = await fetch(`${API_BASE_URL}/api/users?sort=-approvedCount&limit=20`);
         const data = await res.json();
         setLeaders(data.docs || []);
-      } catch (error) {
+      } catch {
         console.error('Failed to load leaderboard');
       } finally {
         setIsLoading(false);

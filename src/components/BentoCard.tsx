@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, memo, useState } from 'react';
-import { HeartIcon, ArrowUpRight } from '../utils/icons';
+import { ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
-import ShareButton from './ShareButton';
+
 import { useAuth } from '../contexts/AuthContext';
 import { useModals } from '../contexts/ModalContext';
 import { m } from 'framer-motion';
@@ -11,7 +11,7 @@ import { CATEGORY_COLORS, FALLBACK_COLORS } from '../data/categories';
 
 // ─── BentoCard ───────────────────────────────────────────────────────────────
 const BentoCard: React.FC<BentoCardProps> = memo(
-  ({ tool, isFocused, index, total, onSaveRequest, isDark }) => {
+  ({ tool, isFocused, index, onSaveRequest, isDark }) => {
     const { user } = useAuth();
     const { setIsAuthModalOpen } = useModals();
     const onRequireAuth = () => setIsAuthModalOpen(true);

@@ -55,7 +55,7 @@ const UserProfile = ({
         setCollections(userData.collections || []);
         const subData = await subRes.json();
         setSubmissions(subData.docs || []);
-      } catch (error) {
+      } catch {
         console.error('Failed to load user data');
       } finally {
         setIsLoading(false);
@@ -77,7 +77,7 @@ const UserProfile = ({
         body: JSON.stringify({ nickname }),
       });
       if (response.ok && user) user.nickname = nickname;
-    } catch (error) {
+    } catch {
       // Silently fail
     }
   };
@@ -100,7 +100,7 @@ const UserProfile = ({
         },
         body: JSON.stringify({ collections: updatedCollections }),
       });
-    } catch (error) {
+    } catch {
       console.error('Failed to save folder');
     }
   };

@@ -89,7 +89,7 @@ export const getLevelEmoji = (level: string) => {
  * Genera un patrón de bento grid 2.0 más orgánico y variado
  * Crea layouts asimétricos con tamaños diversos para un look premium
  */
-export const getBentoSpan = (i: number, total: number) => {
+export const getBentoSpan = (i: number, _total: number) => {
   // Patrón Bento 2.0: layout orgánico con variedad visual
   const pattern = i % 12;
 

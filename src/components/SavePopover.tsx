@@ -75,7 +75,7 @@ const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
         body: JSON.stringify(updatedUser),
       });
       if (res.ok) setUser(updatedUser);
-    } catch (err) {
+    } catch {
     } finally {
       setIsSaving(false);
     }
