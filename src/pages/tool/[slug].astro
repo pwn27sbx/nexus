@@ -7,10 +7,10 @@ import { API_BASE_URL } from "../../utils/constants";
 // Enable SSR for this route
 export const prerender = false;
 
-const { slug } = Astro.params;
+const slug = Astro.params.slug as string;
 
 // Fetch the tool from Payload CMS using the REST API
-let tool = null;
+let tool: any = null;
 
 try {
   const isNumeric = /^\d+$/.test(slug);
