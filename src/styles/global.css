@@ -12,6 +12,12 @@
     --accent: #7c3aed;
     --global-font: 'Inter', sans-serif;
 
+    /* Theme Colors */
+    --color-primary: #7c3aed;
+    --color-secondary: #a855f7;
+    --color-primary-light: #c084fc;
+    --color-primary-lighter: #d8b4fe;
+
     /* Spatial palette */
     --bg-from: #d4e5ff;
     --bg-mid:  #e5deff;

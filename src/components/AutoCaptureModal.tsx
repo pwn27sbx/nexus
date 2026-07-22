@@ -1,18 +1,19 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { GlobeIcon, DescIcon, CloseIcon, CheckIcon, SpinnerIcon, PlusIcon } from '../utils/icons';
 import { ALL_CATEGORIES, API_BASE_URL, APP_CONFIG, COMMON_TAGS } from '../utils/constants';
 import { isValidUrl } from '../utils/helpers';
 import { playSound } from '../utils/sounds';
+import type { AutoCaptureModalProps } from '../types';
 
-const AutoCaptureModal = ({ isOpen, onClose, user }) => {
+const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose, user }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
   const [description, setDescription] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
-  const [submitStatus, setSubmitStatus] = useState('idle');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const [urlError, setUrlError] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
   const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
@@ -34,13 +35,13 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
     setTagInput('');
   };
 
-  const removeTag = (tag) => {
+  const removeTag = (tag: string) => {
     setSelectedTags(selectedTags.filter((t) => t !== tag));
   };
 
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -49,7 +50,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 
   if (!isOpen) return null;
 
-  const handleUrlChange = (e) => {
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setUrl(val);
     if (val && !isValidUrl(val)) {
@@ -59,8 +60,9 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
     }
   };
 
-  const handleCapture = async (e) => {
+  const handleCapture = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     if (!isValidUrl(url)) {
       setUrlError('Please enter a valid URL (https://...)');
       return;
@@ -82,10 +84,17 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
         setTimeout(() => {
           onClose(); setName(''); setUrl(''); setDescription('');
           setCategory('Design'); setSelectedTags([]); setTagInput('');
-          setSubmitStatus('idle'); setUrlError(''); setPreviewUrl('');
+          setSubmitStatus('idle'); setUrlError(''); setPreviewUrl(''); setErrorMessage('');
         }, 2000);
-      } else { setSubmitStatus('error'); }
-    } catch (err) { setSubmitStatus('error'); }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        setErrorMessage(errorData.error || errorData.message || 'Server connection failed.');
+        setSubmitStatus('error'); 
+      }
+    } catch (err: any) { 
+      setErrorMessage(err?.message || 'Network error occurred.');
+      setSubmitStatus('error'); 
+    }
   };
 
   const inputStyle = {
@@ -208,7 +217,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
 
           {submitStatus === 'success' ? (
             <div className="py-10 flex flex-col items-center justify-center text-center animate-scale-in">
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 24px rgba(124,58,237,0.4)', marginBottom: '16px' }}><CheckIcon size={32} /></div>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 24px rgba(124,58,237,0.4)', marginBottom: '16px' }}><CheckIcon size={32} /></div>
               <h3 style={{ fontSize: '20px', fontWeight: 800, color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)', marginBottom: '4px' }}>Received!</h3>
               <p style={{ fontSize: '13px', color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)' }}>Waiting for curation review.</p>
             </div>
@@ -230,7 +239,7 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
                 <div style={{ ...inputStyle, padding: '12px 16px' }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: selectedTags.length > 0 ? '10px' : '0' }}>
                     {selectedTags.map((tag) => (
-                      <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '100px', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: 'white', fontSize: '11px', fontWeight: 700 }}>
+                      <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '100px', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: 'white', fontSize: '11px', fontWeight: 700 }}>
                         {tag}
                         <button onClick={() => removeTag(tag)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 0 }} aria-label={`Remove ${tag}`}>
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -251,8 +260,8 @@ const AutoCaptureModal = ({ isOpen, onClose, user }) => {
                   {ALL_CATEGORIES.map((c) => (<option key={c} value={c}>{c}</option>))}
                 </select>
               </div>
-              {submitStatus === 'error' && <p style={{ color: '#ef4444', fontSize: '12px', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>Server connection failed.</p>}
-              <button type="submit" disabled={submitStatus === 'loading'} style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', color: 'white', fontSize: '15px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 20px rgba(124,58,237,0.35)', transition: 'all 0.2s ease', opacity: submitStatus === 'loading' ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {submitStatus === 'error' && <p style={{ color: '#ef4444', fontSize: '12px', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>{errorMessage}</p>}
+              <button type="submit" disabled={submitStatus === 'loading'} style={{ width: '100%', padding: '14px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: 'white', fontSize: '15px', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 4px 20px rgba(124,58,237,0.35)', transition: 'all 0.2s ease', opacity: submitStatus === 'loading' ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 {submitStatus === 'loading' ? (<><SpinnerIcon size={16} /> Sending...</>) : ('Submit to Directory')}
               </button>
             </form>

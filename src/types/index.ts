@@ -83,6 +83,7 @@ export interface BentoCardProps {
   index: number;
   total: number;
   onSaveRequest: (config: SavePopoverConfig) => void;
+  isDark?: boolean;
 }
 
 export interface ListCardProps {
@@ -92,6 +93,8 @@ export interface ListCardProps {
   isFocused: boolean;
   indexNumber: number;
   onSaveRequest: (config: SavePopoverConfig) => void;
+  isDark?: boolean;
+  delay?: string;
 }
 
 export interface SavePopoverProps {
@@ -161,4 +164,21 @@ export interface AppConfig {
   BENTO_COLS_LG: number;
   LIST_PAGE_SIZE: number;
   ALGOLIA_HITS_PER_PAGE: number;
+}
+
+export interface HeroBentoCardProps {
+  tool: Tool;
+  user: User | null;
+  onRequireAuth: () => void;
+  isFocused: boolean;
+  onSaveRequest: (config: SavePopoverConfig) => void;
+  isDark: boolean;
+}
+
+export interface SpatialCommunityHubProps {
+  isDark: boolean;
+  onRequireAuth: () => void;
+  user: User | null;
+  searchQuery: string;
+  setIsCommandPaletteOpen: (isOpen: boolean) => void;
 }

@@ -1,9 +1,9 @@
-// @ts-nocheck
 import React, { memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
+import type { ListCardProps } from '../types';
 
-const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveRequest, delay }) => {
+const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveRequest, delay }: ListCardProps) => {
   const numericToolId = Number(tool.id);
   const [isHovered, setIsHovered] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));

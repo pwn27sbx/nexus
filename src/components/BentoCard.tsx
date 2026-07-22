@@ -1,8 +1,8 @@
-// @ts-nocheck
 import React, { useRef, useEffect, memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 import ShareButton from './ShareButton';
+import type { BentoCardProps } from '../types';
 
 // ─── Category → Badge Colors ────────────────────────────────────────────────
 const CATEGORY_COLORS = {
@@ -26,7 +26,7 @@ const CATEGORY_COLORS = {
 const FALLBACK_COLORS = { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', border: 'rgba(148,163,184,0.2)' };
 
 // ─── BentoCard ───────────────────────────────────────────────────────────────
-const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, onSaveRequest, isDark }) => {
+const BentoCard: React.FC<BentoCardProps> = memo(({ tool, user, onRequireAuth, isFocused, index, total, onSaveRequest, isDark }) => {
   const cardRef = useRef(null);
   const numericToolId = Number(tool.id);
   const domain = getDomain(tool.url);
@@ -47,8 +47,8 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
   }, [isFocused]);
 
   useEffect(() => {
-    const handleKey = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT' || (e.target as HTMLElement).tagName === 'TEXTAREA') return;
       if (isFocused && (e.key === 'f' || e.key === 'F')) {
         e.preventDefault();
         if (user && cardRef.current) {
@@ -324,6 +324,7 @@ const BentoCard = memo(({ tool, user, onRequireAuth, isFocused, index, total, on
         pointerEvents: isHovered ? 'auto' : 'none',
       }}>
         <button
+          data-save-btn
           onClick={e => {
             e.stopPropagation();
             if (user) { const rect = e.currentTarget.getBoundingClientRect(); onSaveRequest({ tool, rect }); }
