@@ -37,7 +37,6 @@ export const Users: CollectionConfig = {
       },
       access: {
         read: () => true,
-        create: ({ req: { user } }: { req: { user: any } }) => user?.role === 'admin',
         update: ({ req: { user } }: { req: { user: any } }) => user?.role === 'admin',
       },
     },
@@ -98,11 +97,18 @@ export const Users: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      ({ data, originalDoc, req: { user } }) => {
+      ({ data, originalDoc, req: { user }, operation }) => {
         // Protección server-side: evitar que usuarios se autopromuevan a admin
-        if (data.role && originalDoc && data.role !== originalDoc.role) {
-          if (!user || user?.role !== 'admin') {
-            throw new Error('Solo los administradores pueden cambiar el rol de un usuario.');
+        if (operation === 'create') {
+          // Si no hay un admin logueado, forzar rol a 'user'
+          if (!user || user.role !== 'admin') {
+            data.role = 'user';
+          }
+        } else if (operation === 'update') {
+          if (data.role && originalDoc && data.role !== originalDoc.role) {
+            if (!user || user?.role !== 'admin') {
+              throw new Error('Solo los administradores pueden cambiar el rol de un usuario.');
+            }
           }
         }
         return data;
