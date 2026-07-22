@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
-import type { SpatialCommunityHubProps } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
+import type { SpatialCommunityHubProps, User } from '../types';
 
 import { MOCK_CONTRIBUTORS, MOCK_DISCUSSIONS, MOCK_COLLECTIONS } from '../utils/mockData';
 
@@ -213,7 +215,7 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
 
     {/* Image grid */}
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', borderRadius: '10px', overflow: 'hidden' }}>
-      {collection.images.slice(0, 3).map((img, i) => (
+      {collection.images.slice(0, 3).map((img: string, i: number) => (
         <div
           key={i}
           style={{
@@ -236,7 +238,7 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
 
     {/* Bottom avatars */}
     <div style={{ display: 'flex', marginTop: '10px' }}>
-      {collection.avatars.map((a, i) => (
+      {collection.avatars.map((a: string, i: number) => (
         <div
           key={i}
           style={{
@@ -261,9 +263,13 @@ const CollectionCard: React.FC<{ collection: any, isDark: boolean }> = ({ collec
   </div>
 );
 
-// ── Main Community Hub component ─────────────────────────────────────────────
-const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, onRequireAuth, user, searchQuery, setIsCommandPaletteOpen }) => {
-  const [leaders, setLeaders] = useState<any[]>([]);
+// ── Main Community Component ─────────────────────────────────────────────────
+const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({ isDark, searchQuery, setIsCommandPaletteOpen }) => {
+  const { user } = useAuth();
+  const { setIsAuthModalOpen } = useModals();
+  const onRequireAuth = () => setIsAuthModalOpen(true);
+  
+  const [leaders, setLeaders] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchLeaders = async () => {

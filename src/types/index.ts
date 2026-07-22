@@ -77,8 +77,6 @@ export interface Badge {
 // === Props Types ===
 export interface BentoCardProps {
   tool: Tool;
-  user: User | null;
-  onRequireAuth: () => void;
   isFocused: boolean;
   index: number;
   total: number;
@@ -88,8 +86,6 @@ export interface BentoCardProps {
 
 export interface ListCardProps {
   tool: Tool;
-  user: User | null;
-  onRequireAuth: () => void;
   isFocused: boolean;
   indexNumber: number;
   onSaveRequest: (config: SavePopoverConfig) => void;
@@ -122,7 +118,6 @@ export interface CommandPaletteProps {
 export interface AutoCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
-  user: User | null;
 }
 
 export interface AuthModalProps {
@@ -168,8 +163,6 @@ export interface AppConfig {
 
 export interface HeroBentoCardProps {
   tool: Tool;
-  user: User | null;
-  onRequireAuth: () => void;
   isFocused: boolean;
   onSaveRequest: (config: SavePopoverConfig) => void;
   isDark: boolean;
@@ -177,8 +170,6 @@ export interface HeroBentoCardProps {
 
 export interface SpatialCommunityHubProps {
   isDark: boolean;
-  onRequireAuth: () => void;
-  user: User | null;
   searchQuery: string;
-  setIsCommandPaletteOpen: (isOpen: boolean) => void;
+  setIsCommandPaletteOpen: (open: boolean) => void;
 }

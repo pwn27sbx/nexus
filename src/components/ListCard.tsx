@@ -1,9 +1,15 @@
 import React, { memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 import type { ListCardProps } from '../types';
 
-const ListCard = memo(({ tool, user, onRequireAuth, isFocused, indexNumber, onSaveRequest, delay }: ListCardProps) => {
+const ListCard = memo(({ tool, isFocused, indexNumber, onSaveRequest, delay }: ListCardProps) => {
+  const { user } = useAuth();
+  const { setIsAuthModalOpen } = useModals();
+  const onRequireAuth = () => setIsAuthModalOpen(true);
+  
   const numericToolId = Number(tool.id);
   const [isHovered, setIsHovered] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));

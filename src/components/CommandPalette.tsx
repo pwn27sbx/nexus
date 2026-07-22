@@ -1,9 +1,18 @@
-// @ts-nocheck
+
 import React, { useState, useEffect, useRef } from 'react';
 import { SearchIcon, ArrowUpRight } from '../utils/icons';
+import type { Tool } from '../types';
 
-const CommandPalette = ({ isOpen, onClose, query, setQuery, tools }) => {
-  const inputRef = useRef(null);
+interface CommandPaletteProps {
+  isOpen: boolean;
+  onClose: () => void;
+  query: string;
+  setQuery: (q: string) => void;
+  tools: Tool[];
+}
+
+const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose, query, setQuery, tools }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
@@ -17,7 +26,7 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools }) => {
   }, [isOpen]);
 
   useEffect(() => {
-    const handleEsc = (e) => {
+    const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     if (isOpen) {
@@ -36,7 +45,7 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools }) => {
     .filter((t) => t.name.toLowerCase().includes(query.toLowerCase()))
     .slice(0, 6);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex((prev) => (prev < filteredTools.length - 1 ? prev + 1 : 0));
@@ -136,7 +145,7 @@ const CommandPalette = ({ isOpen, onClose, query, setQuery, tools }) => {
           {query ? (
             filteredTools.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                {filteredTools.map((tool, idx) => {
+                {filteredTools.map((tool: Tool, idx: number) => {
                   const isSelected = idx === selectedIndex;
                   return (
                     <button

@@ -1,5 +1,7 @@
-// @ts-nocheck
+
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 import { playSound } from '../utils/sounds';
 
 // ── Mock featured collections ────────────────────────────────────────────────
@@ -87,7 +89,9 @@ const formatViews = (n: number) => {
 };
 
 // ── Large Hero Collection Card ────────────────────────────────────────────────
-const HeroCollectionCard = ({ collection, isDark, onRequireAuth, user }) => {
+const HeroCollectionCard = ({ collection, isDark }: { collection: any; isDark: boolean }) => {
+  const { user } = useAuth();
+  const { setIsAuthModalOpen } = useModals();
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -144,7 +148,7 @@ const HeroCollectionCard = ({ collection, isDark, onRequireAuth, user }) => {
         {/* Action buttons on hover */}
         <div style={{ display: 'flex', gap: '6px', opacity: isHovered ? 1 : 0, transition: 'opacity 0.2s ease' }}>
           <button
-            onClick={e => { e.stopPropagation(); if (user) {} else onRequireAuth(); }}
+            onClick={e => { e.stopPropagation(); if (user) {} else setIsAuthModalOpen(true); }}
             style={{
               width: '26px', height: '26px', borderRadius: '50%',
               background: 'linear-gradient(135deg,#f43f5e,#ec4899)',
@@ -235,7 +239,7 @@ const HeroCollectionCard = ({ collection, isDark, onRequireAuth, user }) => {
 };
 
 // ── Small Collection Card ─────────────────────────────────────────────────────
-const SmallCollectionCard = ({ collection, isDark }) => {
+const SmallCollectionCard = ({ collection, isDark }: { collection: any; isDark: boolean }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -330,7 +334,7 @@ const SmallCollectionCard = ({ collection, isDark }) => {
 };
 
 // ── Main CollectionsView ──────────────────────────────────────────────────────
-const CollectionsView = ({ isDark, onRequireAuth, user, setIsCommandPaletteOpen }) => {
+export default function CollectionsView({ isDark, setIsCommandPaletteOpen }: any) {
   const [heroCollection] = useState(FEATURED_COLLECTIONS[0]);
   const rest = FEATURED_COLLECTIONS.slice(1);
 
@@ -409,8 +413,6 @@ const CollectionsView = ({ isDark, onRequireAuth, user, setIsCommandPaletteOpen 
         <HeroCollectionCard
           collection={heroCollection}
           isDark={isDark}
-          onRequireAuth={onRequireAuth}
-          user={user}
         />
         {/* Small cards */}
         {rest.map((c, i) => (
@@ -438,6 +440,4 @@ const CollectionsView = ({ isDark, onRequireAuth, user, setIsCommandPaletteOpen 
       `}</style>
     </div>
   );
-};
-
-export default CollectionsView;
+}

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import type { Tool, User, SavePopoverConfig, HeroBentoCardProps } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 
 const CATEGORY_COLORS_HERO: Record<string, { bg: string; text: string; border: string }> = {
   Design:        { bg: 'rgba(124,58,237,0.12)', text: 'var(--color-primary)', border: 'rgba(124,58,237,0.2)' },
@@ -8,7 +10,11 @@ const CATEGORY_COLORS_HERO: Record<string, { bg: string; text: string; border: s
   Productivity:  { bg: 'rgba(217,119,6,0.12)',  text: '#f59e0b', border: 'rgba(217,119,6,0.2)' },
 };
 
-const HeroBentoCard: React.FC<HeroBentoCardProps> = ({ tool, user, onRequireAuth, isFocused, onSaveRequest, isDark }) => {
+const HeroBentoCard: React.FC<HeroBentoCardProps> = ({ tool, isFocused, onSaveRequest, isDark }) => {
+  const { user } = useAuth();
+  const { setIsAuthModalOpen } = useModals();
+  const onRequireAuth = () => setIsAuthModalOpen(true);
+  
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);

@@ -2,10 +2,12 @@ import React, { useRef, useEffect, memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 import ShareButton from './ShareButton';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 import type { BentoCardProps } from '../types';
 
 // ─── Category → Badge Colors ────────────────────────────────────────────────
-const CATEGORY_COLORS = {
+const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   Design:        { bg: 'rgba(124,58,237,0.12)', text: '#9333ea', border: 'rgba(124,58,237,0.2)' },
   Development:   { bg: 'rgba(37,99,235,0.12)',  text: '#3b82f6', border: 'rgba(37,99,235,0.2)' },
   'AI Tools':    { bg: 'rgba(5,150,105,0.12)',  text: '#10b981', border: 'rgba(5,150,105,0.2)' },
@@ -26,8 +28,12 @@ const CATEGORY_COLORS = {
 const FALLBACK_COLORS = { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', border: 'rgba(148,163,184,0.2)' };
 
 // ─── BentoCard ───────────────────────────────────────────────────────────────
-const BentoCard: React.FC<BentoCardProps> = memo(({ tool, user, onRequireAuth, isFocused, index, total, onSaveRequest, isDark }) => {
-  const cardRef = useRef(null);
+const BentoCard: React.FC<BentoCardProps> = memo(({ tool, isFocused, index, total, onSaveRequest, isDark }) => {
+  const { user } = useAuth();
+  const { setIsAuthModalOpen } = useModals();
+  const onRequireAuth = () => setIsAuthModalOpen(true);
+  
+  const cardRef = useRef<HTMLDivElement>(null);
   const numericToolId = Number(tool.id);
   const domain = getDomain(tool.url);
   const [imageLoaded, setImageLoaded] = useState(false);

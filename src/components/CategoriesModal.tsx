@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import React, { useState, useEffect } from 'react';
 import { ALL_CATEGORIES } from '../utils/constants';
 import { playSound } from '../utils/sounds';
@@ -23,7 +23,7 @@ const CATEGORY_DATA: Record<string, { emoji: string; gradient: string; desc: str
 };
 
 // Stitch category-style icon component
-const CategoryIcon = ({ category, isActive, isDark }) => {
+const CategoryIcon = ({ category, isActive, isDark }: { category: string; isActive: boolean; isDark: boolean }) => {
   const data = CATEGORY_DATA[category] || { emoji: '📁', gradient: 'linear-gradient(135deg,#e2e8f0,#cbd5e1)', desc: category };
   return (
     <div
@@ -59,12 +59,20 @@ const CategoryIcon = ({ category, isActive, isDark }) => {
   );
 };
 
-const CategoriesModal = ({ isOpen, onClose, activeCategory, setActiveCategory, isDark = false }) => {
+interface CategoriesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  activeCategory: string;
+  setActiveCategory: (category: string) => void;
+  isDark?: boolean;
+}
+
+const CategoriesModal: React.FC<CategoriesModalProps> = ({ isOpen, onClose, activeCategory, setActiveCategory, isDark = false }) => {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -264,7 +272,7 @@ const CategoriesModalStyles = () => (
   `}</style>
 );
 
-export default function CategoriesModalWrapper(props) {
+export default function CategoriesModalWrapper(props: CategoriesModalProps) {
   return (
     <>
       <CategoriesModalStyles />

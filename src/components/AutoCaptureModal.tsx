@@ -4,13 +4,15 @@ import { ALL_CATEGORIES, API_BASE_URL, APP_CONFIG, COMMON_TAGS } from '../utils/
 import { isValidUrl } from '../utils/helpers';
 import { playSound } from '../utils/sounds';
 import type { AutoCaptureModalProps } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
-const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose, user }) => {
+const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) => {
+  const { user } = useAuth();
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
   const [description, setDescription] = useState('');
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -27,7 +29,7 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose, us
     }
   }, [url]);
 
-  const addTag = (tag) => {
+  const addTag = (tag: string) => {
     const clean = tag.toLowerCase().trim();
     if (clean && !selectedTags.includes(clean) && selectedTags.length < 5) {
       setSelectedTags([...selectedTags, clean]);

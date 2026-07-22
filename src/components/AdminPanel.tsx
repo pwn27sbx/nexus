@@ -1,17 +1,32 @@
-// @ts-nocheck
+
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 import { API_BASE_URL } from '../utils/constants';
 import { CloseIcon, CheckIcon, SpinnerIcon } from '../utils/icons';
 import { playSound } from '../utils/sounds';
+import type { Tool } from '../types';
+
+interface ToastMessage {
+  id: number;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
+interface ToastProps {
+  message: string;
+  type?: 'success' | 'error' | 'info';
+  onClose: () => void;
+}
 
 // ─── Toast Component ───────────────────────────────────────────────────
-const Toast = ({ message, type = 'success', onClose }) => {
+const Toast: React.FC<ToastProps> = ({ message, type = 'success', onClose }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, 3000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bgGradients = {
+  const bgGradients: Record<string, string> = {
     success: 'linear-gradient(135deg, #10b981, #14b8a6)',
     error: 'linear-gradient(135deg, #ef4444, #f43f5e)',
     info: 'linear-gradient(135deg, #7c3aed, #a855f7)',
@@ -43,8 +58,15 @@ const Toast = ({ message, type = 'success', onClose }) => {
   );
 };
 
+interface ConfirmDialogProps {
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  isLoading: boolean;
+}
+
 // ─── Confirm Dialog ─────────────────────────────────────────────────────
-const ConfirmDialog = ({ message, onConfirm, onCancel, isLoading }) => {
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, onCancel, isLoading }) => {
   const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
   return (
     <div
@@ -160,24 +182,26 @@ const ConfirmDialog = ({ message, onConfirm, onCancel, isLoading }) => {
 };
 
 // ─── Main AdminPanel ────────────────────────────────────────────────────
-const AdminPanel = ({ isOpen, onClose, user }) => {
-  const [pendingTools, setPendingTools] = useState([]);
+const AdminPanel = () => {
+  const { user } = useAuth();
+  const { isAdminPanelOpen: isOpen, setIsAdminPanelOpen } = useModals();
+  const onClose = () => setIsAdminPanelOpen(false);
+  const [pendingTools, setPendingTools] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [actionStatus, setActionStatus] = useState({});
+  const [page, setPage] = useState(1);
+  const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; toolId: string | number | null; type: 'approve' | 'reject' | null }>({ isOpen: false, toolId: null, type: null });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [expandedToolId, setExpandedToolId] = useState<string | number | null>(null);
+  const [actionStatus, setActionStatus] = useState<Record<string | number, string>>({});
   const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
-  // Toast state
-  const [toasts, setToasts] = useState([]);
-  const addToast = useCallback((message, type = 'success') => {
+  const addToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
   }, []);
-
-  // Confirm dialog state
-  const [confirmReject, setConfirmReject] = useState(null);
 
   const isAdmin = user?.role === 'admin' || user?.email?.includes('@admin');
 
@@ -208,7 +232,7 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
     fetchPending(1);
   }, [isOpen, isAdmin, fetchPending]);
 
-  const handleApprove = async (toolId) => {
+  const handleApprove = async (toolId: string | number) => {
     setActionStatus((prev) => ({ ...prev, [toolId]: 'approving' }));
     const token = localStorage.getItem('payload-token');
     try {
@@ -231,14 +255,14 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
     }
   };
 
-  const handleReject = async (toolId) => {
-    setConfirmReject(toolId);
+  const handleReject = async (toolId: string | number) => {
+    setConfirmDialog({ isOpen: true, toolId, type: 'reject' });
   };
 
   const confirmRejectAction = async () => {
-    const toolId = confirmReject;
+    const toolId = confirmDialog.toolId;
     if (!toolId) return;
-    setConfirmReject(null);
+    setIsProcessing(true);
     setActionStatus((prev) => ({ ...prev, [toolId]: 'rejecting' }));
     const token = localStorage.getItem('payload-token');
     try {
@@ -258,12 +282,15 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
     } catch (error) {
       setActionStatus((prev) => ({ ...prev, [toolId]: 'error' }));
       addToast('Network error', 'error');
+    } finally {
+      setIsProcessing(false);
+      setConfirmDialog({ isOpen: false, toolId: null, type: null });
     }
   };
 
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -275,22 +302,22 @@ const AdminPanel = ({ isOpen, onClose, user }) => {
   return (
     <>
       {/* Toast notifications */}
-      {toasts.map((toast) => (
+      {toasts.map((t: ToastMessage) => (
         <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
+          key={t.id}
+          message={t.message}
+          type={t.type}
+          onClose={() => setToasts((prev) => prev.filter((toast) => toast.id !== t.id))}
         />
       ))}
 
       {/* Confirm dialog */}
-      {confirmReject && (
+      {confirmDialog.isOpen && (
         <ConfirmDialog
           message="Are you sure? This tool will be rejected and won't appear in the directory."
           onConfirm={confirmRejectAction}
-          onCancel={() => setConfirmReject(null)}
-          isLoading={actionStatus[confirmReject] === 'rejecting'}
+          onCancel={() => setConfirmDialog({ isOpen: false, toolId: null, type: null })}
+          isLoading={isProcessing}
         />
       )}
 

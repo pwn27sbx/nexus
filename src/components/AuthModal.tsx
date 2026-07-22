@@ -1,8 +1,13 @@
-// @ts-nocheck
+
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 
-const AuthModal = ({ isOpen, onClose }) => {
+const AuthModal = () => {
+  const { isAuthModalOpen: isOpen, setIsAuthModalOpen } = useModals();
+  const { setUser } = useAuth();
+  const onClose = () => setIsAuthModalOpen(false);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +17,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -21,7 +26,7 @@ const AuthModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
@@ -40,6 +45,7 @@ const AuthModal = ({ isOpen, onClose }) => {
       if (response.ok) {
         setStatus('success');
         localStorage.setItem('payload-token', data.token);
+        setUser(data.user); // Also set user!
         setTimeout(() => {
           onClose();
           setStatus('idle');

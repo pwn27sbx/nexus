@@ -1,7 +1,8 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { useModals } from '../contexts/ModalContext';
 import { API_BASE_URL, SCORE_THRESHOLDS } from '../utils/constants';
 import { SpinnerIcon } from '../utils/icons';
+import type { User } from '../types';
 
 const BADGES = [
   { name: 'Platinum', icon: '👑', minApproved: 30, color: 'text-slate-300 bg-slate-100 dark:bg-slate-800' },
@@ -10,22 +11,24 @@ const BADGES = [
   { name: 'Bronze', icon: '🥉', minApproved: 3, color: 'text-amber-700 bg-amber-100 dark:bg-amber-900/30' },
 ];
 
-const getBadge = (approvedCount) => {
+const getBadge = (approvedCount: number) => {
   for (const badge of BADGES) {
     if (approvedCount >= badge.minApproved) return badge;
   }
   return { name: 'Rising Star', icon: '⭐', color: 'text-zinc-400 bg-zinc-100 dark:bg-zinc-800' };
 };
 
-const LEVEL_COLORS = {
+const LEVEL_COLORS: Record<string, string> = {
   Explorer: 'linear-gradient(135deg,#71717a,#52525b)',
   Contributor: 'linear-gradient(135deg,#3b82f6,#6366f1)',
   'Expert Curator': 'linear-gradient(135deg,#7c3aed,#a855f7)',
   'Master Curator': 'linear-gradient(135deg,#f59e0b,#f97316)',
 };
 
-const LeaderboardModal = ({ isOpen, onClose }) => {
-  const [leaders, setLeaders] = useState([]);
+const LeaderboardModal = () => {
+  const { isLeaderboardOpen: isOpen, setIsLeaderboardOpen } = useModals();
+  const onClose = () => setIsLeaderboardOpen(false);
+  const [leaders, setLeaders] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
@@ -48,7 +51,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -161,8 +164,9 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                       leader={leaders[1]}
                       rank={2}
                       badge={getBadge(leaders[1].approvedCount || 0)}
-                      levelColor={LEVEL_COLORS[leaders[1].level] || LEVEL_COLORS.Explorer}
+                      levelColor={LEVEL_COLORS[leaders[1].level || 'Explorer'] || LEVEL_COLORS.Explorer}
                       isDark={isDark}
+                      isFirst={false}
                     />
                   )}
                   {/* 1st Place */}
@@ -171,7 +175,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                       leader={leaders[0]}
                       rank={1}
                       badge={getBadge(leaders[0].approvedCount || 0)}
-                      levelColor={LEVEL_COLORS[leaders[0].level] || LEVEL_COLORS.Explorer}
+                      levelColor={LEVEL_COLORS[leaders[0].level || 'Explorer'] || LEVEL_COLORS.Explorer}
                       isDark={isDark}
                       isFirst
                     />
@@ -182,8 +186,9 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                       leader={leaders[2]}
                       rank={3}
                       badge={getBadge(leaders[2].approvedCount || 0)}
-                      levelColor={LEVEL_COLORS[leaders[2].level] || LEVEL_COLORS.Explorer}
+                      levelColor={LEVEL_COLORS[leaders[2].level || 'Explorer'] || LEVEL_COLORS.Explorer}
                       isDark={isDark}
+                      isFirst={false}
                     />
                   )}
                 </div>
@@ -229,7 +234,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
                         fontSize: '16px',
                         fontWeight: 700,
                         color: 'white',
-                        background: LEVEL_COLORS[leader.level] || LEVEL_COLORS.Explorer,
+                        background: LEVEL_COLORS[leader.level || 'Explorer'] || LEVEL_COLORS.Explorer,
                         border: isDark ? '2px solid rgba(255,255,255,0.12)' : '2px solid rgba(255,255,255,0.9)',
                         boxShadow: '0 2px 8px rgba(80,60,160,0.2)',
                         flexShrink: 0,
@@ -357,8 +362,16 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
   );
 };
 
-// Podium Card Component for Top 3
-const LeaderPodiumCard = ({ leader, rank, badge, levelColor, isFirst, isDark }) => {
+interface LeaderRowProps {
+  leader: User;
+  rank: number;
+  badge: { name: string; icon: string; color: string; minApproved?: number };
+  levelColor: string;
+  isFirst?: boolean;
+  isDark: boolean;
+}
+
+const LeaderPodiumCard: React.FC<LeaderRowProps> = ({ leader, rank, badge, levelColor, isFirst, isDark }) => {
   const initials = (leader.nickname || leader.email || 'U').charAt(0).toUpperCase();
   const name = leader.nickname ? `@${leader.nickname}` : leader.email.split('@')[0];
   const crown = rank === 1 ? '👑' : rank === 2 ? '🥈' : '🥉';

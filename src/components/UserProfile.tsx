@@ -1,7 +1,9 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useModals } from '../contexts/ModalContext';
 import { API_BASE_URL, ACCENTS } from '../utils/constants';
 import { playSound } from '../utils/sounds';
+import type { Tool, UserCollection } from '../types';
 
 const availableFonts = [
   { id: 'inter', name: 'Inter', value: "'Inter', sans-serif" },
@@ -12,23 +14,27 @@ const availableFonts = [
 ];
 
 const UserProfile = ({
-  isOpen,
-  onClose,
-  user,
-  onLogout,
   accentColor,
   setAccentColor,
   fontFamily,
   setFontFamily,
+}: {
+  accentColor: string;
+  setAccentColor: (color: string) => void;
+  fontFamily: string;
+  setFontFamily: (font: string) => void;
 }) => {
-  const [arsenal, setArsenal] = useState([]);
-  const [collections, setCollections] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
+  const { user, logout: onLogout, setUser } = useAuth();
+  const { isProfileOpen: isOpen, setIsProfileOpen } = useModals();
+  const onClose = () => setIsProfileOpen(false);
+  const [arsenal, setArsenal] = useState<(Tool | number)[]>([]);
+  const [collections, setCollections] = useState<UserCollection[]>([]);
+  const [submissions, setSubmissions] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [nickname, setNickname] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
-  const [activeFolder, setActiveFolder] = useState(null);
+  const [activeFolder, setActiveFolder] = useState<UserCollection | 'all' | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
 
@@ -63,7 +69,7 @@ const UserProfile = ({
   }, [isOpen, user]);
 
   const handleSaveNickname = async () => {
-    if (nickname === user.nickname || nickname.length < 3) return;
+    if (!user || nickname === user.nickname || nickname.length < 3) return;
     const token = localStorage.getItem('payload-token');
     try {
       const response = await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
@@ -74,15 +80,15 @@ const UserProfile = ({
         },
         body: JSON.stringify({ nickname }),
       });
-      if (response.ok) user.nickname = nickname;
+      if (response.ok && user) user.nickname = nickname;
     } catch (error) {
       // Silently fail
     }
   };
 
-  const handleCreateFolder = async (e) => {
+  const handleCreateFolder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newFolderName.trim()) return;
+    if (!user || !newFolderName.trim()) return;
     const token = localStorage.getItem('payload-token');
     const updatedCollections = [
       ...collections,
@@ -108,7 +114,7 @@ const UserProfile = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -567,10 +573,10 @@ const UserProfile = ({
                       onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; }}
                       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}
                     >
-                      {arsenal.slice(0, 4).map((tool, i) => (
+                      {arsenal.slice(0, 4).map((tool: any, i) => (
                         <img
                           key={i}
-                          src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`}
+                          src={`https://www.google.com/s2/favicons?domain=${tool.url || ''}&sz=64`}
                           alt=""
                           style={{
                             width: '100%',
@@ -611,10 +617,10 @@ const UserProfile = ({
                         onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}
                       >
                         {folder.tools && folder.tools.length > 0
-                          ? folder.tools.slice(0, 4).map((tool, i) => (
+                          ? folder.tools.slice(0, 4).map((tool: any, i) => (
                               <img
                                 key={i}
-                                src={`https://www.google.com/s2/favicons?domain=${tool.url}&sz=64`}
+                                src={`https://www.google.com/s2/favicons?domain=${tool.url || ''}&sz=64`}
                                 alt=""
                                 style={{
                                   width: '100%',
@@ -676,13 +682,13 @@ const UserProfile = ({
                     marginBottom: '24px',
                   }}
                 >
-                  {activeFolder === 'all' ? 'All Saved Tools' : activeFolder.name}
+                  {activeFolder === 'all' ? 'All Saved Tools' : (activeFolder as UserCollection)?.name}
                 </h3>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }} className="tools-grid">
                   {(() => {
                     const toolsToShow =
-                      activeFolder === 'all' ? arsenal : activeFolder.tools || [];
+                      activeFolder === 'all' ? arsenal : (activeFolder as UserCollection)?.tools || [];
                     if (toolsToShow.length === 0)
                       return (
                         <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '48px 0' }}>
@@ -710,10 +716,10 @@ const UserProfile = ({
                         </div>
                       );
 
-                    return toolsToShow.map((tool) => (
+                    return toolsToShow.map((tool: any) => (
                       <a
                         key={tool.id}
-                        href={tool.url}
+                        href={tool.url || ''}
                         target="_blank"
                         rel="noreferrer"
                         style={{

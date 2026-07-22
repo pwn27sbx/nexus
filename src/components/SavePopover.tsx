@@ -1,15 +1,22 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { HeartIcon, LayersIcon, SpinnerIcon } from '../utils/icons';
 import { API_BASE_URL } from '../utils/constants';
 import { playSound } from '../utils/sounds';
+import type { SavePopoverConfig } from '../types';
 
-const SavePopover = ({ config, onClose, user, setUser }) => {
+interface SavePopoverProps {
+  config: SavePopoverConfig | null;
+  onClose: () => void;
+}
+
+const SavePopover: React.FC<SavePopoverProps> = ({ config, onClose }) => {
+  const { user, setUser } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!config) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -30,20 +37,20 @@ const SavePopover = ({ config, onClose, user, setUser }) => {
   let top = rect.bottom + 12;
   if (top + 280 > window.innerHeight) top = rect.top - 280 - 12;
 
-  const handleToggleFolder = async (folderIndex) => {
+  const handleToggleFolder = async (folderIndex: number) => {
     setIsSaving(true);
     const token = localStorage.getItem('payload-token');
     const updatedUser = JSON.parse(JSON.stringify(user));
     if (folderIndex === -1) {
-      let currentBookmarks = updatedUser.bookmarks ? updatedUser.bookmarks.map(b => typeof b === 'object' ? b.id : b) : [];
-      if (isInArsenal) currentBookmarks = currentBookmarks.filter(id => id !== numericToolId);
+      let currentBookmarks = updatedUser.bookmarks ? updatedUser.bookmarks.map((b: any) => typeof b === 'object' ? b.id : b) : [];
+      if (isInArsenal) currentBookmarks = currentBookmarks.filter((id: number) => id !== numericToolId);
       else { currentBookmarks.push(numericToolId); playSound('pop'); }
       updatedUser.bookmarks = currentBookmarks;
     } else {
       const folder = updatedUser.collections[folderIndex];
-      let toolsInFolder = folder.tools ? folder.tools.map(t => typeof t === 'object' ? t.id : t) : [];
+      let toolsInFolder = folder.tools ? folder.tools.map((t: any) => typeof t === 'object' ? t.id : t) : [];
       const isInFolder = toolsInFolder.includes(numericToolId);
-      if (isInFolder) toolsInFolder = toolsInFolder.filter(id => id !== numericToolId);
+      if (isInFolder) toolsInFolder = toolsInFolder.filter((id: number) => id !== numericToolId);
       else { toolsInFolder.push(numericToolId); playSound('pop'); }
       updatedUser.collections[folderIndex].tools = toolsInFolder;
     }
