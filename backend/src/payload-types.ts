@@ -181,7 +181,7 @@ export interface Tool {
   /**
    * Breve descripción de la herramienta (Máx 100 caracteres).
    */
-  description: string;
+  description?: string | null;
   /**
    * Etiquetas en formato JSON array (ej: ["diseño", "ui", "gratis"]). O también separado por comas: diseño, ui, gratis
    */

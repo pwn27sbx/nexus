@@ -19,8 +19,8 @@ export const Tools: CollectionConfig = {
   access: {
     read: () => true,
     create: () => true,
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    update: () => true,
+    delete: () => true,
   },
   endpoints: [
     {
