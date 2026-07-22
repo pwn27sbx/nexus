@@ -1153,11 +1153,10 @@ export default function App() {
 
         {/* ══ BOTTOM NAVIGATION DOCK (Floating Pill — Stitch Style) ════ */}
         <nav
-          className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-6 pointer-events-none"
-          style={{ paddingLeft: '16px', paddingRight: '16px' }}
+          className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-6 pointer-events-none px-4"
         >
           <div
-            className="pointer-events-auto flex items-center gap-1 px-2 py-2 rounded-2xl"
+            className="pointer-events-auto flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-2 rounded-2xl max-w-full overflow-x-auto no-scrollbar"
             style={{
               background: isDark
                 ? 'rgba(18,16,40,0.55)'
@@ -1181,7 +1180,7 @@ export default function App() {
                     if (item.id === 'submit') setIsModalOpen(true);
                     else if (item.id === 'categories') setIsCategoryModalOpen(true);
                   }}
-                  className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all hover:scale-105"
+                  className="flex flex-col items-center gap-1 px-2 sm:px-4 py-2 rounded-xl transition-all hover:scale-105 flex-shrink-0 min-w-[60px] sm:min-w-[70px]"
                   style={{
                     background: isActive
                       ? isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.92)'
@@ -1197,7 +1196,6 @@ export default function App() {
                     color: isActive
                       ? isDark ? '#e2e0ff' : '#111111'
                       : isDark ? 'rgba(180,160,255,0.4)' : 'rgba(100,100,120,0.55)',
-                    minWidth: '70px',
                   }}
                   aria-label={item.label}
                   aria-current={isActive ? 'page' : undefined}
