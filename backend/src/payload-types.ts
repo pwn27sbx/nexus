@@ -132,6 +132,10 @@ export interface User {
    */
   role?: ('user' | 'admin') | null;
   nickname?: string | null;
+  /**
+   * URL o base64 de la foto de perfil o icono.
+   */
+  avatar?: string | null;
   bookmarks?: (number | Tool)[] | null;
   /**
    * Nivel del usuario basado en sus contribuciones.
@@ -321,6 +325,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   role?: T;
   nickname?: T;
+  avatar?: T;
   bookmarks?: T;
   level?: T;
   approvedCount?: T;

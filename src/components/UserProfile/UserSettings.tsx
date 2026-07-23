@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import Cropper, { type Point, type Area } from 'react-easy-crop';
 import { playSound } from '../../utils/sounds';
 import { ACCENTS } from '../../utils/constants';
 import type { User } from '../../types';
@@ -77,6 +78,50 @@ const UserSettings: React.FC<UserSettingsProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
+
+  // Cropper State
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+
+  const onCropComplete = (croppedArea: Area, currentCroppedAreaPixels: Area) => {
+    setCroppedAreaPixels(currentCroppedAreaPixels);
+  };
+
+  const handleCropConfirm = () => {
+    if (!selectedImage || !croppedAreaPixels) return;
+
+    const img = new Image();
+    img.src = selectedImage;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const size = 128;
+      canvas.width = size;
+      canvas.height = size;
+
+      if (ctx) {
+        ctx.drawImage(
+          img,
+          croppedAreaPixels.x,
+          croppedAreaPixels.y,
+          croppedAreaPixels.width,
+          croppedAreaPixels.height,
+          0,
+          0,
+          size,
+          size
+        );
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        setAvatar(dataUrl);
+        handleSaveProfile(dataUrl);
+        playSound('success');
+        setIsEditingAvatar(false);
+        setSelectedImage(null);
+      }
+    };
+  };
   const glassCard = {
     background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
     border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
@@ -271,31 +316,12 @@ const UserSettings: React.FC<UserSettingsProps> = ({
                       if (!file) return;
                       const reader = new FileReader();
                       reader.onload = (event) => {
-                        const img = new Image();
-                        img.onload = () => {
-                          const canvas = document.createElement('canvas');
-                          const ctx = canvas.getContext('2d');
-                          const size = 128;
-                          canvas.width = size;
-                          canvas.height = size;
-
-                          // Cover fit
-                          const scale = Math.max(size / img.width, size / img.height);
-                          const x = (size - img.width * scale) / 2;
-                          const y = (size - img.height * scale) / 2;
-
-                          if (ctx) {
-                            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                            setAvatar(dataUrl);
-                            handleSaveProfile(dataUrl);
-                            playSound('success');
-                            setIsEditingAvatar(false);
-                          }
-                        };
-                        img.src = event.target?.result as string;
+                        setSelectedImage(event.target?.result as string);
+                        setZoom(1);
+                        setCrop({ x: 0, y: 0 });
                       };
                       reader.readAsDataURL(file);
+                      e.target.value = ''; // Reset input
                     }}
                   />
                 </div>
@@ -502,6 +528,128 @@ const UserSettings: React.FC<UserSettingsProps> = ({
           })}
         </div>
       </div>
+
+      {/* CROPPER MODAL */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          style={{
+            background: isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <div
+            className="animate-scale-in"
+            style={{
+              width: '100%',
+              maxWidth: '440px',
+              background: isDark ? 'rgba(20,18,42,0.95)' : 'white',
+              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)',
+              borderRadius: '24px',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: isDark
+                ? '0 20px 60px rgba(0,0,0,0.5)'
+                : '0 20px 60px rgba(80,60,180,0.15)',
+            }}
+          >
+            <div
+              style={{
+                padding: '16px 24px',
+                borderBottom: isDark
+                  ? '1px solid rgba(255,255,255,0.08)'
+                  : '1px solid rgba(0,0,0,0.05)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '18px',
+                  fontWeight: 800,
+                  color: isDark ? 'white' : 'black',
+                  margin: 0,
+                }}
+              >
+                Adjust Photo
+              </h3>
+            </div>
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '320px',
+                background: isDark ? '#111' : '#f5f5f5',
+              }}
+            >
+              <Cropper
+                image={selectedImage}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            </div>
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <span style={{ fontSize: '18px' }}>🔍</span>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  style={{ flex: 1, accentColor: '#7c3aed' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setSelectedImage(null)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '14px',
+                    border: isDark
+                      ? '1px solid rgba(255,255,255,0.1)'
+                      : '1px solid rgba(0,0,0,0.15)',
+                    background: isDark ? 'rgba(255,255,255,0.05)' : 'transparent',
+                    color: isDark ? 'white' : 'black',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'background 0.2s',
+                  }}
+                  className="hover:bg-white/10 dark:hover:bg-white/10"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCropConfirm}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '14px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                    color: 'white',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 16px rgba(124,58,237,0.3)',
+                    transition: 'transform 0.15s, box-shadow 0.15s',
+                  }}
+                  className="hover:scale-105"
+                >
+                  Save Avatar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
