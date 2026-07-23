@@ -22,7 +22,7 @@ import SkeletonCard from './SkeletonCard';
 import VoiceAssistantOverlay from './VoiceAssistantOverlay';
 import ErrorBoundary from './ErrorBoundary';
 import HeroBentoCard from './HeroBentoCard';
-import { SearchIcon, UserIcon, PlusIcon } from 'lucide-react';
+import { SearchIcon, UserIcon, PlusIcon, LayoutGrid } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import BlurText from './BlurText';
 import Magnet from './Magnet';
@@ -31,6 +31,7 @@ import BorderGlow from './BorderGlow';
 import GooeyToggle from './GooeyToggle';
 import DockToggle from './DockToggle';
 import OptionWheel from './OptionWheel';
+import BubbleMenu from './BubbleMenu';
 
 const CategoriesModal = React.lazy(() => import('./CategoriesModal'));
 const CommandPalette = React.lazy(() => import('./CommandPalette'));
@@ -826,14 +827,14 @@ const DirectoryContent: React.FC = () => {
                   >
                     <div className="w-full flex flex-col bg-[rgba(255,255,255,0.15)] dark:bg-[rgba(18,16,40,0.25)] backdrop-blur-[32px] rounded-[21.5px] border border-[rgba(255,255,255,0.45)] dark:border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden">
                       {/* Search Input Area */}
-                      <div className="flex flex-row w-full h-full relative">
-                        <div className="hidden sm:flex items-center pl-2 shrink-0">
+                      <div className="flex flex-row w-full h-full relative items-center">
+                        <div className="flex items-center pl-1 sm:pl-2 shrink-0">
                           <button
                             disabled
-                            className="flex items-center justify-center w-[90px] h-[64px] rounded-[16px] bg-transparent opacity-90 cursor-not-allowed"
+                            className="flex items-center justify-center w-[60px] sm:w-[90px] h-[50px] sm:h-[64px] rounded-[14px] sm:rounded-[16px] bg-transparent opacity-90 cursor-not-allowed"
                             title="Pronto"
                           >
-                            <div style={{ width: '80px', height: '60px', position: 'relative' }}>
+                            <div className="relative w-[50px] sm:w-[80px] h-[40px] sm:h-[60px]">
                               <Strands
                                 colors={['#c5bdf0', '#96bbef', '#823fef']}
                                 count={4}
@@ -856,20 +857,20 @@ const DirectoryContent: React.FC = () => {
                               />
                             </div>
                           </button>
-                          <div className="h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
+                          <div className="h-6 sm:h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
                         </div>
                         <button
                           onClick={() => setIsCommandPaletteOpen(true)}
-                          className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3 px-4 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
+                          className="flex-1 min-w-0 flex items-center gap-1.5 sm:gap-3 px-2 sm:px-4 py-3 sm:py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
                           id="hero-search-btn"
                           aria-label="Open search"
                         >
                           <SearchIcon
-                            size={18}
-                            className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
+                            size={16}
+                            className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)] hidden sm:block"
                           />
-                          <span className="flex-1 min-w-0 text-left text-[14px] sm:text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
-                            Search for spatial experiences...
+                          <span className="flex-1 min-w-0 text-left text-[12px] sm:text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
+                            Search for spatial experiences, tools, and resources...
                           </span>
                           <kbd className="hidden md:inline-flex shrink-0 items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-md border-[rgba(200,190,240,0.6)] dark:border-[rgba(255,255,255,0.15)] border text-[rgba(120,90,200,0.6)] dark:text-[rgba(180,160,255,0.6)] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.04)]">
                             ⌘K
@@ -878,13 +879,26 @@ const DirectoryContent: React.FC = () => {
 
                         <div className="w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] shrink-0" />
 
+                        {/* PC Categories Button (OptionWheel) */}
                         <button
                           ref={categoriesBtnRef}
                           onClick={handleCategoriesClick}
-                          className="shrink-0 whitespace-nowrap px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)] rounded-r-[21.5px]"
+                          className="hidden sm:flex shrink-0 whitespace-nowrap px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)] rounded-r-[21.5px]"
                         >
                           Categories
                         </button>
+
+                        <BubbleMenu
+                          className="sm:hidden"
+                          menuAriaLabel="Open Categories"
+                          staggerDelay={0.03}
+                          items={['All Tools', ...ALL_CATEGORIES].map((cat: string, i: number) => ({
+                            label: cat,
+                            onClick: () => setActiveCategory(cat),
+                            rotation: (i % 2 === 0 ? 1 : -1) * (5 + Math.random() * 5),
+                            hoverStyles: { bgColor: '#7c3aed', textColor: '#ffffff' },
+                          }))}
+                        />
                       </div>
                     </div>
                   </BorderGlow>
@@ -1107,7 +1121,7 @@ const DirectoryContent: React.FC = () => {
         {/* ══ BOTTOM NAVIGATION DOCK (Floating Pill — Stitch Style) ════ */}
         <nav className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-6 pointer-events-none px-4">
           <div
-            className="pointer-events-auto flex items-center p-1.5 sm:p-2 rounded-[32px] max-w-full overflow-x-auto no-scrollbar"
+            className="pointer-events-auto flex items-center p-1.5 sm:p-2 rounded-[32px] max-w-full overflow-x-auto no-scrollbar relative"
             style={{
               background: isDark
                 ? 'linear-gradient(180deg, rgba(30,25,50,0.25) 0%, rgba(10,5,20,0.05) 100%)'
@@ -1122,41 +1136,46 @@ const DirectoryContent: React.FC = () => {
                 : 'inset 0 1px 1px rgba(255,255,255,0.8), inset 0 4px 16px rgba(255,255,255,0.4), inset 0 -1px 1px rgba(0,0,0,0.05), 0 20px 40px -8px rgba(80,60,180,0.15)',
             }}
           >
-            <DockToggle
-              items={NAV_ITEMS.filter((item) => item.id !== 'categories').map((item) => ({
-                label: item.label,
-                value: item.id,
-                icon: item.icon(false),
-              }))}
-              initialActiveIndex={Math.max(
-                0,
-                NAV_ITEMS.filter((item) => item.id !== 'categories').findIndex(
-                  (i) => i.id === activeNav
-                )
-              )}
-              onItemClick={(index, value) => {
-                if (value === 'assistant') {
-                  if (
-                    voiceError === 'El reconocimiento de voz no está soportado en este navegador.'
-                  ) {
-                    alert(
-                      'El reconocimiento de voz no está disponible. Abriendo búsqueda de texto.'
-                    );
-                    setIsCommandPaletteOpen(true);
+            {/* Extra frost layer strictly for mobile to boost text visibility against dark/complex backgrounds */}
+            <div className="absolute inset-0 rounded-[32px] bg-[rgba(255,255,255,0.55)] dark:bg-[rgba(20,15,40,0.65)] sm:hidden pointer-events-none" />
+
+            <div className="relative z-10 flex w-full justify-center">
+              <DockToggle
+                items={NAV_ITEMS.filter((item) => item.id !== 'categories').map((item) => ({
+                  label: item.label,
+                  value: item.id,
+                  icon: item.icon(false),
+                }))}
+                initialActiveIndex={Math.max(
+                  0,
+                  NAV_ITEMS.filter((item) => item.id !== 'categories').findIndex(
+                    (i) => i.id === activeNav
+                  )
+                )}
+                onItemClick={(index, value) => {
+                  if (value === 'assistant') {
+                    if (
+                      voiceError === 'El reconocimiento de voz no está soportado en este navegador.'
+                    ) {
+                      alert(
+                        'El reconocimiento de voz no está disponible. Abriendo búsqueda de texto.'
+                      );
+                      setIsCommandPaletteOpen(true);
+                      return;
+                    }
+                    if (isListening) stopListening();
+                    else startListening();
                     return;
                   }
-                  if (isListening) stopListening();
-                  else startListening();
-                  return;
-                }
-                setActiveNav(value);
-                playSound('pop');
-                if (value === 'submit') setIsModalOpen(true);
-              }}
-              animationTime={500}
-              particleCount={18}
-              variant="vertical"
-            />
+                  setActiveNav(value);
+                  playSound('pop');
+                  if (value === 'submit') setIsModalOpen(true);
+                }}
+                animationTime={500}
+                particleCount={18}
+                variant="vertical"
+              />
+            </div>
           </div>
         </nav>
 

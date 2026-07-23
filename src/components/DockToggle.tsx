@@ -335,7 +335,7 @@ const DockToggle: React.FC<DockToggleProps> = ({
                 ? `rounded-xl relative cursor-pointer transition-[color] duration-300 ease text-[10.5px] font-semibold leading-none ${
                     activeIndex === index
                       ? 'active text-transparent'
-                      : 'text-[rgba(100,100,120,0.55)] dark:text-[rgba(180,160,255,0.4)] hover:text-[#111111] dark:hover:text-white'
+                      : 'text-[rgba(60,40,90,0.85)] dark:text-[rgba(220,200,255,0.85)] sm:text-[rgba(100,100,120,0.55)] dark:sm:text-[rgba(180,160,255,0.4)] hover:text-[#111111] dark:hover:text-white'
                   }`
                 : `rounded-full relative cursor-pointer transition-[color] duration-300 ease text-[12.5px] font-bold ${
                     activeIndex === index
@@ -348,10 +348,10 @@ const DockToggle: React.FC<DockToggleProps> = ({
                 : 'outline-none py-1.5 px-4 min-w-[90px] flex items-center justify-center gap-1.5 capitalize';
 
               return (
-                <li key={index} onClick={(e) => handleClick(e as any, index)} className={liClass}>
+                <li key={index} className={liClass}>
                   <button
                     className={btnClass}
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => handleClick(e as any, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                   >
                     {isVertical ? (
