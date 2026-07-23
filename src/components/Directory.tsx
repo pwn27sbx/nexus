@@ -18,23 +18,24 @@ import BentoCard from './BentoCard';
 import ListCard from './ListCard';
 import SavePopover from './SavePopover';
 import SkeletonCard from './SkeletonCard';
-import CategoriesModal from './CategoriesModal';
-import CommandPalette from './CommandPalette';
-import AutoCaptureModal from './AutoCaptureModal';
-import AuthModal from './AuthModal';
-import UserProfile from './UserProfile';
-import LeaderboardModal from './LeaderboardModal';
-import AdminPanel from './AdminPanel';
 import ErrorBoundary from './ErrorBoundary';
-import SpatialCommunityHub from './SpatialCommunityHub';
-import CollectionsView from './CollectionsView';
 import HeroBentoCard from './HeroBentoCard';
 import { SearchIcon, UserIcon, PlusIcon } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
-import LiquidEther from './LiquidEther';
 import BlurText from './BlurText';
 import Magnet from './Magnet';
 import StarBorder from './StarBorder';
+
+const CategoriesModal = React.lazy(() => import('./CategoriesModal'));
+const CommandPalette = React.lazy(() => import('./CommandPalette'));
+const AutoCaptureModal = React.lazy(() => import('./AutoCaptureModal'));
+const AuthModal = React.lazy(() => import('./AuthModal'));
+const UserProfile = React.lazy(() => import('./UserProfile'));
+const LeaderboardModal = React.lazy(() => import('./LeaderboardModal'));
+const AdminPanel = React.lazy(() => import('./AdminPanel'));
+const LiquidEther = React.lazy(() => import('./LiquidEther'));
+const SpatialCommunityHub = React.lazy(() => import('./SpatialCommunityHub'));
+const CollectionsView = React.lazy(() => import('./CollectionsView'));
 
 // ── VIRTUALIZATION WRAPPERS ──
 const VirtualBentoWrapper = ({
@@ -455,18 +456,20 @@ const DirectoryContent: React.FC = () => {
               opacity: isDark ? 0.3 : 0.6,
             }}
           >
-            <LiquidEther
-              mouseForce={23}
-              cursorSize={120}
-              isViscous={true}
-              viscous={70}
-              colors={LIQUID_ETHER_COLORS}
-              autoDemo
-              autoSpeed={0.7}
-              autoIntensity={2.5}
-              isBounce={false}
-              resolution={0.5}
-            />
+            <React.Suspense fallback={null}>
+              <LiquidEther
+                mouseForce={23}
+                cursorSize={120}
+                isViscous={true}
+                viscous={70}
+                colors={LIQUID_ETHER_COLORS}
+                autoDemo
+                autoSpeed={0.7}
+                autoIntensity={2.5}
+                isBounce={false}
+                resolution={0.5}
+              />
+            </React.Suspense>
           </div>
         </div>
 
@@ -491,26 +494,22 @@ const DirectoryContent: React.FC = () => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
             {/* Theme toggle */}
-            <Magnet padding={30} magnetStrength={3}>
-              <button
-                onClick={toggleTheme}
-                className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {isDark ? <SunIcon size={14} /> : <MoonIcon size={14} />}
-              </button>
-            </Magnet>
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <SunIcon size={14} /> : <MoonIcon size={14} />}
+            </button>
 
             {/* Leaderboard */}
-            <Magnet padding={30} magnetStrength={3}>
-              <button
-                onClick={() => setIsLeaderboardOpen(true)}
-                className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-                aria-label="Leaderboard"
-              >
-                <TrophyIcon size={14} />
-              </button>
-            </Magnet>
+            <button
+              onClick={() => setIsLeaderboardOpen(true)}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+              aria-label="Leaderboard"
+            >
+              <TrophyIcon size={14} />
+            </button>
 
             {/* View toggle */}
             <button
@@ -545,21 +544,19 @@ const DirectoryContent: React.FC = () => {
                     </svg>
                   </button>
                 )}
-                <Magnet padding={40} magnetStrength={3}>
-                  <button
-                    onClick={() => setIsProfileOpen(true)}
-                    className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-2 backdrop-blur-md"
+                <StarBorder
+                  as="button"
+                  onClick={() => setIsProfileOpen(true)}
+                  color={isDark ? '#d8b4fe' : '#7c3aed'}
+                  className="transition-all hover:scale-105"
+                  aria-label="Open profile"
+                >
+                  <div
+                    className="px-3 md:px-4 h-8 rounded-[17.5px] text-[12px] font-semibold flex items-center gap-2 backdrop-blur-md"
                     style={{
                       background: isDark ? 'rgba(124,58,237,0.25)' : 'rgba(124,58,237,0.1)',
-                      border: isDark
-                        ? '1px solid rgba(124,58,237,0.4)'
-                        : '1px solid rgba(124,58,237,0.3)',
                       color: isDark ? '#d8b4fe' : '#7c3aed',
-                      boxShadow: isDark
-                        ? '0 4px 12px rgba(0,0,0,0.2)'
-                        : '0 4px 12px rgba(124,58,237,0.1)',
                     }}
-                    aria-label="Open profile"
                   >
                     <div
                       className="w-2 h-2 rounded-full"
@@ -568,30 +565,28 @@ const DirectoryContent: React.FC = () => {
                     <span className="hidden sm:inline">
                       {user.nickname || user.email.split('@')[0]}
                     </span>
-                  </button>
-                </Magnet>
+                  </div>
+                </StarBorder>
               </>
             ) : (
-              <Magnet padding={40} magnetStrength={3}>
-                <button
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-1.5 backdrop-blur-md"
+              <StarBorder
+                as="button"
+                onClick={() => setIsAuthModalOpen(true)}
+                color={isDark ? '#d8b4fe' : '#7c3aed'}
+                className="transition-all hover:scale-105"
+                aria-label="Sign in"
+              >
+                <div
+                  className="px-3 md:px-4 h-8 rounded-[17.5px] text-[12px] font-semibold flex items-center gap-1.5 backdrop-blur-md"
                   style={{
                     background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
-                    border: isDark
-                      ? '1px solid rgba(255,255,255,0.08)'
-                      : '1px solid rgba(255,255,255,0.9)',
                     color: isDark ? '#d8b4fe' : '#7c3aed',
-                    boxShadow: isDark
-                      ? '0 4px 12px rgba(0,0,0,0.2)'
-                      : '0 4px 12px rgba(80,60,160,0.06)',
                   }}
-                  aria-label="Sign in"
                 >
                   <UserIcon size={12} />
                   <span className="hidden sm:inline">Sign in</span>
-                </button>
-              </Magnet>
+                </div>
+              </StarBorder>
             )}
 
             {/* Sort tabs (Moved inside the right actions group for mobile layout harmony, but still hidden on small screens) */}
@@ -624,16 +619,20 @@ const DirectoryContent: React.FC = () => {
         >
           {/* ── COMMUNITY VIEW ── */}
           {activeNav === 'community' && (
-            <SpatialCommunityHub
-              isDark={isDark}
-              searchQuery={searchQuery}
-              setIsCommandPaletteOpen={setIsCommandPaletteOpen}
-            />
+            <React.Suspense fallback={null}>
+              <SpatialCommunityHub
+                isDark={isDark}
+                searchQuery={searchQuery}
+                setIsCommandPaletteOpen={setIsCommandPaletteOpen}
+              />
+            </React.Suspense>
           )}
 
           {/* ── COLLECTIONS VIEW ── */}
           {activeNav === 'collections' && (
-            <CollectionsView isDark={isDark} setIsCommandPaletteOpen={setIsCommandPaletteOpen} />
+            <React.Suspense fallback={null}>
+              <CollectionsView isDark={isDark} setIsCommandPaletteOpen={setIsCommandPaletteOpen} />
+            </React.Suspense>
           )}
 
           {/* ── DISCOVER / CATEGORIES / SUBMIT VIEWS ── */}
@@ -1003,39 +1002,41 @@ const DirectoryContent: React.FC = () => {
 
         {/* ══ MODALS ════════════════════════════════════════ */}
         <SavePopover config={savePopoverConfig} onClose={() => setSavePopoverConfig(null)} />
-        <CategoriesModal
-          isOpen={isCategoryModalOpenVal}
-          onClose={() => {
-            setIsCategoryModalOpen(false);
-            if (activeNav === 'categories') setActiveNav('discover');
-          }}
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-          isDark={isDark}
-        />
-        <CommandPalette
-          isOpen={isCommandPaletteOpenVal}
-          onClose={() => setIsCommandPaletteOpen(false)}
-          query={searchQuery}
-          setQuery={handleSearchChange}
-          tools={tools}
-        />
-        <AutoCaptureModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            if (activeNav === 'submit') setActiveNav('discover');
-          }}
-        />
-        <AuthModal />
-        <UserProfile
-          accentColor={accentColor}
-          setAccentColor={setAccentColor}
-          fontFamily={fontFamily}
-          setFontFamily={setFontFamily}
-        />
-        <LeaderboardModal />
-        <AdminPanel />
+        <React.Suspense fallback={null}>
+          <CategoriesModal
+            isOpen={isCategoryModalOpenVal}
+            onClose={() => {
+              setIsCategoryModalOpen(false);
+              if (activeNav === 'categories') setActiveNav('discover');
+            }}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            isDark={isDark}
+          />
+          <CommandPalette
+            isOpen={isCommandPaletteOpenVal}
+            onClose={() => setIsCommandPaletteOpen(false)}
+            query={searchQuery}
+            setQuery={handleSearchChange}
+            tools={tools}
+          />
+          <AutoCaptureModal
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              if (activeNav === 'submit') setActiveNav('discover');
+            }}
+          />
+          <AuthModal />
+          <UserProfile
+            accentColor={accentColor}
+            setAccentColor={setAccentColor}
+            fontFamily={fontFamily}
+            setFontFamily={setFontFamily}
+          />
+          <LeaderboardModal />
+          <AdminPanel />
+        </React.Suspense>
       </div>
     </ErrorBoundary>
   );

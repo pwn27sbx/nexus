@@ -130,11 +130,11 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
 
   return (
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center"
+      className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden"
       style={{
-        background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(180,195,240,0.45)',
-        backdropFilter: 'blur(28px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+        background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(180,195,240,0.2)',
+        backdropFilter: 'blur(16px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(150%)',
       }}
       onClick={onClose}
       role="dialog"
@@ -170,7 +170,7 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
 
       {/* Main content */}
       <div
-        className="relative w-full submit-layout animate-scale-in flex flex-col md:flex-row"
+        className="relative w-full submit-layout animate-scale-in flex flex-col md:flex-row z-10"
         style={{ maxWidth: '960px', padding: '0 16px', maxHeight: '95vh', gap: '16px' }}
         onClick={(e) => e.stopPropagation()}
       >

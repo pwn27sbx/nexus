@@ -78,11 +78,11 @@ const AuthModal = () => {
 
   return (
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center"
+      className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden"
       style={{
-        background: isDark ? 'rgba(0,0,0,0.55)' : 'rgba(180,195,240,0.45)',
-        backdropFilter: 'blur(28px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(200%)',
+        background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(180,195,240,0.2)',
+        backdropFilter: 'blur(16px) saturate(150%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(150%)',
       }}
       onClick={onClose}
       role="dialog"
@@ -119,7 +119,7 @@ const AuthModal = () => {
 
       {/* Glass card */}
       <div
-        className="animate-scale-in"
+        className="animate-scale-in relative z-10"
         style={{
           width: '90%',
           maxWidth: '420px',

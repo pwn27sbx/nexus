@@ -1,8 +1,8 @@
 ---
-import "../../../styles/global.css";
-import { API_BASE_URL } from "../../../utils/constants";
-import ToolDetailView from "../../../components/ToolDetailView.tsx"; // Actually we need a collection view, let's create a new component or just render the ListCards here.
-import BentoCard from "../../../components/BentoCard.tsx";
+import '../../../styles/global.css';
+import { API_BASE_URL } from '../../../utils/constants';
+import ToolDetailView from '../../../components/ToolDetailView.tsx'; // Actually we need a collection view, let's create a new component or just render the ListCards here.
+import BentoCard from '../../../components/BentoCard.tsx';
 
 // Enable SSR
 export const prerender = false;
@@ -18,18 +18,18 @@ try {
   const userRes = await fetch(`${API_BASE_URL}/api/users/${userId}?depth=1`);
   if (userRes.ok) {
     user = await userRes.json();
-    
+
     // Find the specific collection
     if (user.collections) {
       collection = user.collections.find((c: any) => c.slug === collectionSlug);
-      
+
       if (collection && collection.isPublic && collection.tools) {
         tools = collection.tools;
       }
     }
   }
 } catch (e) {
-  console.error("Error fetching collection:", e);
+  console.error('Error fetching collection:', e);
 }
 
 if (!collection || !collection.isPublic) {
@@ -42,31 +42,38 @@ if (!collection || !collection.isPublic) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{collection.name} by {user?.nickname} — Nexus Directory</title>
-    <meta name="description" content={`A public collection of tools curated by ${user?.nickname}`} />
+    <meta
+      name="description"
+      content={`A public collection of tools curated by ${user?.nickname}`}
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap"
+      rel="stylesheet"
+    />
     <script is:inline>
-      (function() {
+      (function () {
         try {
           var isDark = false;
-          var stored = localStorage.getItem("nexus-theme");
-          if (stored === "dark" || stored === "light") {
-            isDark = stored === "dark";
+          var stored = localStorage.getItem('nexus-theme');
+          if (stored === 'dark' || stored === 'light') {
+            isDark = stored === 'dark';
           } else {
-            isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           }
           if (isDark) {
-            document.documentElement.classList.add("dark");
+            document.documentElement.classList.add('dark');
           } else {
-            document.documentElement.classList.remove("dark");
+            document.documentElement.classList.remove('dark');
           }
         } catch (e) {}
       })();
     </script>
   </head>
-  <body class="bg-[#f0f4f8] text-[#0f172a] dark:bg-[#050505] dark:text-[#f8fafc] min-h-screen transition-colors duration-300 antialiased">
-    
+  <body
+    class="bg-[#f0f4f8] text-[#0f172a] dark:bg-[#050505] dark:text-[#f8fafc] min-h-screen transition-colors duration-300 antialiased"
+  >
     <header
       class="sticky top-0 z-50 px-6 py-4 flex items-center justify-between"
       style="background: rgba(5,5,5,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05);"
@@ -86,17 +93,21 @@ if (!collection || !collection.isPublic) {
         <p class="mt-4 opacity-50">{tools.length} tools</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-[280px]">
-        {tools.map((tool: any, index: number) => (
-          <BentoCard client:load tool={tool} index={index} />
-        ))}
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-[280px]"
+      >
+        {
+          tools.map((tool: any, index: number) => (
+            <BentoCard client:load tool={tool} index={index} />
+          ))
+        }
       </div>
-      
-      {tools.length === 0 && (
-        <div class="text-center opacity-50 py-20">
-          This collection is empty.
-        </div>
-      )}
+
+      {
+        tools.length === 0 && (
+          <div class="text-center opacity-50 py-20">This collection is empty.</div>
+        )
+      }
     </main>
   </body>
 </html>
