@@ -259,9 +259,13 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
           display: 'flex',
           gap: '8px',
           padding: '6px',
-          background: isDark ? 'rgba(30, 30, 40, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-          border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(200,200,220,0.5)',
-          boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.12)',
+          background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+          boxShadow: isDark
+            ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+            : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
           borderRadius: '24px',
           opacity: isHovered ? 1 : 0,
           transform: isHovered ? 'translateY(0)' : 'translateY(4px)',
@@ -304,6 +308,7 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
             size={18}
             fill={isSaved ? 'currentColor' : 'none'}
             strokeWidth={isSaved ? 0 : 2.5}
+            stroke={isSaved ? 'none' : 'currentColor'}
           />
         </button>
         <button

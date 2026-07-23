@@ -19,13 +19,20 @@ const StarBorder: React.FC<StarBorderProps> = ({
 }) => {
   return (
     <Component
-      className={`relative inline-block overflow-hidden rounded-[20px] p-[1px] group ${className}`}
+      className={`relative inline-block overflow-hidden rounded-[20px] p-[2px] group ${className}`}
       {...rest}
     >
       <div
+        className="absolute inset-[-100%] z-0 origin-center blur-md opacity-80"
+        style={{
+          background: `conic-gradient(from 90deg at 50% 50%, transparent 40%, ${color} 100%)`,
+          animation: `spin ${speed} linear infinite`,
+        }}
+      />
+      <div
         className="absolute inset-[-100%] z-0 origin-center"
         style={{
-          background: `conic-gradient(from 90deg at 50% 50%, transparent 50%, ${color} 100%)`,
+          background: `conic-gradient(from 90deg at 50% 50%, transparent 60%, ${color} 100%)`,
           animation: `spin ${speed} linear infinite`,
         }}
       />
