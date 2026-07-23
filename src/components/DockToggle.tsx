@@ -37,6 +37,10 @@ const DockToggle: React.FC<DockToggleProps> = ({
   const textRef = useRef<HTMLSpanElement>(null);
   const [activeIndex, setActiveIndex] = useState<number>(initialActiveIndex);
 
+  useEffect(() => {
+    setActiveIndex(initialActiveIndex);
+  }, [initialActiveIndex]);
+
   const noise = (n = 1) => n / 2 - Math.random() * n;
   const getXY = (distance: number, pointIndex: number, totalPoints: number): [number, number] => {
     const angle = ((360 + noise(8)) / totalPoints) * pointIndex * (Math.PI / 180);
@@ -309,7 +313,7 @@ const DockToggle: React.FC<DockToggleProps> = ({
         `}
       </style>
 
-      <svg width="0" height="0" className="absolute hidden">
+      <svg style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }}>
         <filter id="gooey-toggle">
           <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
           <feColorMatrix

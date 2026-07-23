@@ -12,7 +12,6 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
   const [submitterNote, setSubmitterNote] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle'
@@ -31,18 +30,6 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
       setPreviewUrl('');
     }
   }, [url]);
-
-  const addTag = (tag: string) => {
-    const clean = tag.toLowerCase().trim();
-    if (clean && !selectedTags.includes(clean) && selectedTags.length < 5) {
-      setSelectedTags([...selectedTags, clean]);
-    }
-    setTagInput('');
-  };
-
-  const removeTag = (tag: string) => {
-    setSelectedTags(selectedTags.filter((t) => t !== tag));
-  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -82,7 +69,10 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
           url,
           category,
           submitterNote,
-          tags: selectedTags,
+          tags: tagInput
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
           status: 'pending',
           submittedBy: user ? user.id : null,
         }),
@@ -96,7 +86,6 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
           setUrl('');
           setSubmitterNote('');
           setCategory('Design');
-          setSelectedTags([]);
           setTagInput('');
           setSubmitStatus('idle');
           setUrlError('');
@@ -514,111 +503,32 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
                     aria-label="Note for admin"
                   />
                 </div>
-                <div style={{ ...inputStyle, padding: '12px 16px' }}>
-                  <div
+                <div
+                  style={{
+                    ...inputStyle,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '12px 18px',
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Tags (comma separated, e.g. free, design)"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    disabled={submitStatus === 'loading'}
                     style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '6px',
-                      marginBottom: selectedTags.length > 0 ? '10px' : '0',
+                      background: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      width: '100%',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(20,15,50,0.85)',
                     }}
-                  >
-                    {selectedTags.map((tag) => (
-                      <span
-                        key={tag}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          padding: '3px 10px',
-                          borderRadius: '100px',
-                          background:
-                            'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
-                          color: 'white',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {tag}
-                        <button
-                          onClick={() => removeTag(tag)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'white',
-                            cursor: 'pointer',
-                            padding: 0,
-                          }}
-                          aria-label={`Remove ${tag}`}
-                        >
-                          <svg
-                            width="10"
-                            height="10"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                          >
-                            <line x1="18" y1="6" x2="6" y2="18" />
-                            <line x1="6" y1="6" x2="18" y2="18" />
-                          </svg>
-                        </button>
-                      </span>
-                    ))}
-                    {selectedTags.length < 5 && (
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addTag(tagInput);
-                          } else if (e.key === ',' || e.key === 'Tab') {
-                            e.preventDefault();
-                            addTag(tagInput.replace(',', ''));
-                          }
-                        }}
-                        placeholder="Add tag..."
-                        disabled={submitStatus === 'loading'}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          outline: 'none',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          minWidth: '80px',
-                          flex: 1,
-                          color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(20,15,50,0.85)',
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                    {COMMON_TAGS.filter((t) => !selectedTags.includes(t.id))
-                      .slice(0, 6)
-                      .map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => addTag(t.id)}
-                          disabled={submitStatus === 'loading'}
-                          style={{
-                            padding: '2px 8px',
-                            borderRadius: '100px',
-                            background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                            color: isDark ? 'rgba(180,165,240,0.6)' : 'rgba(80,60,140,0.55)',
-                            fontSize: '10px',
-                            fontWeight: 600,
-                            border: 'none',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                          }}
-                        >
-                          + {t.label}
-                        </button>
-                      ))}
-                  </div>
+                    aria-label="Tags"
+                  />
                 </div>
                 <select
                   value={category}
