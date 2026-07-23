@@ -25,6 +25,9 @@ import { useInView } from 'react-intersection-observer';
 import BlurText from './BlurText';
 import Magnet from './Magnet';
 import StarBorder from './StarBorder';
+import BorderGlow from './BorderGlow';
+import GooeyToggle from './GooeyToggle';
+import OptionWheel from './OptionWheel';
 
 const CategoriesModal = React.lazy(() => import('./CategoriesModal'));
 const CommandPalette = React.lazy(() => import('./CommandPalette'));
@@ -243,6 +246,7 @@ const DirectoryContent: React.FC = () => {
 
   // ── Theme ──
   const [isDark, setIsDark] = useState(false);
+  const [isOptionWheelOpen, setIsOptionWheelOpen] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -493,47 +497,21 @@ const DirectoryContent: React.FC = () => {
 
           {/* Center: Sort tabs Redesigned with StarBorder and Framer Motion */}
           <div className="hidden md:flex justify-center pointer-events-auto">
-            <StarBorder
-              as="div"
-              color={isDark ? 'rgba(168,85,247,0.7)' : 'rgba(124,58,237,0.5)'}
-              className="rounded-full shadow-[0_4px_16px_rgba(124,58,237,0.15)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
-              speed="4s"
-            >
-              <div className="flex items-center gap-1 rounded-[17.5px] p-1 bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(20,15,40,0.85)] backdrop-blur-xl border border-white/50 dark:border-white/5">
-                {(['newest', 'popular'] as const).map((tab) => {
-                  const isActive = activeTab === tab;
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setActiveTab(tab);
-                        setSortBy(tab === 'popular' ? 'name' : 'default');
-                        playSound('pop');
-                      }}
-                      className="relative px-4 py-1.5 rounded-full text-[12.5px] font-bold capitalize transition-colors duration-200 min-w-[90px] flex justify-center"
-                      style={{
-                        color: isActive
-                          ? '#ffffff'
-                          : isDark
-                            ? 'rgba(200,190,240,0.6)'
-                            : 'rgba(80,60,140,0.65)',
-                      }}
-                    >
-                      {isActive && (
-                        <motion.div
-                          layoutId="sort-tab-active-pill"
-                          className="absolute inset-0 rounded-full bg-gradient-to-r from-[#7c3aed] to-[#a855f7] shadow-[0_2px_10px_rgba(124,58,237,0.4)]"
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        />
-                      )}
-                      <span className="relative z-10 flex items-center gap-1.5">
-                        {tab === 'newest' ? '✦' : '↑'} {tab}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </StarBorder>
+            <div className="flex items-center gap-1 rounded-[19.5px] p-1 bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(20,15,40,0.85)] backdrop-blur-xl border border-[rgba(255,255,255,0.7)] dark:border-[rgba(255,255,255,0.08)] shadow-[0_4px_16px_rgba(80,60,160,0.1)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
+              <GooeyToggle
+                items={[
+                  { label: 'Newest', value: 'newest', icon: '✦' },
+                  { label: 'Popular', value: 'popular', icon: '↑' },
+                ]}
+                initialActiveIndex={activeTab === 'newest' ? 0 : 1}
+                onItemClick={(index, value) => {
+                  const tab = value as 'newest' | 'popular';
+                  setActiveTab(tab);
+                  setSortBy(tab === 'popular' ? 'name' : 'default');
+                  playSound('pop');
+                }}
+              />
+            </div>
           </div>
 
           {/* Right: Actions */}
@@ -589,49 +567,34 @@ const DirectoryContent: React.FC = () => {
                     </svg>
                   </button>
                 )}
-                <StarBorder
-                  as="button"
+                <button
                   onClick={() => setIsProfileOpen(true)}
-                  color={isDark ? '#d8b4fe' : '#7c3aed'}
-                  className="transition-all hover:scale-105"
-                  aria-label="Open profile"
-                >
-                  <div
-                    className="px-3 md:px-4 h-8 rounded-[17.5px] text-[12px] font-semibold flex items-center gap-2 backdrop-blur-md"
-                    style={{
-                      background: isDark ? 'rgba(124,58,237,0.25)' : 'rgba(124,58,237,0.1)',
-                      color: isDark ? '#d8b4fe' : '#7c3aed',
-                    }}
-                  >
-                    <div
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: accentColor }}
-                    />
-                    <span className="hidden sm:inline">
-                      {user.nickname || user.email.split('@')[0]}
-                    </span>
-                  </div>
-                </StarBorder>
-              </>
-            ) : (
-              <StarBorder
-                as="button"
-                onClick={() => setIsAuthModalOpen(true)}
-                color={isDark ? '#d8b4fe' : '#7c3aed'}
-                className="transition-all hover:scale-105"
-                aria-label="Sign in"
-              >
-                <div
-                  className="px-3 md:px-4 h-8 rounded-[17.5px] text-[12px] font-semibold flex items-center gap-1.5 backdrop-blur-md"
+                  className="px-3 md:px-4 h-8 rounded-[17.5px] text-[12px] font-semibold flex items-center gap-2 backdrop-blur-md transition-all hover:scale-105 shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-[rgba(124,58,237,0.3)] dark:border-[rgba(124,58,237,0.4)]"
                   style={{
-                    background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+                    background: isDark ? 'rgba(124,58,237,0.25)' : 'rgba(124,58,237,0.1)',
                     color: isDark ? '#d8b4fe' : '#7c3aed',
                   }}
+                  aria-label="Open profile"
                 >
-                  <UserIcon size={12} />
-                  <span className="hidden sm:inline">Sign in</span>
-                </div>
-              </StarBorder>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} />
+                  <span className="hidden sm:inline">
+                    {user.nickname || user.email.split('@')[0]}
+                  </span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="px-3 md:px-4 h-8 rounded-[17.5px] text-[12px] font-semibold flex items-center gap-1.5 backdrop-blur-md transition-all hover:scale-105 shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)]"
+                style={{
+                  background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
+                  color: isDark ? '#d8b4fe' : '#7c3aed',
+                }}
+                aria-label="Sign in"
+              >
+                <UserIcon size={12} />
+                <span className="hidden sm:inline">Sign in</span>
+              </button>
             )}
           </div>
         </header>
@@ -663,8 +626,8 @@ const DirectoryContent: React.FC = () => {
           {(activeNav === 'discover' || activeNav === 'categories' || activeNav === 'submit') && (
             <>
               {/* ── HERO SECTION ── */}
-              <section className="w-full flex flex-col items-center text-center px-4 pt-10 pb-8 overflow-visible">
-                <h1 className="font-display text-[32px] sm:text-[42px] md:text-[50px] lg:text-[56px] font-black tracking-tight leading-[1.1] mb-3 text-[rgba(10,8,30,0.90)] dark:text-[rgba(240,240,255,0.97)] tracking-[-0.025em]">
+              <section className="w-full flex flex-col items-center text-center px-4 pt-8 pb-4 overflow-visible">
+                <h1 className="font-display text-[32px] sm:text-[42px] md:text-[50px] lg:text-[56px] font-black tracking-tight leading-[1.1] mb-2 text-[rgba(10,8,30,0.90)] dark:text-[rgba(240,240,255,0.97)] tracking-[-0.025em]">
                   <BlurText
                     text="Ultimate Spatial Gallery Directory"
                     delay={100}
@@ -674,81 +637,130 @@ const DirectoryContent: React.FC = () => {
                 </h1>
 
                 <p
-                  className="text-[15px] sm:text-[17px] font-medium mb-8 animate-fade-up max-w-md text-[rgba(80,60,140,0.65)] dark:text-[rgba(180,170,230,0.7)]"
+                  className="text-[15px] sm:text-[16px] font-medium mb-6 animate-fade-up max-w-md text-[rgba(80,60,140,0.65)] dark:text-[rgba(180,170,230,0.7)]"
                   style={{ animationDelay: '80ms' }}
                 >
                   Next-generation immersive web directory &amp; resource library.
                 </p>
 
-                {/* Search bar */}
+                {/* UNIFIED CONTROL CENTER (Search + Categories) */}
                 <div
-                  className="w-full max-w-[580px] animate-fade-up mt-2"
+                  className="w-full max-w-[640px] animate-fade-up mt-1 mb-4 relative"
                   style={{ animationDelay: '140ms' }}
                 >
-                  <StarBorder
-                    color={isDark ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,1)'}
-                    speed="4s"
-                    className="w-full text-left"
-                    style={{
-                      boxShadow: isDark
-                        ? '0 0 20px rgba(255,255,255,0.1)'
-                        : '0 0 20px rgba(255,255,255,0.5)',
-                    }}
+                  <BorderGlow
+                    edgeSensitivity={40}
+                    glowColor="252 48 74"
+                    backgroundColor="transparent"
+                    borderRadius={24}
+                    glowRadius={35}
+                    glowIntensity={1}
+                    coneSpread={27}
+                    animated={false}
+                    colors={['#c084fc', '#f472b6', '#38bdf8']}
+                    className="w-full shadow-[0_8px_32px_rgba(124,58,237,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
                   >
-                    <button
-                      onClick={() => setIsCommandPaletteOpen(true)}
-                      className="w-full flex items-center gap-3 px-5 py-3 transition-all rounded-[19px] bg-[rgba(255,255,255,0.85)] dark:bg-[rgba(18,16,40,0.85)] backdrop-blur-xl border-none shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_5px_rgba(0,0,0,0.3)]"
-                      id="hero-search-btn"
-                      aria-label="Open search"
-                    >
-                      <SearchIcon
-                        size={16}
-                        className="text-[rgba(100,80,160,0.6)] dark:text-[rgba(180,160,255,0.5)]"
-                      />
-                      <span className="flex-1 text-left text-[14.5px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.45)]">
-                        Search for spatial experiences, tools, and resources...
-                      </span>
-                      <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[11px] font-bold px-1.5 py-0.5 rounded-md border-[rgba(200,190,240,0.6)] dark:border-[rgba(255,255,255,0.12)] border text-[rgba(120,90,200,0.5)] dark:text-[rgba(180,160,255,0.45)] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.04)]">
-                        ⌘K
-                      </kbd>
-                    </button>
-                  </StarBorder>
-                </div>
+                    <div className="w-full flex flex-col bg-[rgba(255,255,255,0.15)] dark:bg-[rgba(18,16,40,0.25)] backdrop-blur-[32px] rounded-[21.5px] border border-[rgba(255,255,255,0.45)] dark:border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden">
+                      {/* Search Input Area */}
+                      <div className="flex flex-row w-full h-full relative">
+                        <button
+                          onClick={() => setIsCommandPaletteOpen(true)}
+                          className="flex-1 flex items-center gap-3 px-5 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
+                          id="hero-search-btn"
+                          aria-label="Open search"
+                        >
+                          <SearchIcon
+                            size={18}
+                            className="text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
+                          />
+                          <span className="flex-1 text-left text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
+                            Search for spatial experiences, tools, and resources...
+                          </span>
+                          <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-md border-[rgba(200,190,240,0.6)] dark:border-[rgba(255,255,255,0.15)] border text-[rgba(120,90,200,0.6)] dark:text-[rgba(180,160,255,0.6)] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.04)]">
+                            ⌘K
+                          </kbd>
+                        </button>
 
-                {/* Category pills */}
-                <div
-                  className="flex items-center gap-2 mt-5 flex-wrap justify-center max-w-[700px] animate-fade-up"
-                  style={{ animationDelay: '200ms' }}
-                >
-                  {SIDEBAR_CATEGORIES.slice(0, 8).map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        setActiveCategory(cat);
-                        playSound('pop');
-                      }}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all hover:scale-105 backdrop-blur-md ${
-                        activeCategory === cat
-                          ? 'bg-[rgba(124,58,237,0.12)] dark:bg-[rgba(124,58,237,0.35)] border border-[rgba(124,58,237,0.5)] text-[#7c3aed] dark:text-[#c084fc]'
-                          : 'bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.07)] border border-[rgba(255,255,255,0.85)] dark:border-[rgba(255,255,255,0.1)] text-[rgba(80,60,140,0.55)] dark:text-[rgba(190,180,240,0.6)]'
-                      }`}
-                    >
-                      <span className="text-[11px] leading-none">{CATEGORY_ICONS[cat] || '•'}</span>
-                      {cat}
-                    </button>
-                  ))}
-                  {activeCategory !== 'All Tools' &&
-                    SIDEBAR_CATEGORIES.indexOf(activeCategory) >= 8 && (
-                      <span className="px-3.5 py-1.5 rounded-full text-[12px] font-semibold bg-[rgba(124,58,237,0.35)] border border-[rgba(124,58,237,0.5)] text-[#7c3aed] dark:text-[#c084fc]">
-                        {activeCategory}
-                      </span>
-                    )}
-                  <button
-                    onClick={() => setIsCategoryModalOpen(true)}
-                    className="px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all hover:scale-105 bg-[rgba(255,255,255,0.55)] dark:bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.8)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(120,100,180,0.45)] dark:text-[rgba(180,160,255,0.4)]"
-                  >
-                    More...
-                  </button>
+                        <div className="w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)]" />
+
+                        <button
+                          onClick={() => setIsOptionWheelOpen(!isOptionWheelOpen)}
+                          className="px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)]"
+                        >
+                          Categories
+                        </button>
+                      </div>
+                    </div>
+                  </BorderGlow>
+
+                  {/* Option Wheel Dropdown */}
+                  {isOptionWheelOpen && (
+                    <>
+                      {/* Blurred overlay to close on click outside */}
+                      <div
+                        className="fixed inset-0 z-[90] bg-[rgba(255,255,255,0.02)] dark:bg-[rgba(0,0,0,0.2)] backdrop-blur-[6px] transition-all duration-300"
+                        onClick={() => setIsOptionWheelOpen(false)}
+                      />
+                      <div
+                        className="absolute left-[calc(100%+16px)] top-1/2 -translate-y-1/2 w-[240px] h-[400px] bg-transparent z-[100] hidden md:block"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <OptionWheel
+                          items={SIDEBAR_CATEGORIES}
+                          defaultSelected={
+                            SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
+                              ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
+                              : 0
+                          }
+                          onChange={(index, item) => {
+                            setActiveCategory(item);
+                          }}
+                          textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
+                          activeColor={isDark ? '#ffffff' : '#000000'}
+                          side="left"
+                          fontSize={1.6}
+                          spacing={1.5}
+                          curve={0.8}
+                          tilt={5}
+                          blur={1.5}
+                          fade={0.4}
+                          smoothing={400}
+                          inset={24}
+                          loop={true}
+                          draggable
+                        />
+                      </div>
+                      <div
+                        className="absolute top-[calc(100%+12px)] right-0 w-[240px] h-[340px] bg-transparent z-[100] md:hidden"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <OptionWheel
+                          items={SIDEBAR_CATEGORIES}
+                          defaultSelected={
+                            SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
+                              ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
+                              : 0
+                          }
+                          onChange={(index, item) => {
+                            setActiveCategory(item);
+                          }}
+                          textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
+                          activeColor={isDark ? '#ffffff' : '#000000'}
+                          side="left"
+                          fontSize={1.6}
+                          spacing={1.5}
+                          curve={0.8}
+                          tilt={5}
+                          blur={1.5}
+                          fade={0.4}
+                          smoothing={400}
+                          inset={24}
+                          loop={true}
+                          draggable
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </section>
 
