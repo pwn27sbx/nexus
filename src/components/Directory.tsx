@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStore } from '@nanostores/react';
@@ -247,6 +247,23 @@ const DirectoryContent: React.FC = () => {
   // ── Theme ──
   const [isDark, setIsDark] = useState(false);
   const [isOptionWheelOpen, setIsOptionWheelOpen] = useState(false);
+
+  // ── Categories Wheel Position ──
+  const categoriesBtnRef = useRef<HTMLButtonElement>(null);
+  const [wheelPos, setWheelPos] = useState({ top: 0, left: 0, bottom: 0, right: 0 });
+
+  const handleCategoriesClick = () => {
+    if (categoriesBtnRef.current) {
+      const rect = categoriesBtnRef.current.getBoundingClientRect();
+      setWheelPos({
+        top: rect.top + rect.height / 2,
+        left: rect.right + 16,
+        bottom: rect.bottom + 12,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setIsOptionWheelOpen(!isOptionWheelOpen);
+  };
 
   useEffect(() => {
     if (!hydrated) return;
@@ -684,83 +701,15 @@ const DirectoryContent: React.FC = () => {
                         <div className="w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)]" />
 
                         <button
-                          onClick={() => setIsOptionWheelOpen(!isOptionWheelOpen)}
-                          className="px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)]"
+                          ref={categoriesBtnRef}
+                          onClick={handleCategoriesClick}
+                          className="px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)] rounded-r-[21.5px]"
                         >
                           Categories
                         </button>
                       </div>
                     </div>
                   </BorderGlow>
-
-                  {/* Option Wheel Dropdown */}
-                  {isOptionWheelOpen && (
-                    <>
-                      {/* Blurred overlay to close on click outside */}
-                      <div
-                        className="fixed inset-0 z-[90] bg-[rgba(255,255,255,0.02)] dark:bg-[rgba(0,0,0,0.2)] backdrop-blur-[6px] transition-all duration-300"
-                        onClick={() => setIsOptionWheelOpen(false)}
-                      />
-                      <div
-                        className="absolute left-[calc(100%+16px)] top-1/2 -translate-y-1/2 w-[240px] h-[400px] bg-transparent z-[100] hidden md:block"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <OptionWheel
-                          items={SIDEBAR_CATEGORIES}
-                          defaultSelected={
-                            SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
-                              ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
-                              : 0
-                          }
-                          onChange={(index, item) => {
-                            setActiveCategory(item);
-                          }}
-                          textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
-                          activeColor={isDark ? '#ffffff' : '#000000'}
-                          side="left"
-                          fontSize={1.6}
-                          spacing={1.5}
-                          curve={0.8}
-                          tilt={5}
-                          blur={1.5}
-                          fade={0.4}
-                          smoothing={400}
-                          inset={24}
-                          loop={true}
-                          draggable
-                        />
-                      </div>
-                      <div
-                        className="absolute top-[calc(100%+12px)] right-0 w-[240px] h-[340px] bg-transparent z-[100] md:hidden"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <OptionWheel
-                          items={SIDEBAR_CATEGORIES}
-                          defaultSelected={
-                            SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
-                              ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
-                              : 0
-                          }
-                          onChange={(index, item) => {
-                            setActiveCategory(item);
-                          }}
-                          textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
-                          activeColor={isDark ? '#ffffff' : '#000000'}
-                          side="left"
-                          fontSize={1.6}
-                          spacing={1.5}
-                          curve={0.8}
-                          tilt={5}
-                          blur={1.5}
-                          fade={0.4}
-                          smoothing={400}
-                          inset={24}
-                          loop={true}
-                          draggable
-                        />
-                      </div>
-                    </>
-                  )}
                 </div>
               </section>
 
@@ -1037,6 +986,78 @@ const DirectoryContent: React.FC = () => {
         </nav>
 
         {/* ══ MODALS ════════════════════════════════════════ */}
+        {isOptionWheelOpen && (
+          <div className="fixed inset-0 z-[9999]">
+            {/* Blurred overlay */}
+            <div
+              className="absolute inset-0 bg-[rgba(255,255,255,0.02)] dark:bg-[rgba(0,0,0,0.2)] backdrop-blur-[8px] transition-all duration-300"
+              onClick={() => setIsOptionWheelOpen(false)}
+            />
+            {/* Desktop Wheel */}
+            <div
+              className="absolute hidden md:block w-[240px] h-[400px] bg-transparent -translate-y-1/2"
+              style={{ top: wheelPos.top, left: wheelPos.left }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <OptionWheel
+                items={SIDEBAR_CATEGORIES}
+                defaultSelected={
+                  SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
+                    ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
+                    : 0
+                }
+                onChange={(index, item) => {
+                  setActiveCategory(item);
+                }}
+                textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
+                activeColor={isDark ? '#ffffff' : '#000000'}
+                side="left"
+                fontSize={1.6}
+                spacing={1.5}
+                curve={0.8}
+                tilt={5}
+                blur={1.5}
+                fade={0.4}
+                smoothing={400}
+                inset={24}
+                loop={true}
+                draggable
+              />
+            </div>
+            {/* Mobile Wheel */}
+            <div
+              className="absolute md:hidden w-[240px] h-[340px] bg-transparent"
+              style={{ top: wheelPos.bottom, right: wheelPos.right }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <OptionWheel
+                items={SIDEBAR_CATEGORIES}
+                defaultSelected={
+                  SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
+                    ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
+                    : 0
+                }
+                onChange={(index, item) => {
+                  setActiveCategory(item);
+                }}
+                textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
+                activeColor={isDark ? '#ffffff' : '#000000'}
+                side="left"
+                fontSize={1.6}
+                spacing={1.5}
+                curve={0.8}
+                tilt={5}
+                blur={1.5}
+                fade={0.4}
+                smoothing={400}
+                inset={24}
+                loop={true}
+                draggable
+              />
+            </div>
+          </div>
+        )}
+
         <SavePopover config={savePopoverConfig} onClose={() => setSavePopoverConfig(null)} />
         <React.Suspense fallback={null}>
           <CategoriesModal
