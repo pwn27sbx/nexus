@@ -12,36 +12,40 @@ interface StarBorderProps {
 const StarBorder: React.FC<StarBorderProps> = ({
   as: Component = 'button',
   className = '',
-  color = 'white',
-  speed = '6s',
+  color = 'rgba(255,255,255,1)',
+  speed = '4s',
   children,
   ...rest
 }) => {
   return (
     <Component
-      className={`relative inline-block overflow-hidden rounded-[20px] p-[2px] group ${className}`}
+      className={`relative inline-block overflow-hidden rounded-[20px] p-[2.5px] group ${className}`}
       {...rest}
     >
+      {/* Soft Glow Layer */}
       <div
-        className="absolute inset-[-100%] z-0 origin-center blur-md opacity-80"
+        className="absolute inset-0 z-0 blur-xl opacity-80"
         style={{
-          background: `conic-gradient(from 90deg at 50% 50%, transparent 40%, ${color} 100%)`,
-          animation: `spin ${speed} linear infinite`,
+          background: `linear-gradient(90deg, transparent 0%, ${color} 50%, transparent 100%)`,
+          backgroundSize: '200% 100%',
+          animation: `sweep ${speed} linear infinite`,
         }}
       />
+      {/* Sharp Beam Layer */}
       <div
-        className="absolute inset-[-100%] z-0 origin-center"
+        className="absolute inset-0 z-0 opacity-100"
         style={{
-          background: `conic-gradient(from 90deg at 50% 50%, transparent 60%, ${color} 100%)`,
-          animation: `spin ${speed} linear infinite`,
+          background: `linear-gradient(90deg, transparent 30%, ${color} 50%, transparent 70%)`,
+          backgroundSize: '200% 100%',
+          animation: `sweep ${speed} linear infinite`,
         }}
       />
-      <div className="relative w-full h-full rounded-[19px] bg-transparent">{children}</div>
+      <div className="relative w-full h-full rounded-[17.5px] bg-transparent">{children}</div>
 
       <style>{`
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
+                @keyframes sweep {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
                 }
             `}</style>
     </Component>
