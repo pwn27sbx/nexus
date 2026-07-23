@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStore } from '@nanostores/react';
 import {
@@ -943,7 +944,20 @@ const DirectoryContent: React.FC = () => {
 
         {/* ══ BOTTOM NAVIGATION DOCK (Floating Pill — Stitch Style) ════ */}
         <nav className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-6 pointer-events-none px-4">
-          <div className="pointer-events-auto flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-2 rounded-2xl max-w-full overflow-x-auto no-scrollbar bg-[rgba(255,255,255,0.50)] dark:bg-[rgba(18,16,40,0.55)] backdrop-blur-[28px] backdrop-saturate-[2] border border-[rgba(255,255,255,0.72)] dark:border-[rgba(255,255,255,0.10)] shadow-[0_20px_40px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.9)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)]">
+          <div
+            className="pointer-events-auto flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-2 rounded-2xl max-w-full overflow-x-auto no-scrollbar"
+            style={{
+              background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              border: isDark
+                ? '1px solid rgba(255,255,255,0.09)'
+                : '1px solid rgba(255,255,255,0.62)',
+              boxShadow: isDark
+                ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+                : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
+            }}
+          >
             {NAV_ITEMS.map((item) => {
               const isActive = activeNav === item.id;
               return (
@@ -955,21 +969,28 @@ const DirectoryContent: React.FC = () => {
                     if (item.id === 'submit') setIsModalOpen(true);
                     else if (item.id === 'categories') setIsCategoryModalOpen(true);
                   }}
-                  className={`flex flex-col items-center gap-1 px-2 sm:px-4 py-2 rounded-xl transition-all hover:scale-105 flex-shrink-0 min-w-[60px] sm:min-w-[70px] ${
+                  className={`group relative flex flex-col items-center gap-1 px-2 sm:px-4 py-2 rounded-xl transition-colors flex-shrink-0 min-w-[60px] sm:min-w-[70px] ${
                     isActive
-                      ? 'bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(255,255,255,0.15)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[rgba(0,0,0,0.04)] dark:border-[rgba(255,255,255,0.12)] text-[#111111] dark:text-[#e2e0ff]'
-                      : 'bg-transparent shadow-none border border-transparent text-[rgba(100,100,120,0.55)] dark:text-[rgba(180,160,255,0.4)]'
+                      ? 'text-[#111111] dark:text-[#e2e0ff]'
+                      : 'text-[rgba(100,100,120,0.55)] dark:text-[rgba(180,160,255,0.4)] hover:text-black dark:hover:text-white'
                   }`}
                   aria-label={item.label}
                   aria-current={isActive ? 'page' : undefined}
                 >
-                  <span className="relative flex items-center justify-center w-5 h-5 transition-all">
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 rounded-xl bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(255,255,255,0.15)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[rgba(0,0,0,0.04)] dark:border-[rgba(255,255,255,0.12)]"
+                      transition={{ type: 'spring', stiffness: 450, damping: 28 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center justify-center w-5 h-5 transition-transform duration-300 group-hover:scale-[1.15]">
                     {item.icon(isActive)}
                   </span>
                   <span
-                    className="text-[10.5px] font-semibold leading-none"
+                    className="relative z-10 text-[10.5px] font-semibold leading-none transition-opacity duration-300"
                     style={{
-                      opacity: isActive ? 1 : 0.7,
+                      opacity: isActive ? 1 : 0.8,
                     }}
                   >
                     {item.label}
