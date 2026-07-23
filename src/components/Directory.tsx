@@ -273,33 +273,109 @@ const DirectoryContent: React.FC = () => {
   // ── Categories Wheel Position ──
   const categoriesBtnRef = useRef<HTMLButtonElement>(null);
 
-  // --- Voice Assistant State ---
   const {
     isListening,
     transcript,
+    finalText,
+    audioData,
     error: voiceError,
+    mode,
     startListening,
     stopListening,
   } = useVoiceCommand();
   const [isVoiceProcessing, setIsVoiceProcessing] = useState(false);
 
   useEffect(() => {
-    // If voice error, maybe show toast (omitted for brevity, handled in UI)
+    // If voice error, show alert and clear the processing state
     if (voiceError) {
       console.warn('Voice error:', voiceError);
+      setIsVoiceProcessing(false);
+      if (voiceError === 'not-allowed') {
+        alert(
+          'Por favor, permite el acceso al micrófono en tu navegador para usar la búsqueda por voz.'
+        );
+      } else if (voiceError !== 'El reconocimiento de voz no está soportado en este navegador.') {
+        alert(`Error con el micrófono: ${voiceError}`);
+      }
     }
   }, [voiceError]);
 
-  // Effect to process the transcript when listening stops and we have text
+  // Effect to process the audio data when recording stops
   useEffect(() => {
     const processVoiceSearch = async () => {
-      if (!isListening && transcript && transcript.length > 3 && !isVoiceProcessing) {
+      // 1. MODO NATIVO (Web Speech API) - Cero costo, cero límites
+      if (!isListening && finalText && !isVoiceProcessing && mode === 'native') {
         setIsVoiceProcessing(true);
         try {
+          // Limpiamos el texto localmente para extraer las palabras clave
+          const stopwords = [
+            'quiero',
+            'busco',
+            'una',
+            'un',
+            'herramienta',
+            'que',
+            'me',
+            'sirva',
+            'para',
+            'crear',
+            'hacer',
+            'el',
+            'la',
+            'los',
+            'las',
+            'recomiéndame',
+            'recomiendame',
+            'por',
+            'favor',
+            'necesito',
+            'alguien',
+            'sabe',
+            'de',
+          ];
+          let cleaned = finalText.toLowerCase();
+          stopwords.forEach((word) => {
+            const regex = new RegExp(`\\b${word}\\b`, 'gi');
+            cleaned = cleaned.replace(regex, '');
+          });
+          cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+          console.log(
+            '%c[Native Voice Search]',
+            'color: #10b981; font-weight: bold;',
+            'Transcribió:',
+            finalText
+          );
+          console.log(
+            '%c[Native Voice Search]',
+            'color: #10b981; font-weight: bold;',
+            'Buscando:',
+            cleaned || finalText
+          );
+
+          handleSearchChange(cleaned || finalText);
+
+          if (activeNav !== 'discover') {
+            setActiveNav('discover');
+          }
+        } finally {
+          setIsVoiceProcessing(false);
+        }
+      }
+
+      // 2. MODO RESPALDO (MediaRecorder + Gemini) - Para navegadores restrictivos
+      if (!isListening && audioData && !isVoiceProcessing && mode === 'audio') {
+        setIsVoiceProcessing(true);
+        try {
+          console.log(
+            '%c[IA Voice Search]',
+            'color: #3b82f6; font-weight: bold;',
+            'Enviando audio de respaldo a Gemini...'
+          );
           const response = await fetch('/api/assistant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ transcript }),
+            body: JSON.stringify({ audio: audioData }),
           });
 
           if (!response.ok) {
@@ -308,24 +384,36 @@ const DirectoryContent: React.FC = () => {
           }
 
           const data = await response.json();
-          // Put the AI keywords into the search bar
-          handleSearchChange(data.keywords);
 
-          // Switch to discover if we were somewhere else
+          console.log(
+            '%c[IA Voice Search]',
+            'color: #8b5cf6; font-weight: bold;',
+            'Transcribió:',
+            data.transcripcion || '(vacio)'
+          );
+          console.log(
+            '%c[IA Voice Search]',
+            'color: #ec4899; font-weight: bold;',
+            'Palabras clave generadas:',
+            data.keywords || '(vacio)'
+          );
+
+          handleSearchChange(data.keywords || '');
+
           if (activeNav !== 'discover') {
             setActiveNav('discover');
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error processing voice command:', error);
+          alert(`Error al procesar con IA: ${error.message || 'Intenta de nuevo'}`);
         } finally {
           setIsVoiceProcessing(false);
-          // Small delay before clearing transcript logic is usually handled by the hook
         }
       }
     };
 
     processVoiceSearch();
-  }, [isListening, transcript]);
+  }, [isListening, audioData, finalText, mode]);
 
   const [wheelPos, setWheelPos] = useState({ top: 0, left: 0, bottom: 0, right: 0 });
 
@@ -1035,6 +1123,16 @@ const DirectoryContent: React.FC = () => {
               )}
               onItemClick={(index, value) => {
                 if (value === 'assistant') {
+                  // Fallback ONLY if the browser natively doesn't support it at all
+                  if (
+                    voiceError === 'El reconocimiento de voz no está soportado en este navegador.'
+                  ) {
+                    alert(
+                      'El reconocimiento de voz no está disponible. Abriendo búsqueda de texto.'
+                    );
+                    isCommandPaletteOpen.set(true);
+                    return;
+                  }
                   if (isListening) stopListening();
                   else startListening();
                   return; // Don't change active nav to assistant, it's just an action

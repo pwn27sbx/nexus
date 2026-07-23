@@ -3,10 +3,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { transcript } = await request.json();
+    const { audio } = await request.json();
 
-    if (!transcript) {
-      return new Response(JSON.stringify({ error: 'No transcript provided' }), { status: 400 });
+    if (!audio || !audio.base64) {
+      return new Response(JSON.stringify({ error: 'No audio provided' }), { status: 400 });
     }
 
     const apiKey = import.meta.env.GEMINI_API_KEY;
@@ -21,25 +21,72 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
     const prompt = `
-Eres un asistente de búsqueda inteligente para un directorio de recursos web (herramientas, diseño, desarrollo, IA).
-El usuario dijo el siguiente comando de voz: "${transcript}"
+Eres un experto asistente de búsqueda para un directorio de recursos web (herramientas, diseño, desarrollo, IA).
+Escucha atentamente el siguiente audio. El usuario está hablando en Español.
 
-Tu objetivo es deducir qué herramientas o categorías está buscando el usuario y devolver UNICAMENTE una cadena de búsqueda (keywords) optimizada para el motor de búsqueda (Algolia). 
-Por ejemplo, si dice "soy estudiante de finanzas", devuelve "calculadora finanzas excel hojas".
-Si dice "quiero hacer un logo animado", devuelve "logo animación svg".
-No incluyas explicaciones, saludos ni comillas. Solo las palabras clave separadas por espacio.
+Paso 1: Transcribe exactamente lo que dice el usuario. Si hay ruido, trata de aislar la voz.
+Paso 2: Deduce la intención de búsqueda principal.
+Paso 3: Genera una lista de palabras clave (keywords) separadas por espacio, ideales para buscar en el directorio.
+
+Responde ÚNICAMENTE con un objeto JSON válido con esta estructura:
+{
+  "transcripcion": "lo que dijo el usuario palabra por palabra",
+  "keywords": "palabra1 palabra2 palabra3"
+}
+
+Ejemplo 1:
+Audio dice: "quiero crear una landing page con animaciones en javascript recomiendame"
+Respuesta: {"transcripcion": "quiero crear una landing page con animaciones en javascript recomiendame", "keywords": "animaciones javascript landing page web"}
+
+Ejemplo 2:
+Audio dice: "busco inspiración para sitios web"
+Respuesta: {"transcripcion": "busco inspiración para sitios web", "keywords": "inspiración diseño web ui"}
+
+Reglas:
+- Si el audio es puro ruido, ininteligible o vacío, devuelve {"transcripcion": "", "keywords": ""}
+- No incluyas bloques de código markdown, responde SOLO con las llaves del JSON { y }.
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: (audio.mimeType || 'audio/webm').split(';')[0],
+          data: audio.base64,
+        },
+      },
+    ]);
+
     const response = await result.response;
-    const searchKeywords = response.text().trim();
+    let responseText = response.text().trim();
+
+    // Clean up potential markdown formatting from the AI response
+    if (responseText.startsWith('`\``')) {
+      responseText = responseText
+        .replace(/^`\``(json)?/, '')
+        .replace(/`\``$/, '')
+        .trim();
+    }
+
+    let searchKeywords = '';
+    let transcripcionFinal = '';
+    try {
+      const dataObj = JSON.parse(responseText);
+      searchKeywords = dataObj.keywords || '';
+      transcripcionFinal = dataObj.transcripcion || '';
+      console.log('IA transcribió:', transcripcionFinal);
+    } catch (e) {
+      console.error('Error parseando JSON de IA:', responseText);
+      searchKeywords = responseText; // Fallback in case it ignored JSON
+    }
 
     return new Response(
       JSON.stringify({
         keywords: searchKeywords,
+        transcripcion: transcripcionFinal,
       }),
       {
         status: 200,
@@ -50,9 +97,21 @@ No incluyas explicaciones, saludos ni comillas. Solo las palabras clave separada
     );
   } catch (error: any) {
     console.error('Gemini API Error:', error);
+
+    // Si el error es por límite de cuota (Rate Limit)
+    if (error.message && error.message.includes('429')) {
+      return new Response(
+        JSON.stringify({
+          error:
+            'Demasiadas personas están usando la búsqueda por voz en este momento. Por favor, intenta de nuevo en 30 segundos.',
+        }),
+        { status: 429 }
+      );
+    }
+
     return new Response(
       JSON.stringify({
-        error: 'Hubo un error procesando tu solicitud con la IA.',
+        error: 'Hubo un error procesando tu solicitud con la IA. Intenta de nuevo.',
       }),
       { status: 500 }
     );

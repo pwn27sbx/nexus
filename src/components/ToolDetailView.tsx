@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Star, ArrowUpRight } from 'lucide-react';
 import { getDomain } from '../utils/helpers';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import ReviewSection from './ReviewSection';
 import BentoCard from './BentoCard';
 import type { Tool } from '../types';
-import { AuthProvider } from '../contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { API_BASE_URL } from '../utils/constants';
 import DecryptedText from './DecryptedText';
 import Magnet from './Magnet';

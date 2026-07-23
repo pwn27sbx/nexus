@@ -1,78 +1,159 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-
-// Extend the window object to include the speech recognition APIs
-declare global {
-  interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
-  }
-}
+import { useState, useCallback, useRef } from 'react';
 
 export function useVoiceCommand() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [finalText, setFinalText] = useState('');
+  const [audioData, setAudioData] = useState<{ base64: string; mimeType: string } | null>(null);
   const [error, setError] = useState('');
+  const [mode, setMode] = useState<'native' | 'audio'>('native');
 
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const recognitionRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const startMediaRecorder = async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('La grabación de audio no está soportada en este navegador.');
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
 
-      if (SpeechRecognition) {
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = false;
-        recognitionRef.current.interimResults = true;
-        // For multiple languages, we can use 'es-ES' or let it auto-detect based on browser.
-        recognitionRef.current.lang = 'es-ES'; // Spanish by default since user speaks Spanish
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
 
-        recognitionRef.current.onresult = (event: any) => {
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const blob = new Blob(chunksRef.current, { type: mimeType });
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          const base64data = reader.result as string;
+          const base64String = base64data.split(',')[1];
+          setAudioData({ base64: base64String, mimeType });
+        };
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+        setIsListening(false);
+      };
+
+      mediaRecorder.start();
+      setMode('audio');
+      setIsListening(true);
+      setTranscript('Escuchando...');
+    } catch (e: any) {
+      console.error('Microphone permission denied or error:', e);
+      if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError')
+        setError('not-allowed');
+      else setError(e.message || 'Error al acceder al micrófono');
+      setIsListening(false);
+    }
+  };
+
+  const startListening = useCallback(() => {
+    setTranscript('');
+    setFinalText('');
+    setAudioData(null);
+    setError('');
+
+    // First Line of Defense: Native Web Speech API
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
+        recognition.lang = 'es-ES';
+        recognition.interimResults = true;
+        recognition.continuous = false;
+
+        let hasError = false;
+        let finalResult = '';
+
+        recognition.onstart = () => {
+          setIsListening(true);
+          setMode('native');
+          setTranscript('Escuchando...');
+        };
+
+        recognition.onresult = (event: any) => {
           let currentTranscript = '';
-          for (let i = 0; i < event.results.length; i++) {
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
             currentTranscript += event.results[i][0].transcript;
           }
           setTranscript(currentTranscript);
+          finalResult = currentTranscript;
         };
 
-        recognitionRef.current.onerror = (event: any) => {
+        recognition.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
-          setError(event.error);
-          setIsListening(false);
+          hasError = true;
+
+          // Si el navegador bloquea la API nativa (Brave/Edge sin red, etc.), iniciamos el Respaldo
+          if (
+            event.error === 'network' ||
+            event.error === 'not-allowed' ||
+            event.error === 'audio-capture' ||
+            event.error === 'aborted'
+          ) {
+            console.log('Activando modo respaldo (MediaRecorder)...');
+            startMediaRecorder();
+          } else {
+            setError(event.error);
+            setIsListening(false);
+          }
         };
 
-        recognitionRef.current.onend = () => {
-          setIsListening(false);
+        recognition.onend = () => {
+          if (!hasError) {
+            if (finalResult) {
+              setFinalText(finalResult);
+            }
+            setIsListening(false);
+          }
         };
-      } else {
-        setError('El reconocimiento de voz no está soportado en este navegador.');
-      }
-    }
-  }, []);
 
-  const startListening = useCallback(() => {
-    if (recognitionRef.current) {
-      setTranscript('');
-      setError('');
-      setIsListening(true);
-      try {
-        recognitionRef.current.start();
+        recognition.start();
       } catch (e) {
-        console.error(e);
+        console.log('Error iniciando SpeechRecognition, activando modo respaldo...');
+        startMediaRecorder();
       }
+    } else {
+      // Second Line of Defense: Fallback to Audio Recording directly (Firefox)
+      console.log('SpeechRecognition no soportado, activando modo respaldo directamente...');
+      startMediaRecorder();
     }
   }, []);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
+    if (mode === 'native' && recognitionRef.current) {
       recognitionRef.current.stop();
-      // isListening will be set to false in onend
+    } else if (
+      mode === 'audio' &&
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state === 'recording'
+    ) {
+      mediaRecorderRef.current.stop();
     }
-  }, []);
+  }, [mode]);
 
   return {
     isListening,
     transcript,
+    finalText,
+    audioData,
     error,
+    mode,
     startListening,
     stopListening,
   };

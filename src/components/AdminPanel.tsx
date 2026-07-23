@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useStore } from '@nanostores/react';
 import { isAdminPanelOpen } from '../stores/modals';
 import { API_BASE_URL } from '../utils/constants';

@@ -4,7 +4,7 @@ import { ALL_CATEGORIES, API_BASE_URL, APP_CONFIG, COMMON_TAGS } from '../utils/
 import { isValidUrl } from '../utils/helpers';
 import { playSound } from '../utils/sounds';
 import type { AutoCaptureModalProps } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();

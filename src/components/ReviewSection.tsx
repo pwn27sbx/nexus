@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import { API_BASE_URL } from '../utils/constants';
 

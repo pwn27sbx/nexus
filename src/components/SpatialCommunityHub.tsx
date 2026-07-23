@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import type { SpatialCommunityHubProps, User } from '../types';
 

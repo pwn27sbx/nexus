@@ -1,7 +1,7 @@
 import React, { memo, useState } from 'react';
 import { HeartIcon, ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import type { ListCardProps } from '../types';
 

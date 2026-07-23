@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { HeartIcon, LayersIcon, SpinnerIcon } from '../utils/icons';
 import { API_BASE_URL } from '../utils/constants';
 import { playSound } from '../utils/sounds';

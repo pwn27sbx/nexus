@@ -2,7 +2,7 @@ import React, { useRef, useEffect, memo, useState } from 'react';
 import { ArrowUpRight } from '../utils/icons';
 import { getDomain } from '../utils/helpers';
 
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import { m } from 'framer-motion';
 import { Heart } from 'lucide-react';

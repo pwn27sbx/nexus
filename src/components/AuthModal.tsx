@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../utils/constants';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useStore } from '@nanostores/react';
 import { isAuthModalOpen } from '../stores/modals';
 

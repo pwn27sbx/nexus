@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { HeroBentoCardProps } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import { Heart } from 'lucide-react';
 
