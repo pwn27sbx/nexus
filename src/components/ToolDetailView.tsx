@@ -53,11 +53,13 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
   };
 
   const glassStyle = {
-    background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.5)',
-    backdropFilter: 'blur(30px)',
-    WebkitBackdropFilter: 'blur(30px)',
-    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
-    boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.04)',
+    background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+    backdropFilter: 'blur(24px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+    border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
+    boxShadow: isDark
+      ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+      : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
   };
 
   const pillStyle = {
@@ -70,9 +72,7 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
     <div
       className="min-h-screen pb-20 relative overflow-hidden"
       style={{
-        background: isDark
-          ? '#111'
-          : 'linear-gradient(135deg, #e6eaff 0%, #ecdfff 50%, #f4dff4 100%)',
+        background: 'transparent',
       }}
     >
       {/* ══ LIQUID ETHER BACKGROUND ══════════════════════════════ */}
@@ -272,23 +272,20 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
                 </div>
               </div>
 
-              <Magnet
-                padding={40}
-                magnetStrength={2}
-                wrapperClassName="w-full"
-                innerClassName="w-full"
+              <button
+                onClick={handleVisit}
+                className="group w-full py-3.5 rounded-2xl text-[1.05rem] font-bold flex items-center justify-center gap-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(168,85,247,0.55)] shadow-[0_4px_14px_rgba(168,85,247,0.35)]"
+                style={{
+                  background: 'linear-gradient(to right, #8b5cf6, #a855f7)',
+                  color: 'white',
+                }}
               >
-                <button
-                  onClick={handleVisit}
-                  className="w-full py-3.5 rounded-2xl text-[1.05rem] font-bold flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(168,85,247,0.39)]"
-                  style={{
-                    background: 'linear-gradient(to right, #8b5cf6, #a855f7)',
-                    color: 'white',
-                  }}
-                >
-                  Visit Website <ArrowUpRight size={18} />
-                </button>
-              </Magnet>
+                Visit Website{' '}
+                <ArrowUpRight
+                  size={18}
+                  className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
+                />
+              </button>
 
               <div className="pt-2 flex flex-col gap-5 text-black dark:text-white">
                 <div
