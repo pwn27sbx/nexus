@@ -85,6 +85,16 @@ export const Users: CollectionConfig = {
       defaultValue: 0,
       admin: { readOnly: true }
     },
+    // Puntos de Reputación
+    {
+      name: 'reputationScore',
+      type: 'number',
+      defaultValue: 0,
+      admin: { 
+        readOnly: true, 
+        description: 'Puntos ganados por likes en discusiones y comentarios'
+      }
+    },
     {
       name: 'collections',
       type: 'array',

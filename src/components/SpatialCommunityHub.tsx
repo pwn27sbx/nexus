@@ -4,7 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import type { SpatialCommunityHubProps, User } from '../types';
 
-import { MOCK_CONTRIBUTORS, MOCK_DISCUSSIONS, MOCK_COLLECTIONS } from '../utils/mockData';
+import { MOCK_CONTRIBUTORS } from '../utils/mockData';
+import CreateDiscussionModal from './CreateDiscussionModal';
+import CollectionModal from './CollectionModal';
 
 // ── Avatar component ─────────────────────────────────────────────────────────
 interface AvatarProps {
@@ -146,14 +148,28 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
 
 // ── Discussion Card ──────────────────────────────────────────────────────────
 const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discussion, isDark }) => (
-  <div
+  <a
+    href={`/community/discussion/${discussion.id}`}
     style={{
-      background: isDark ? 'rgba(20,18,42,0.7)' : 'rgba(255,255,255,0.72)',
-      border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.88)',
-      backdropFilter: 'blur(16px)',
+      display: 'block',
+      textDecoration: 'none',
+      background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+      backdropFilter: 'blur(24px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
       borderRadius: '16px',
       padding: '16px 18px',
-      boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.3)' : '0 4px 16px rgba(80,60,160,0.07)',
+      boxShadow: isDark
+        ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+        : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
+      transition: 'transform 0.2s, box-shadow 0.2s',
+      cursor: 'pointer',
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'none';
     }}
   >
     <p
@@ -196,7 +212,11 @@ const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discus
     </p>
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <Avatar name={discussion.author} size={20} />
+        <Avatar
+          name={discussion.author?.nickname || 'User'}
+          size={20}
+          src={discussion.author?.avatar}
+        />
         <span
           style={{
             fontSize: '11.5px',
@@ -204,7 +224,7 @@ const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discus
             color: isDark ? 'rgba(200,190,255,0.65)' : 'rgba(80,60,140,0.65)',
           }}
         >
-          {discussion.author}
+          {discussion.author?.nickname || 'User'}
         </span>
       </div>
       <span
@@ -213,32 +233,56 @@ const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discus
           color: isDark ? 'rgba(160,145,220,0.4)' : 'rgba(120,90,180,0.45)',
         }}
       >
-        {discussion.timeAgo}
+        {new Date(discussion.createdAt || Date.now()).toLocaleDateString()}
       </span>
     </div>
-  </div>
+  </a>
 );
 
 // ── Collection Card ──────────────────────────────────────────────────────────
-const CollectionCard: React.FC<{ collection: any; isDark: boolean }> = ({ collection, isDark }) => (
+const CollectionCard: React.FC<{ collection: any; isDark: boolean; onClick: () => void }> = ({
+  collection,
+  isDark,
+  onClick,
+}) => (
   <div
+    onClick={onClick}
     style={{
-      background: isDark ? 'rgba(20,18,42,0.7)' : 'rgba(255,255,255,0.72)',
-      border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.88)',
-      backdropFilter: 'blur(16px)',
+      background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+      backdropFilter: 'blur(24px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+      border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
       borderRadius: '16px',
       padding: '14px',
-      boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.3)' : '0 4px 16px rgba(80,60,160,0.07)',
+      boxShadow: isDark
+        ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+        : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
+      cursor: 'pointer',
+      transition: 'transform 0.2s',
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'none';
     }}
   >
     {/* Header */}
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-      <Avatar name={collection.author} size={24} />
+      <Avatar
+        name={collection.author?.nickname || 'User'}
+        size={24}
+        src={collection.author?.avatar}
+      />
       <span
         style={{
           fontSize: '12px',
           fontWeight: 700,
           color: isDark ? 'rgba(225,220,255,0.88)' : 'rgba(20,15,50,0.82)',
+          display: '-webkit-box',
+          WebkitLineClamp: 1,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
         }}
       >
         {collection.title}
@@ -255,7 +299,7 @@ const CollectionCard: React.FC<{ collection: any; isDark: boolean }> = ({ collec
         overflow: 'hidden',
       }}
     >
-      {collection.images.slice(0, 3).map((img: string, i: number) => (
+      {collection.tools?.slice(0, 3).map((tool: any, i: number) => (
         <div
           key={i}
           style={{
@@ -265,50 +309,35 @@ const CollectionCard: React.FC<{ collection: any; isDark: boolean }> = ({ collec
             overflow: 'hidden',
           }}
         >
-          <img
-            src={img}
-            alt=""
-            loading="lazy"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        </div>
-      ))}
-    </div>
-
-    {/* Bottom avatars */}
-    <div style={{ display: 'flex', marginTop: '10px' }}>
-      {collection.avatars.map((a: string, i: number) => (
-        <div
-          key={i}
-          style={{
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            background: [
-              'linear-gradient(135deg,#7c3aed,#a855f7)',
-              'linear-gradient(135deg,#3b82f6,#6366f1)',
-              'linear-gradient(135deg,#ec4899,#f43f5e)',
-            ][i % 3],
-            border: isDark ? '2px solid rgba(20,18,42,1)' : '2px solid rgba(255,255,255,1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '9px',
-            fontWeight: 700,
-            color: 'white',
-            marginLeft: i > 0 ? '-6px' : '0',
-          }}
-        >
-          {a}
+          {tool.image ? (
+            <img
+              src={typeof tool.image === 'string' ? tool.image : tool.image.url}
+              alt={tool.name}
+              loading="lazy"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span style={{ fontSize: '10px', opacity: 0.5 }}>{tool.name?.substring(0, 3)}</span>
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -326,22 +355,55 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
   const onRequireAuth = () => setIsAuthModalOpen(true);
 
   const [leaders, setLeaders] = useState<User[]>([]);
+  const [discussions, setDiscussions] = useState<any[]>([]);
+  const [collections, setCollections] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [isCreateDiscussionOpen, setIsCreateDiscussionOpen] = useState(false);
+  const [selectedCollection, setSelectedCollection] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchLeaders = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/users?sort=-approvedCount&limit=3`);
+        const res = await fetch(
+          `${API_BASE_URL}/api/users?sort=-reputationScore,-approvedCount&limit=3`
+        );
         if (res.ok) {
           const data = await res.json();
           setLeaders(data.docs || []);
-        } else {
-          console.error(`SpatialCommunityHub: Failed to fetch leaders. Status: ${res.status}`);
         }
       } catch (err) {
         console.error('SpatialCommunityHub: Network error fetching leaders:', err);
       }
     };
-    fetchLeaders();
+    const fetchDiscussions = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/discussions?sort=-createdAt&limit=4`);
+        if (res.ok) {
+          const data = await res.json();
+          setDiscussions(data.docs || []);
+        }
+      } catch (err) {
+        console.error('Error fetching discussions:', err);
+      }
+    };
+    const fetchCollections = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/api/community-collections?sort=-createdAt&limit=4`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setCollections(data.docs || []);
+        }
+      } catch (err) {
+        console.error('Error fetching collections:', err);
+      }
+    };
+
+    Promise.all([fetchLeaders(), fetchDiscussions(), fetchCollections()]).then(() => {
+      setIsLoading(false);
+    });
   }, []);
 
   // Map API leaders to display format, fall back to mock
@@ -536,9 +598,15 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
             Latest Discussions
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {MOCK_DISCUSSIONS.map((d) => (
-              <DiscussionCard key={d.id} discussion={d} isDark={isDark} />
-            ))}
+            {isLoading ? (
+              <div style={{ opacity: 0.5, textAlign: 'center', padding: '20px' }}>Loading...</div>
+            ) : discussions.length > 0 ? (
+              discussions.map((d) => <DiscussionCard key={d.id} discussion={d} isDark={isDark} />)
+            ) : (
+              <div style={{ opacity: 0.5, textAlign: 'center', padding: '20px', fontSize: '13px' }}>
+                No discussions yet. Be the first to start one!
+              </div>
+            )}
           </div>
         </section>
 
@@ -556,43 +624,90 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
             User Collections
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            {MOCK_COLLECTIONS.map((c) => (
-              <CollectionCard key={c.id} collection={c} isDark={isDark} />
-            ))}
+            {isLoading ? (
+              <div style={{ opacity: 0.5, padding: '20px' }}>Loading...</div>
+            ) : collections.length > 0 ? (
+              collections.map((c) => (
+                <CollectionCard
+                  key={c.id}
+                  collection={c}
+                  isDark={isDark}
+                  onClick={() => setSelectedCollection(c)}
+                />
+              ))
+            ) : (
+              <div style={{ opacity: 0.5, padding: '20px', fontSize: '13px' }}>
+                No collections available.
+              </div>
+            )}
           </div>
         </section>
       </div>
 
       {/* ── Join CTA (bottom right floating) ── */}
-      <button
-        onClick={() => (user ? null : onRequireAuth())}
-        className="animate-pulse-glow"
+      <div
         style={{
           position: 'fixed',
           bottom: '96px',
           right: '28px',
-          padding: '14px 22px',
-          borderRadius: '28px',
-          background: 'linear-gradient(135deg, #f4a27e, #f08c7b)',
-          color: 'white',
-          fontSize: '14px',
-          fontWeight: 700,
-          border: 'none',
-          cursor: 'pointer',
-          boxShadow: '0 4px 24px rgba(240,140,123,0.45)',
-          transition: 'all 0.25s ease',
           zIndex: 100,
-          letterSpacing: '-0.01em',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'none';
         }}
       >
-        Join the Conversation
-      </button>
+        <div
+          className="animate-pulse-glow"
+          style={{
+            position: 'absolute',
+            inset: '-20px',
+            background:
+              'radial-gradient(circle, rgba(168,85,247,0.45) 0%, rgba(236,72,153,0.3) 40%, rgba(168,85,247,0) 70%)',
+            filter: 'blur(20px)',
+            zIndex: -1,
+            pointerEvents: 'none',
+          }}
+        />
+        <button
+          onClick={() => (user ? setIsCreateDiscussionOpen(true) : onRequireAuth())}
+          style={{
+            padding: '14px 22px',
+            borderRadius: '28px',
+            background: 'linear-gradient(135deg, #f4a27e, #f08c7b)',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: 700,
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 24px rgba(240,140,123,0.45)',
+            transition: 'all 0.25s ease',
+            letterSpacing: '-0.01em',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'none';
+          }}
+        >
+          Join the Conversation
+        </button>
+      </div>
+
+      {isCreateDiscussionOpen && (
+        <CreateDiscussionModal
+          isOpen={isCreateDiscussionOpen}
+          onClose={() => setIsCreateDiscussionOpen(false)}
+          isDark={isDark}
+          user={user!}
+        />
+      )}
+
+      {selectedCollection && (
+        <CollectionModal
+          isOpen={true}
+          onClose={() => setSelectedCollection(null)}
+          collection={selectedCollection}
+          isDark={isDark}
+        />
+      )}
 
       {/* Responsive styles */}
       <style>{`

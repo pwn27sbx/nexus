@@ -10,6 +10,9 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Tools } from './collections/Tools'
 import { Reviews } from './collections/Reviews'
+import { CommunityCollections } from './collections/CommunityCollections'
+import { Discussions } from './collections/Discussions'
+import { Comments } from './collections/Comments'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -23,7 +26,7 @@ export default buildConfig({
   },
   cors: ['https://nexusallinone.vercel.app', process.env.SERVER_URL || ''].filter(Boolean),
   csrf: ['https://nexusallinone.vercel.app', process.env.SERVER_URL || ''].filter(Boolean),
-  collections: [Users, Media, Tools, Reviews],
+  collections: [Users, Media, Tools, Reviews, CommunityCollections, Discussions, Comments],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

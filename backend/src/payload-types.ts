@@ -71,6 +71,9 @@ export interface Config {
     media: Media;
     tools: Tool;
     reviews: Review;
+    'community-collections': CommunityCollection;
+    discussions: Discussion;
+    comments: Comment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +85,9 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     tools: ToolsSelect<false> | ToolsSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    'community-collections': CommunityCollectionsSelect<false> | CommunityCollectionsSelect<true>;
+    discussions: DiscussionsSelect<false> | DiscussionsSelect<true>;
+    comments: CommentsSelect<false> | CommentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -142,6 +148,10 @@ export interface User {
    */
   level?: ('Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator') | null;
   approvedCount?: number | null;
+  /**
+   * Puntos ganados por likes en discusiones y comentarios
+   */
+  reputationScore?: number | null;
   collections?:
     | {
         name: string;
@@ -242,6 +252,62 @@ export interface Review {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-collections".
+ */
+export interface CommunityCollection {
+  id: number;
+  title: string;
+  description?: string | null;
+  author: number | User;
+  tools?: (number | Tool)[] | null;
+  likes?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discussions".
+ */
+export interface Discussion {
+  id: number;
+  title: string;
+  summary?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  category?: string | null;
+  author: number | User;
+  upvotes?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments".
+ */
+export interface Comment {
+  id: number;
+  discussion: number | Discussion;
+  author: number | User;
+  text: string;
+  likes?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -279,6 +345,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'reviews';
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'community-collections';
+        value: number | CommunityCollection;
+      } | null)
+    | ({
+        relationTo: 'discussions';
+        value: number | Discussion;
+      } | null)
+    | ({
+        relationTo: 'comments';
+        value: number | Comment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -333,6 +411,7 @@ export interface UsersSelect<T extends boolean = true> {
   bookmarks?: T;
   level?: T;
   approvedCount?: T;
+  reputationScore?: T;
   collections?:
     | T
     | {
@@ -408,6 +487,45 @@ export interface ReviewsSelect<T extends boolean = true> {
   user?: T;
   rating?: T;
   comment?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-collections_select".
+ */
+export interface CommunityCollectionsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  author?: T;
+  tools?: T;
+  likes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "discussions_select".
+ */
+export interface DiscussionsSelect<T extends boolean = true> {
+  title?: T;
+  summary?: T;
+  content?: T;
+  category?: T;
+  author?: T;
+  upvotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "comments_select".
+ */
+export interface CommentsSelect<T extends boolean = true> {
+  discussion?: T;
+  author?: T;
+  text?: T;
+  likes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
