@@ -5,6 +5,7 @@ import { isAuthModalOpen } from '../stores/modals';
 import type { SpatialCommunityHubProps, User } from '../types';
 
 import { MOCK_CONTRIBUTORS } from '../utils/mockData';
+// Modals
 import CreateDiscussionModal from './CreateDiscussionModal';
 import CollectionModal from './CollectionModal';
 
@@ -46,7 +47,7 @@ const Avatar: React.FC<AvatarProps> = ({ name, size = 40, src = null, badge = nu
         }}
       >
         {src ? (
-          src.startsWith('data:image') || src.startsWith('http') ? (
+          typeof src === 'string' && (src.startsWith('data:image') || src.startsWith('http')) ? (
             <img
               loading="lazy"
               decoding="async"
@@ -55,7 +56,7 @@ const Avatar: React.FC<AvatarProps> = ({ name, size = 40, src = null, badge = nu
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <span>{src}</span>
+            <span>{typeof src === 'string' ? src : 'U'}</span>
           )
         ) : (
           <span>{initials}</span>
@@ -78,69 +79,78 @@ const Avatar: React.FC<AvatarProps> = ({ name, size = 40, src = null, badge = nu
   );
 };
 
-// ── User Orb (floating bubble) ───────────────────────────────────────────────
-interface UserOrbProps {
-  contributor: any; // We could define a strict type, using any for brevity here as it comes from mock/API
-  animClass: string;
-  size?: number;
+// ── Contributor Pill (Wall of Fame) ───────────────────────────────────────────
+interface ContributorPillProps {
+  contributor: any;
   isDark: boolean;
+  delay?: number;
 }
-const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, isDark }) => {
+const ContributorPill: React.FC<ContributorPillProps> = ({ contributor, isDark, delay = 0 }) => {
   return (
     <div
-      className={animClass}
+      className="animate-fade-up relative flex items-center p-2 pr-6 rounded-[50px] mb-6"
       style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        borderRadius: '50%',
-        background: isDark ? 'rgba(25,22,52,0.72)' : 'rgba(255,255,255,0.7)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        border: isDark
-          ? '1.5px solid rgba(255,255,255,0.12)'
-          : '1.5px solid rgba(255,255,255,0.92)',
+        animationDelay: `${delay}ms`,
+        background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.4)',
+        backdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255,255,255,0.4)',
         boxShadow: isDark
-          ? '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07)'
-          : '0 8px 32px rgba(80,60,160,0.15), inset 0 1px 0 rgba(255,255,255,0.95)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        padding: '16px',
-        textAlign: 'center',
-        flexShrink: 0,
+          ? '0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(168,85,247,0.2)'
+          : '0 8px 32px rgba(168,85,247,0.15), 0 0 20px rgba(255,255,255,0.6)',
+        maxWidth: '320px',
       }}
     >
-      <Avatar
-        name={contributor.name}
-        size={contributor.isTop ? 52 : 42}
-        src={contributor.avatarUrl}
-        badge={contributor.isTop ? '🏆' : null}
-      />
-      <div>
+      {/* Outer Glow Ring for Avatar */}
+      <div
+        className="relative flex-shrink-0 rounded-full p-[3px]"
+        style={{
+          background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+          boxShadow: '0 0 15px rgba(79,172,254,0.6)',
+        }}
+      >
+        <Avatar name={contributor.name} size={70} src={contributor.avatarUrl} />
+      </div>
+
+      <div className="ml-4 flex-1">
+        {contributor.isTop && (
+          <div
+            className="font-bold text-[13px] mb-0.5"
+            style={{ color: isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)' }}
+          >
+            Top Contributor
+          </div>
+        )}
         <div
+          className="font-bold font-display"
           style={{
-            fontSize: contributor.isTop ? '14px' : '12px',
-            fontWeight: 700,
-            color: isDark ? 'rgba(235,230,255,0.92)' : 'rgba(15,10,40,0.85)',
-            lineHeight: 1.2,
+            fontSize: '18px',
+            color: isDark ? 'white' : 'black',
+            lineHeight: 1.1,
           }}
         >
           {contributor.name}
         </div>
         <div
-          style={{
-            fontSize: '11px',
-            color: isDark ? 'rgba(180,165,240,0.6)' : 'rgba(100,80,160,0.6)',
-            marginTop: '2px',
-            fontWeight: 500,
-          }}
+          className="text-[12px] mt-1"
+          style={{ color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)' }}
         >
-          Contribution of
-          <br />
-          {contributor.contribution} avatars
+          Contribution: {contributor.contribution}
         </div>
+      </div>
+
+      {/* Ribbon Badge */}
+      <div
+        className="absolute -right-4 -bottom-3 w-12 h-12 flex items-center justify-center rounded-full"
+        style={{
+          background: contributor.isTop
+            ? 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)'
+            : 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+          border: '2px solid white',
+          zIndex: 10,
+        }}
+      >
+        <span className="text-xl">🌟</span>
       </div>
     </div>
   );
@@ -150,58 +160,44 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
 const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discussion, isDark }) => (
   <a
     href={`/community/discussion/${discussion.id}`}
+    className="group"
     style={{
       display: 'block',
       textDecoration: 'none',
-      background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
-      backdropFilter: 'blur(24px) saturate(180%)',
-      WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-      border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
-      borderRadius: '16px',
-      padding: '16px 18px',
-      boxShadow: isDark
-        ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
-        : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
+      background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.9)',
+      backdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255,255,255,0.2)',
+      borderRadius: '20px',
+      padding: '20px',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
       transition: 'transform 0.2s, box-shadow 0.2s',
       cursor: 'pointer',
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
+      e.currentTarget.style.transform = 'translateY(-4px)';
     }}
     onMouseLeave={(e) => {
       e.currentTarget.style.transform = 'none';
     }}
   >
-    <p
-      style={{
-        fontSize: '10px',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.06em',
-        color: isDark ? 'rgba(180,160,240,0.5)' : 'rgba(120,90,200,0.5)',
-        marginBottom: '4px',
-      }}
-    >
-      {discussion.category}
-    </p>
     <h4
       style={{
-        fontSize: '13.5px',
-        fontWeight: 700,
-        color: isDark ? 'rgba(235,230,255,0.92)' : 'rgba(15,10,40,0.88)',
-        marginBottom: '6px',
-        lineHeight: 1.35,
-        letterSpacing: '-0.01em',
+        fontSize: '18px',
+        fontWeight: 800,
+        fontFamily: 'Instrument Serif, serif',
+        color: isDark ? 'white' : 'black',
+        marginBottom: '10px',
+        lineHeight: 1.2,
       }}
     >
       {discussion.title}
     </h4>
     <p
       style={{
-        fontSize: '12px',
-        color: isDark ? 'rgba(180,165,235,0.55)' : 'rgba(100,80,160,0.55)',
+        fontSize: '13px',
+        color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
         lineHeight: 1.5,
-        marginBottom: '10px',
+        marginBottom: '20px',
         display: '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
@@ -211,135 +207,168 @@ const DiscussionCard: React.FC<{ discussion: any; isDark: boolean }> = ({ discus
       {discussion.summary}
     </p>
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Avatar
           name={discussion.author?.nickname || 'User'}
-          size={20}
+          size={24}
           src={discussion.author?.avatar}
         />
         <span
           style={{
-            fontSize: '11.5px',
+            fontSize: '12px',
             fontWeight: 600,
-            color: isDark ? 'rgba(200,190,255,0.65)' : 'rgba(80,60,140,0.65)',
+            color: isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)',
           }}
         >
           {discussion.author?.nickname || 'User'}
+          <span style={{ fontWeight: 400, opacity: 0.6, marginLeft: '4px' }}>
+            · {new Date(discussion.createdAt || Date.now()).toLocaleDateString()}
+          </span>
         </span>
       </div>
-      <span
-        style={{
-          fontSize: '11px',
-          color: isDark ? 'rgba(160,145,220,0.4)' : 'rgba(120,90,180,0.45)',
-        }}
+      <div
+        className="flex items-center gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity"
+        style={{ color: isDark ? 'white' : 'black', fontSize: '13px', fontWeight: 600 }}
       >
-        {new Date(discussion.createdAt || Date.now()).toLocaleDateString()}
-      </span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        Reply
+      </div>
     </div>
   </a>
 );
 
-// ── Collection Card ──────────────────────────────────────────────────────────
+// ── Collection Stack (Deck design) ─────────────────────────────────────────
 const CollectionCard: React.FC<{ collection: any; isDark: boolean; onClick: () => void }> = ({
   collection,
   isDark,
   onClick,
 }) => (
-  <div
-    onClick={onClick}
-    style={{
-      background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
-      backdropFilter: 'blur(24px) saturate(180%)',
-      WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-      border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
-      borderRadius: '16px',
-      padding: '14px',
-      boxShadow: isDark
-        ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
-        : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
-      cursor: 'pointer',
-      transition: 'transform 0.2s',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'none';
-    }}
-  >
-    {/* Header */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-      <Avatar
-        name={collection.author?.nickname || 'User'}
-        size={24}
-        src={collection.author?.avatar}
-      />
-      <span
-        style={{
-          fontSize: '12px',
-          fontWeight: 700,
-          color: isDark ? 'rgba(225,220,255,0.88)' : 'rgba(20,15,50,0.82)',
-          display: '-webkit-box',
-          WebkitLineClamp: 1,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
-      >
-        {collection.title}
-      </span>
-    </div>
-
-    {/* Image grid */}
+  <div onClick={onClick} className="group relative cursor-pointer" style={{ height: '240px' }}>
+    {/* Background stacked cards */}
     <div
+      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[85%] h-full rounded-[24px] transition-transform duration-300 group-hover:-translate-y-4"
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '4px',
-        borderRadius: '10px',
-        overflow: 'hidden',
+        background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.4)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 1,
+      }}
+    />
+    <div
+      className="absolute top-2 left-1/2 transform -translate-x-1/2 w-[92%] h-full rounded-[24px] transition-transform duration-300 group-hover:-translate-y-2"
+      style={{
+        background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.6)',
+        border: '1px solid rgba(255,255,255,0.2)',
+        backdropFilter: 'blur(15px)',
+        zIndex: 2,
+      }}
+    />
+
+    {/* Main front card */}
+    <div
+      className="absolute top-4 left-0 w-full h-full rounded-[24px] p-4 flex flex-col transition-transform duration-300"
+      style={{
+        background: isDark ? 'rgba(30,30,30,0.8)' : 'rgba(255,255,255,0.9)',
+        border: '1px solid rgba(255,255,255,0.3)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+        zIndex: 3,
       }}
     >
-      {collection.tools?.slice(0, 3).map((tool: any, i: number) => (
-        <div
-          key={i}
-          style={{
-            paddingBottom: '75%',
-            position: 'relative',
-            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-            overflow: 'hidden',
-          }}
+      {/* Image grid */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '8px',
+          borderRadius: '16px',
+          overflow: 'hidden',
+          marginBottom: '12px',
+          flex: 1,
+        }}
+      >
+        {collection.tools?.slice(0, 3).map((tool: any, i: number) => (
+          <div
+            key={i}
+            className={`${i === 0 ? 'col-span-3 row-span-2' : 'col-span-1'} relative rounded-xl overflow-hidden`}
+            style={{
+              background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+            }}
+          >
+            {tool.image && (
+              <img
+                src={typeof tool.image === 'string' ? tool.image : tool.image.url}
+                alt={tool.name}
+                loading="lazy"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="flex flex-col">
+        <h4
+          className="font-bold text-[15px] mb-2 font-display"
+          style={{ color: isDark ? 'white' : 'black' }}
         >
-          {tool.image ? (
-            <img
-              src={typeof tool.image === 'string' ? tool.image : tool.image.url}
-              alt={tool.name}
-              loading="lazy"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
+          User Collections
+        </h4>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Avatar
+              name={collection.author?.nickname || 'User'}
+              size={20}
+              src={collection.author?.avatar}
             />
-          ) : (
-            <div
+            <span
               style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 500,
+                color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)',
               }}
             >
-              <span style={{ fontSize: '10px', opacity: 0.5 }}>{tool.name?.substring(0, 3)}</span>
-            </div>
-          )}
+              {collection.author?.nickname || 'User'}
+            </span>
+          </div>
+          <div
+            className="flex items-center gap-1"
+            style={{ fontSize: '13px', fontWeight: 600, color: isDark ? 'white' : 'black' }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Save
+          </div>
         </div>
-      ))}
+      </div>
     </div>
   </div>
 );
@@ -413,21 +442,21 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
           {
             id: leaders[0].id,
             name: leaders[0].nickname || leaders[0].email?.split('@')[0] || 'Top Contributor',
-            contribution: `${leaders[0].approvedCount || 23}k`,
+            contribution: (leaders[0].reputationScore || 0) + (leaders[0].approvedCount || 0),
             avatarUrl: leaders[0].avatar || null,
             isTop: true,
           },
           {
             id: leaders[1].id,
             name: leaders[1].nickname || leaders[1].email?.split('@')[0] || 'Maria Caroan',
-            contribution: `${leaders[1].approvedCount || 10}k`,
+            contribution: (leaders[1].reputationScore || 0) + (leaders[1].approvedCount || 0),
             avatarUrl: leaders[1].avatar || null,
             isTop: false,
           },
           {
             id: leaders[2].id,
             name: leaders[2].nickname || leaders[2].email?.split('@')[0] || 'Marty Kenton',
-            contribution: `${leaders[2].approvedCount || 142}k`,
+            contribution: (leaders[2].reputationScore || 0) + (leaders[2].approvedCount || 0),
             avatarUrl: leaders[2].avatar || null,
             isTop: false,
           },
@@ -528,9 +557,10 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
           maxWidth: '1200px',
           padding: '0 24px',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0,1.2fr) minmax(0,1fr) minmax(0,1.4fr)',
-          gap: '28px',
+          gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr)',
+          gap: '40px',
           alignItems: 'start',
+          marginTop: '20px',
         }}
         className="community-grid"
       >
@@ -539,65 +569,59 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
           <h2
             className="font-display"
             style={{
-              fontSize: '26px',
+              fontSize: '22px',
               fontWeight: 800,
-              color: isDark ? 'rgba(240,235,255,0.92)' : 'rgba(10,8,30,0.85)',
-              marginBottom: '24px',
+              color: isDark ? 'white' : 'black',
               letterSpacing: '-0.02em',
             }}
           >
             Wall of Fame
           </h2>
+          <p
+            style={{
+              fontSize: '13px',
+              color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+              marginBottom: '24px',
+            }}
+          >
+            Glassmorphirtate achievement badges
+          </p>
 
-          {/* Organic orb layout */}
-          <div style={{ position: 'relative', height: '320px' }}>
-            {/* Orb 1 — Top Contributor (largest, center-left) */}
-            <div className="animate-orbit" style={{ position: 'absolute', left: '0', top: '60px' }}>
-              <UserOrb
-                contributor={displayContributors[0]}
-                animClass=""
-                size={160}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {displayContributors.map((contributor, idx) => (
+              <ContributorPill
+                key={contributor.id}
+                contributor={contributor}
                 isDark={isDark}
+                delay={idx * 100}
               />
-            </div>
-            {/* Orb 2 — Maria (top right) */}
-            <div className="animate-orbit-2" style={{ position: 'absolute', right: '0', top: '0' }}>
-              <UserOrb
-                contributor={displayContributors[1]}
-                animClass=""
-                size={130}
-                isDark={isDark}
-              />
-            </div>
-            {/* Orb 3 — Marty (bottom right) */}
-            <div
-              className="animate-orbit-3"
-              style={{ position: 'absolute', right: '10px', bottom: '0' }}
-            >
-              <UserOrb
-                contributor={displayContributors[2]}
-                animClass=""
-                size={140}
-                isDark={isDark}
-              />
-            </div>
+            ))}
           </div>
         </section>
 
         {/* ── Latest Discussions ── */}
         <section>
           <h2
+            className="font-display"
             style={{
-              fontSize: '18px',
-              fontWeight: 700,
-              color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(15,10,40,0.85)',
-              marginBottom: '16px',
-              letterSpacing: '-0.01em',
+              fontSize: '22px',
+              fontWeight: 800,
+              color: isDark ? 'white' : 'black',
+              letterSpacing: '-0.02em',
             }}
           >
             Latest Discussions
           </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <p
+            style={{
+              fontSize: '13px',
+              color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+              marginBottom: '24px',
+            }}
+          >
+            Latest rated communicatime cards
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {isLoading ? (
               <div style={{ opacity: 0.5, textAlign: 'center', padding: '20px' }}>Loading...</div>
             ) : discussions.length > 0 ? (
@@ -610,20 +634,29 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
           </div>
         </section>
 
-        {/* ── User Collections ── */}
+        {/* ── Trending Collections ── */}
         <section>
           <h2
+            className="font-display"
             style={{
               fontSize: '22px',
-              fontWeight: 700,
-              color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(15,10,40,0.85)',
-              marginBottom: '16px',
-              letterSpacing: '-0.015em',
+              fontWeight: 800,
+              color: isDark ? 'white' : 'black',
+              letterSpacing: '-0.02em',
             }}
           >
-            User Collections
+            Trending Collections
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <p
+            style={{
+              fontSize: '13px',
+              color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)',
+              marginBottom: '24px',
+            }}
+          >
+            User-curated site bundles in decks
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
             {isLoading ? (
               <div style={{ opacity: 0.5, padding: '20px' }}>Loading...</div>
             ) : collections.length > 0 ? (

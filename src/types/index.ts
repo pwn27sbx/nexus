@@ -27,6 +27,7 @@ export interface User {
   bookmarks?: (number | Tool)[];
   level?: 'Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator';
   approvedCount?: number;
+  reputationScore?: number;
   score?: number;
   collections?: UserCollection[];
   updatedAt?: string;
