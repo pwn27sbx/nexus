@@ -92,13 +92,15 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
           onSubmit={handleSubmit}
           className="mb-8 p-6 rounded-[2rem] space-y-4"
           style={{
-            background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.5)',
-            backdropFilter: 'blur(30px)',
-            WebkitBackdropFilter: 'blur(30px)',
+            background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             border: isDark
-              ? '1px solid rgba(255, 255, 255, 0.1)'
-              : '1px solid rgba(255, 255, 255, 0.7)',
-            boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.04)',
+              ? '1px solid rgba(255,255,255,0.09)'
+              : '1px solid rgba(255,255,255,0.62)',
+            boxShadow: isDark
+              ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+              : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
           }}
         >
           <div className="flex items-center gap-2">
@@ -159,7 +161,17 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
       {!user && (
         <div
           className="mb-12 p-6 rounded-2xl text-center"
-          style={{ background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}
+          style={{
+            background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: isDark
+              ? '1px solid rgba(255,255,255,0.09)'
+              : '1px solid rgba(255,255,255,0.62)',
+            boxShadow: isDark
+              ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+              : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
+          }}
         >
           <p className="opacity-70 mb-4 font-medium text-[0.95rem]">Join to leave a review</p>
           <button
@@ -178,13 +190,15 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
         <div
           className="text-center py-4 rounded-full text-[0.95rem] font-medium text-black dark:text-white"
           style={{
-            background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.5)',
-            backdropFilter: 'blur(30px)',
-            WebkitBackdropFilter: 'blur(30px)',
+            background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             border: isDark
-              ? '1px solid rgba(255, 255, 255, 0.1)'
-              : '1px solid rgba(255, 255, 255, 0.7)',
-            boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.04)',
+              ? '1px solid rgba(255,255,255,0.09)'
+              : '1px solid rgba(255,255,255,0.62)',
+            boxShadow: isDark
+              ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+              : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
           }}
         >
           No reviews yet. Be the first!
@@ -196,8 +210,15 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
               key={review.id}
               className="p-6 rounded-2xl"
               style={{
-                background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                border: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
+                background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                border: isDark
+                  ? '1px solid rgba(255,255,255,0.09)'
+                  : '1px solid rgba(255,255,255,0.62)',
+                boxShadow: isDark
+                  ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
+                  : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
               }}
             >
               <div className="flex justify-between items-start mb-4">

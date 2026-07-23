@@ -1,7 +1,7 @@
 // Configuración del Backend
 export const API_BASE_URL =
   import.meta.env.PUBLIC_API_URL ||
-  (import.meta.env.DEV ? 'http://localhost:3000' : 'https://nexus-xdwz.vercel.app');
+  (import.meta.env.DEV ? 'http://127.0.0.1:3000' : 'https://nexus-xdwz.vercel.app');
 
 // Algolia - usar variables de entorno
 export const ALGOLIA_APP_ID = import.meta.env.PUBLIC_ALGOLIA_APP_ID || 'P34W7YOD99';
