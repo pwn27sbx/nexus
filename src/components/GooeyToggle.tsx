@@ -16,6 +16,7 @@ export interface GooeyToggleProps {
   colors?: number[];
   initialActiveIndex?: number;
   onItemClick?: (index: number, value: string) => void;
+  variant?: 'horizontal' | 'vertical';
 }
 
 const GooeyToggle: React.FC<GooeyToggleProps> = ({
@@ -28,6 +29,7 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
   colors = [1, 2, 3, 1, 2, 3, 1, 4],
   initialActiveIndex = 0,
   onItemClick,
+  variant = 'horizontal',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLUListElement>(null);
@@ -326,33 +328,57 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
           style={{ transform: 'translate3d(0,0,0.01px)' }}
         >
           <ul ref={navRef} className="flex gap-1 list-none p-0 m-0 relative z-[3] items-center">
-            {items.map((item, index) => (
-              <li
-                key={index}
-                onClick={(e) => handleClick(e as any, index)}
-                className={`rounded-xl relative cursor-pointer transition-[color] duration-300 ease text-[10.5px] font-semibold leading-none ${
-                  activeIndex === index
-                    ? 'active text-transparent'
-                    : 'text-[rgba(100,100,120,0.55)] dark:text-[rgba(180,160,255,0.4)] hover:text-[#111111] dark:hover:text-white'
-                }`}
-              >
-                <button
-                  className="group outline-none py-2 px-2 sm:px-4 min-w-[60px] sm:min-w-[70px] flex flex-col items-center justify-center gap-1"
-                  onClick={(e) => e.preventDefault()}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                >
-                  <span className="flex items-center justify-center w-5 h-5 transition-transform duration-300 group-hover:scale-[1.15]">
-                    {item.icon}
-                  </span>
-                  <span className="mt-0.5">{item.label}</span>
-                </button>
-              </li>
-            ))}
+            {items.map((item, index) => {
+              const isVertical = variant === 'vertical';
+
+              const liClass = isVertical
+                ? `rounded-xl relative cursor-pointer transition-[color] duration-300 ease text-[10.5px] font-semibold leading-none ${
+                    activeIndex === index
+                      ? 'active text-transparent'
+                      : 'text-[rgba(100,100,120,0.55)] dark:text-[rgba(180,160,255,0.4)] hover:text-[#111111] dark:hover:text-white'
+                  }`
+                : `rounded-full relative cursor-pointer transition-[color] duration-300 ease text-[12.5px] font-bold ${
+                    activeIndex === index
+                      ? 'active text-transparent'
+                      : 'text-[rgba(80,60,140,0.65)] dark:text-[rgba(200,190,240,0.6)] hover:text-[rgba(80,60,140,0.9)] dark:hover:text-white'
+                  }`;
+
+              const btnClass = isVertical
+                ? 'group outline-none py-2 px-2 sm:px-4 min-w-[60px] sm:min-w-[70px] flex flex-col items-center justify-center gap-1'
+                : 'outline-none py-1.5 px-4 min-w-[90px] flex items-center justify-center gap-1.5 capitalize';
+
+              return (
+                <li key={index} onClick={(e) => handleClick(e as any, index)} className={liClass}>
+                  <button
+                    className={btnClass}
+                    onClick={(e) => e.preventDefault()}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                  >
+                    {isVertical ? (
+                      <>
+                        <span className="flex items-center justify-center w-5 h-5 transition-transform duration-300 group-hover:scale-[1.15]">
+                          {item.icon}
+                        </span>
+                        <span className="mt-0.5">{item.label}</span>
+                      </>
+                    ) : (
+                      <>
+                        {item.icon} {item.label}
+                      </>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
         <span className="effect filter" ref={filterRef} />
         <span
-          className="effect text font-semibold text-[10.5px] leading-none flex flex-col items-center justify-center gap-1 text-[#111111] dark:text-[#e2e0ff]"
+          className={`effect text flex items-center justify-center ${
+            variant === 'vertical'
+              ? 'font-semibold text-[10.5px] leading-none flex-col gap-1 text-[#111111] dark:text-[#e2e0ff]'
+              : 'font-bold text-[12.5px] gap-1.5 capitalize'
+          }`}
           ref={textRef}
         />
       </div>

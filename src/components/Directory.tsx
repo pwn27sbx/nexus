@@ -929,17 +929,19 @@ const DirectoryContent: React.FC = () => {
         {/* ══ BOTTOM NAVIGATION DOCK (Floating Pill — Stitch Style) ════ */}
         <nav className="fixed bottom-0 inset-x-0 z-50 flex justify-center pb-6 pointer-events-none px-4">
           <div
-            className="pointer-events-auto flex items-center p-1.5 sm:p-2 rounded-[28px] max-w-full overflow-x-auto no-scrollbar"
+            className="pointer-events-auto flex items-center p-1.5 sm:p-2 rounded-[32px] max-w-full overflow-x-auto no-scrollbar"
             style={{
-              background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              background: isDark
+                ? 'linear-gradient(180deg, rgba(30,25,50,0.25) 0%, rgba(10,5,20,0.05) 100%)'
+                : 'linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 100%)',
+              backdropFilter: 'blur(48px) saturate(250%)',
+              WebkitBackdropFilter: 'blur(48px) saturate(250%)',
               border: isDark
-                ? '1px solid rgba(255,255,255,0.09)'
-                : '1px solid rgba(255,255,255,0.62)',
+                ? '1px solid rgba(255,255,255,0.08)'
+                : '1px solid rgba(255,255,255,0.4)',
               boxShadow: isDark
-                ? 'inset 0 1px 1px rgba(255,255,255,0.05), 0 8px 32px rgba(0,0,0,0.5)'
-                : 'inset 0 1px 1px rgba(255,255,255,0.7), 0 8px 32px rgba(0,0,0,0.12)',
+                ? 'inset 0 1px 1px rgba(255,255,255,0.15), inset 0 4px 12px rgba(255,255,255,0.05), inset 0 -1px 1px rgba(0,0,0,0.4), 0 20px 40px -8px rgba(0,0,0,0.8)'
+                : 'inset 0 1px 1px rgba(255,255,255,0.8), inset 0 4px 16px rgba(255,255,255,0.4), inset 0 -1px 1px rgba(0,0,0,0.05), 0 20px 40px -8px rgba(80,60,180,0.15)',
             }}
           >
             <GooeyToggle
@@ -961,6 +963,7 @@ const DirectoryContent: React.FC = () => {
               }}
               animationTime={500}
               particleCount={18}
+              variant="vertical"
             />
           </div>
         </nav>
