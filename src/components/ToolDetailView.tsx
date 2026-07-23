@@ -9,6 +9,7 @@ import { AuthProvider } from '../contexts/AuthContext';
 import { API_BASE_URL } from '../utils/constants';
 import DecryptedText from './DecryptedText';
 import Magnet from './Magnet';
+import LiquidEther from './LiquidEther';
 
 export function ToolDetailViewContent({ tool }: { tool: Tool }) {
   const { user } = useAuth();
@@ -67,14 +68,39 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
 
   return (
     <div
-      className="min-h-screen pb-20 relative"
+      className="min-h-screen pb-20 relative overflow-hidden"
       style={{
         background: isDark
           ? '#111'
           : 'linear-gradient(135deg, #e6eaff 0%, #ecdfff 50%, #f4dff4 100%)',
       }}
     >
-      <header className="px-6 py-8 max-w-5xl mx-auto">
+      {/* ══ LIQUID ETHER BACKGROUND ══════════════════════════════ */}
+      <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div
+          style={{
+            width: '100vw',
+            height: '100vh',
+            position: 'relative',
+            opacity: isDark ? 0.3 : 0.6,
+          }}
+        >
+          <LiquidEther
+            mouseForce={23}
+            cursorSize={120}
+            isViscous={true}
+            viscous={70}
+            colors={['#9bbded', '#FF9FFC', '#c5bdf0', '#c5bdf0']}
+            autoDemo
+            autoSpeed={0.7}
+            autoIntensity={2.5}
+            isBounce={false}
+            resolution={0.5}
+          />
+        </div>
+      </div>
+
+      <header className="relative z-10 px-6 py-8 max-w-5xl mx-auto">
         <button
           onClick={() => window.history.back()}
           className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all hover:scale-105"
@@ -85,7 +111,7 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
         </button>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6">
+      <main className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left Column: Browser Mockup + About */}
           <div className="space-y-10">
@@ -189,6 +215,7 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
                   }
                   alt={`Screenshot of ${tool.name}`}
                   className="absolute inset-0 w-full h-full object-cover"
+                  style={{ viewTransitionName: `tool-image-${tool.id}` } as any}
                 />
                 {/* Bottom fade like BentoCard */}
                 <div

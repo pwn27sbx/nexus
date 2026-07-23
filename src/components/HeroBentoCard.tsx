@@ -203,16 +203,19 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
               src={tool.imageUrl}
               alt={`Screenshot of ${tool.name}`}
               loading="lazy"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                transition: 'transform 0.6s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease',
-                transform: isHovered ? 'scale(1.04)' : 'scale(1)',
-                opacity: imageLoaded ? 1 : 0,
-              }}
+              style={
+                {
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  transition: 'transform 0.6s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease',
+                  transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                  opacity: imageLoaded ? 1 : 0,
+                  viewTransitionName: `tool-image-${tool.id}`,
+                } as any
+              }
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageError(true)}
             />
