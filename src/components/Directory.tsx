@@ -482,7 +482,7 @@ const DirectoryContent: React.FC = () => {
           }`}
         >
           {/* Left: Logo / Brand */}
-          <div className="flex items-center gap-2.5 pointer-events-auto">
+          <div className="flex items-center gap-2.5 pointer-events-auto flex-1 justify-start">
             <div className="w-8 h-8 rounded-[10px] flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform bg-gradient-to-br from-[#7c3aed] to-[#a855f7] shadow-[0_4px_14px_rgba(124,58,237,0.4)]">
               <div className="w-2 h-2 bg-white rounded-full opacity-90" />
             </div>
@@ -491,8 +491,53 @@ const DirectoryContent: React.FC = () => {
             </span>
           </div>
 
+          {/* Center: Sort tabs Redesigned with StarBorder and Framer Motion */}
+          <div className="hidden md:flex justify-center pointer-events-auto">
+            <StarBorder
+              as="div"
+              color={isDark ? 'rgba(168,85,247,0.7)' : 'rgba(124,58,237,0.5)'}
+              className="rounded-full shadow-[0_4px_16px_rgba(124,58,237,0.15)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+              speed="4s"
+            >
+              <div className="flex items-center gap-1 rounded-[17.5px] p-1 bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(20,15,40,0.85)] backdrop-blur-xl border border-white/50 dark:border-white/5">
+                {(['newest', 'popular'] as const).map((tab) => {
+                  const isActive = activeTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => {
+                        setActiveTab(tab);
+                        setSortBy(tab === 'popular' ? 'name' : 'default');
+                        playSound('pop');
+                      }}
+                      className="relative px-4 py-1.5 rounded-full text-[12.5px] font-bold capitalize transition-colors duration-200 min-w-[90px] flex justify-center"
+                      style={{
+                        color: isActive
+                          ? '#ffffff'
+                          : isDark
+                            ? 'rgba(200,190,240,0.6)'
+                            : 'rgba(80,60,140,0.65)',
+                      }}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="sort-tab-active-pill"
+                          className="absolute inset-0 rounded-full bg-gradient-to-r from-[#7c3aed] to-[#a855f7] shadow-[0_2px_10px_rgba(124,58,237,0.4)]"
+                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        />
+                      )}
+                      <span className="relative z-10 flex items-center gap-1.5">
+                        {tab === 'newest' ? '✦' : '↑'} {tab}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </StarBorder>
+          </div>
+
           {/* Right: Actions */}
-          <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
+          <div className="flex items-center justify-end gap-2 sm:gap-3 pointer-events-auto flex-1">
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
@@ -588,27 +633,6 @@ const DirectoryContent: React.FC = () => {
                 </div>
               </StarBorder>
             )}
-
-            {/* Sort tabs (Moved inside the right actions group for mobile layout harmony, but still hidden on small screens) */}
-            <div className="hidden md:flex items-center gap-1 rounded-full p-1 ml-2 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
-              {(['newest', 'popular'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setSortBy(tab === 'popular' ? 'name' : 'default');
-                    playSound('pop');
-                  }}
-                  className={`px-4 py-1.5 rounded-full text-[12.5px] font-semibold capitalize transition-all duration-200 ${
-                    activeTab === tab
-                      ? 'bg-[rgba(255,255,255,0.95)] dark:bg-[rgba(124,58,237,0.35)] text-[#7c3aed] dark:text-[#c084fc] shadow-[0_2px_8px_rgba(124,58,237,0.2)]'
-                      : 'bg-transparent text-[rgba(80,60,140,0.6)] dark:text-[rgba(200,200,240,0.6)] shadow-none'
-                  }`}
-                >
-                  {tab === 'newest' ? '✦ Newest' : '↑ Popular'}
-                </button>
-              ))}
-            </div>
           </div>
         </header>
 
