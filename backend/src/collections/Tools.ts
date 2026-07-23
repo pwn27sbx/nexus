@@ -65,6 +65,13 @@ export const Tools: CollectionConfig = {
     },
 
     {
+      name: 'submitterNote',
+      type: 'textarea',
+      required: false,
+      admin: { description: 'Nota/Idea que el usuario dejó al enviar la herramienta (no visible al público).' }
+    },
+
+    {
       name: 'tags',
       type: 'text',
       required: false,

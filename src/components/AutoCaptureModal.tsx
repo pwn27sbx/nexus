@@ -11,7 +11,7 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
-  const [description, setDescription] = useState('');
+  const [submitterNote, setSubmitterNote] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
@@ -81,7 +81,7 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
           name,
           url,
           category,
-          description,
+          submitterNote,
           tags: selectedTags,
           status: 'pending',
           submittedBy: user ? user.id : null,
@@ -94,7 +94,7 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
           onClose();
           setName('');
           setUrl('');
-          setDescription('');
+          setSubmitterNote('');
           setCategory('Design');
           setSelectedTags([]);
           setTagInput('');
@@ -497,11 +497,10 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
                   </div>
                   <input
                     type="text"
-                    required
                     maxLength={APP_CONFIG.MAX_DESCRIPTION_LENGTH}
-                    placeholder="Brief description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Note or idea for the admin (optional)"
+                    value={submitterNote}
+                    onChange={(e) => setSubmitterNote(e.target.value)}
                     disabled={submitStatus === 'loading'}
                     style={{
                       background: 'transparent',
@@ -512,7 +511,7 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
                       fontWeight: 600,
                       color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(20,15,50,0.85)',
                     }}
-                    aria-label="Description"
+                    aria-label="Note for admin"
                   />
                 </div>
                 <div style={{ ...inputStyle, padding: '12px 16px' }}>
