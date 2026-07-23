@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ALL_CATEGORIES } from '../utils/constants';
 import { playSound } from '../utils/sounds';
+import BorderGlow from './BorderGlow';
+import Strands from './Strands';
+import { SearchIcon } from 'lucide-react';
 
 // Category metadata — icons 3D-style with emoji + blurred screenshot backgrounds
 const CATEGORY_DATA: Record<string, { emoji: string; gradient: string; desc: string }> = {
@@ -232,44 +235,68 @@ const CategoriesModal: React.FC<CategoriesModalProps> = ({
         </p>
 
         {/* Search */}
-        <div
-          className="w-full max-w-[540px] mb-8 animate-fade-up"
-          style={{ animationDelay: '100ms' }}
-        >
-          <div
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-            style={{
-              background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.75)',
-              border: isDark
-                ? '1px solid rgba(255,255,255,0.12)'
-                : '1px solid rgba(255,255,255,0.92)',
-              backdropFilter: 'blur(24px)',
-              boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.25)' : '0 4px 20px rgba(80,60,160,0.1)',
-            }}
+        <div className="px-6 pb-6 pt-2 animate-fade-up" style={{ animationDelay: '100ms' }}>
+          <BorderGlow
+            edgeSensitivity={40}
+            glowColor="252 48 74"
+            backgroundColor="transparent"
+            borderRadius={24}
+            glowRadius={35}
+            glowIntensity={1}
+            coneSpread={27}
+            animated={false}
+            colors={['#c084fc', '#f472b6', '#38bdf8']}
+            className="w-full shadow-[0_8px_32px_rgba(124,58,237,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,180,0.45)'}
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search for spatial experiences, tools, and resources..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 bg-transparent text-[14px] font-medium outline-none"
-              style={{ color: isDark ? 'rgba(220,215,255,0.85)' : 'rgba(30,20,60,0.8)' }}
-              autoFocus
-            />
-          </div>
+            <div className="w-full flex flex-col bg-[rgba(255,255,255,0.15)] dark:bg-[rgba(18,16,40,0.25)] backdrop-blur-[32px] rounded-[21.5px] border border-[rgba(255,255,255,0.45)] dark:border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden">
+              <div className="flex flex-row w-full h-full relative">
+                <div className="hidden sm:flex items-center pl-2 shrink-0">
+                  <button
+                    disabled
+                    className="flex items-center justify-center w-[90px] h-[64px] rounded-[16px] bg-transparent opacity-90 cursor-not-allowed"
+                  >
+                    <div style={{ width: '80px', height: '60px', position: 'relative' }}>
+                      <Strands
+                        colors={['#c5bdf0', '#96bbef', '#823fef']}
+                        count={4}
+                        speed={0.5}
+                        amplitude={0.9}
+                        waviness={1.4}
+                        thickness={0.9}
+                        glow={1.7}
+                        taper={3}
+                        spread={1}
+                        intensity={0.5}
+                        saturation={2}
+                        opacity={1}
+                        scale={1.8}
+                        glass={false}
+                        refraction={1}
+                        dispersion={1}
+                        glassSize={1}
+                        hueShift={0}
+                      />
+                    </div>
+                  </button>
+                  <div className="h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
+                </div>
+                <div className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3 px-4 py-4 transition-all bg-transparent">
+                  <SearchIcon
+                    size={18}
+                    className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search for spatial experiences, tools, and resources..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="flex-1 bg-transparent text-[14px] sm:text-[15px] font-medium outline-none text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)]"
+                    autoFocus
+                  />
+                </div>
+              </div>
+            </div>
+          </BorderGlow>
         </div>
 
         {/* ── Category Grid ── */}

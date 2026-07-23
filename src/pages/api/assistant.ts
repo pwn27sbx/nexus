@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { Buffer } from 'node:buffer';
 
 export const POST: APIRoute = async ({ request }) => {
   try {

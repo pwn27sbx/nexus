@@ -29,6 +29,7 @@ import Magnet from './Magnet';
 import StarBorder from './StarBorder';
 import BorderGlow from './BorderGlow';
 import GooeyToggle from './GooeyToggle';
+import DockToggle from './DockToggle';
 import OptionWheel from './OptionWheel';
 
 const CategoriesModal = React.lazy(() => import('./CategoriesModal'));
@@ -95,29 +96,10 @@ import { ALL_CATEGORIES } from '@/utils/constants';
 import { playSound } from '@/utils/sounds';
 
 import type { SavePopoverConfig } from '@/types';
+import Strands from './Strands';
 
 // Nav items for bottom dock
 const NAV_ITEMS = [
-  {
-    id: 'assistant',
-    label: 'AI Search',
-    icon: (active: boolean) => (
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-        <line x1="12" y1="19" x2="12" y2="22" />
-      </svg>
-    ),
-  },
   {
     id: 'discover',
     label: 'Discover',
@@ -827,7 +809,7 @@ const DirectoryContent: React.FC = () => {
 
                 {/* UNIFIED CONTROL CENTER (Search + Categories) */}
                 <div
-                  className="w-full max-w-[640px] animate-fade-up mt-1 mb-4 relative"
+                  className="w-full max-w-[800px] animate-fade-up mt-1 mb-4 relative"
                   style={{ animationDelay: '140ms' }}
                 >
                   <BorderGlow
@@ -845,30 +827,61 @@ const DirectoryContent: React.FC = () => {
                     <div className="w-full flex flex-col bg-[rgba(255,255,255,0.15)] dark:bg-[rgba(18,16,40,0.25)] backdrop-blur-[32px] rounded-[21.5px] border border-[rgba(255,255,255,0.45)] dark:border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden">
                       {/* Search Input Area */}
                       <div className="flex flex-row w-full h-full relative">
+                        <div className="hidden sm:flex items-center pl-2 shrink-0">
+                          <button
+                            disabled
+                            className="flex items-center justify-center w-[90px] h-[64px] rounded-[16px] bg-transparent opacity-90 cursor-not-allowed"
+                            title="Pronto"
+                          >
+                            <div style={{ width: '80px', height: '60px', position: 'relative' }}>
+                              <Strands
+                                colors={['#c5bdf0', '#96bbef', '#823fef']}
+                                count={4}
+                                speed={0.5}
+                                amplitude={0.9}
+                                waviness={1.4}
+                                thickness={0.9}
+                                glow={1.7}
+                                taper={3}
+                                spread={1}
+                                intensity={0.5}
+                                saturation={2}
+                                opacity={1}
+                                scale={1.8}
+                                glass={false}
+                                refraction={1}
+                                dispersion={1}
+                                glassSize={1}
+                                hueShift={0}
+                              />
+                            </div>
+                          </button>
+                          <div className="h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
+                        </div>
                         <button
                           onClick={() => setIsCommandPaletteOpen(true)}
-                          className="flex-1 flex items-center gap-3 px-5 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
+                          className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3 px-4 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
                           id="hero-search-btn"
                           aria-label="Open search"
                         >
                           <SearchIcon
                             size={18}
-                            className="text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
+                            className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
                           />
-                          <span className="flex-1 text-left text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
-                            Search for spatial experiences, tools, and resources...
+                          <span className="flex-1 min-w-0 text-left text-[14px] sm:text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
+                            Search for spatial experiences...
                           </span>
-                          <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-md border-[rgba(200,190,240,0.6)] dark:border-[rgba(255,255,255,0.15)] border text-[rgba(120,90,200,0.6)] dark:text-[rgba(180,160,255,0.6)] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.04)]">
+                          <kbd className="hidden md:inline-flex shrink-0 items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-md border-[rgba(200,190,240,0.6)] dark:border-[rgba(255,255,255,0.15)] border text-[rgba(120,90,200,0.6)] dark:text-[rgba(180,160,255,0.6)] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.04)]">
                             ⌘K
                           </kbd>
                         </button>
 
-                        <div className="w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)]" />
+                        <div className="w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] shrink-0" />
 
                         <button
                           ref={categoriesBtnRef}
                           onClick={handleCategoriesClick}
-                          className="px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)] rounded-r-[21.5px]"
+                          className="shrink-0 whitespace-nowrap px-6 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)] flex items-center justify-center gap-2 text-[14px] font-bold text-[rgba(100,80,160,0.9)] dark:text-[rgba(180,160,255,0.9)] rounded-r-[21.5px]"
                         >
                           Categories
                         </button>
@@ -1109,7 +1122,7 @@ const DirectoryContent: React.FC = () => {
                 : 'inset 0 1px 1px rgba(255,255,255,0.8), inset 0 4px 16px rgba(255,255,255,0.4), inset 0 -1px 1px rgba(0,0,0,0.05), 0 20px 40px -8px rgba(80,60,180,0.15)',
             }}
           >
-            <GooeyToggle
+            <DockToggle
               items={NAV_ITEMS.filter((item) => item.id !== 'categories').map((item) => ({
                 label: item.label,
                 value: item.id,
@@ -1123,19 +1136,18 @@ const DirectoryContent: React.FC = () => {
               )}
               onItemClick={(index, value) => {
                 if (value === 'assistant') {
-                  // Fallback ONLY if the browser natively doesn't support it at all
                   if (
                     voiceError === 'El reconocimiento de voz no está soportado en este navegador.'
                   ) {
                     alert(
                       'El reconocimiento de voz no está disponible. Abriendo búsqueda de texto.'
                     );
-                    isCommandPaletteOpen.set(true);
+                    setIsCommandPaletteOpen(true);
                     return;
                   }
                   if (isListening) stopListening();
                   else startListening();
-                  return; // Don't change active nav to assistant, it's just an action
+                  return;
                 }
                 setActiveNav(value);
                 playSound('pop');
@@ -1157,77 +1169,90 @@ const DirectoryContent: React.FC = () => {
         />
 
         {/* ══ MODALS ════════════════════════════════════════ */}
-        {isOptionWheelOpen && (
-          <div className="fixed inset-0 z-[9999]">
-            {/* Blurred overlay */}
-            <div
-              className="absolute inset-0 bg-[rgba(255,255,255,0.02)] dark:bg-[rgba(0,0,0,0.2)] backdrop-blur-[8px] transition-all duration-300"
-              onClick={() => setIsOptionWheelOpen(false)}
+        {/* ══ MODALS ════════════════════════════════════════ */}
+        <div
+          className={`fixed inset-0 z-[9999] ${
+            isOptionWheelOpen ? 'pointer-events-auto' : 'pointer-events-none'
+          }`}
+        >
+          {/* Blurred overlay */}
+          <div
+            className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isOptionWheelOpen
+                ? 'bg-[rgba(255,255,255,0.02)] dark:bg-[rgba(0,0,0,0.4)] backdrop-blur-[12px]'
+                : 'bg-transparent dark:bg-transparent backdrop-blur-none'
+            }`}
+            onClick={() => setIsOptionWheelOpen(false)}
+          />
+          {/* Desktop Wheel */}
+          <div
+            className={`absolute hidden md:block w-[240px] h-[400px] bg-transparent transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] origin-left ${
+              isOptionWheelOpen
+                ? 'scale-100 -translate-y-1/2 opacity-100'
+                : 'scale-[0.85] -translate-y-1/2 translate-x-8 opacity-0'
+            }`}
+            style={{ top: wheelPos.top, left: wheelPos.left }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <OptionWheel
+              items={SIDEBAR_CATEGORIES}
+              defaultSelected={
+                SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
+                  ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
+                  : 0
+              }
+              onChange={(index, item) => {
+                setActiveCategory(item);
+              }}
+              textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
+              activeColor={isDark ? '#ffffff' : '#000000'}
+              side="left"
+              fontSize={1.6}
+              spacing={1.5}
+              curve={0.8}
+              tilt={5}
+              blur={1.5}
+              fade={0.4}
+              smoothing={400}
+              inset={24}
+              loop={true}
+              draggable
             />
-            {/* Desktop Wheel */}
-            <div
-              className="absolute hidden md:block w-[240px] h-[400px] bg-transparent -translate-y-1/2"
-              style={{ top: wheelPos.top, left: wheelPos.left }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <OptionWheel
-                items={SIDEBAR_CATEGORIES}
-                defaultSelected={
-                  SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
-                    ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
-                    : 0
-                }
-                onChange={(index, item) => {
-                  setActiveCategory(item);
-                }}
-                textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
-                activeColor={isDark ? '#ffffff' : '#000000'}
-                side="left"
-                fontSize={1.6}
-                spacing={1.5}
-                curve={0.8}
-                tilt={5}
-                blur={1.5}
-                fade={0.4}
-                smoothing={400}
-                inset={24}
-                loop={true}
-                draggable
-              />
-            </div>
-            {/* Mobile Wheel */}
-            <div
-              className="absolute md:hidden w-[240px] h-[340px] bg-transparent"
-              style={{ top: wheelPos.bottom, right: wheelPos.right }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <OptionWheel
-                items={SIDEBAR_CATEGORIES}
-                defaultSelected={
-                  SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
-                    ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
-                    : 0
-                }
-                onChange={(index, item) => {
-                  setActiveCategory(item);
-                }}
-                textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
-                activeColor={isDark ? '#ffffff' : '#000000'}
-                side="left"
-                fontSize={1.6}
-                spacing={1.5}
-                curve={0.8}
-                tilt={5}
-                blur={1.5}
-                fade={0.4}
-                smoothing={400}
-                inset={24}
-                loop={true}
-                draggable
-              />
-            </div>
           </div>
-        )}
+          {/* Mobile Wheel */}
+          <div
+            className={`absolute md:hidden w-[240px] h-[340px] bg-transparent transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] origin-bottom ${
+              isOptionWheelOpen ? 'scale-100 opacity-100' : 'scale-[0.85] translate-y-8 opacity-0'
+            }`}
+            style={{ top: wheelPos.bottom, right: wheelPos.right }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <OptionWheel
+              items={SIDEBAR_CATEGORIES}
+              defaultSelected={
+                SIDEBAR_CATEGORIES.indexOf(activeCategory) !== -1
+                  ? SIDEBAR_CATEGORIES.indexOf(activeCategory)
+                  : 0
+              }
+              onChange={(index, item) => {
+                setActiveCategory(item);
+              }}
+              textColor={isDark ? 'rgba(180,160,255,0.6)' : '#8070b0'}
+              activeColor={isDark ? '#ffffff' : '#000000'}
+              side="left"
+              fontSize={1.6}
+              spacing={1.5}
+              curve={0.8}
+              tilt={5}
+              blur={1.5}
+              fade={0.4}
+              smoothing={400}
+              inset={24}
+              loop={true}
+              draggable
+            />
+          </div>
+        </div>
 
         <SavePopover config={savePopoverConfig} onClose={() => setSavePopoverConfig(null)} />
         <React.Suspense fallback={null}>

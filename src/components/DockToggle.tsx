@@ -6,7 +6,7 @@ interface GooeyToggleItem {
   icon?: React.ReactNode;
 }
 
-export interface GooeyToggleProps {
+export interface DockToggleProps {
   items: GooeyToggleItem[];
   animationTime?: number;
   particleCount?: number;
@@ -19,7 +19,7 @@ export interface GooeyToggleProps {
   variant?: 'horizontal' | 'vertical';
 }
 
-const GooeyToggle: React.FC<GooeyToggleProps> = ({
+const DockToggle: React.FC<DockToggleProps> = ({
   items,
   animationTime = 600,
   particleCount = 15,
@@ -31,7 +31,6 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
   onItemClick,
   variant = 'horizontal',
 }) => {
-  const filterId = React.useId().replace(/:/g, '');
   const containerRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLUListElement>(null);
   const filterRef = useRef<HTMLSpanElement>(null);
@@ -157,7 +156,6 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
     if (activeLi) {
       updateEffectPosition(activeLi);
       textRef.current?.classList.add('active');
-      filterRef.current?.classList.add('active');
     }
     const resizeObserver = new ResizeObserver(() => {
       const currentActiveLi = navRef.current?.querySelectorAll('li')[activeIndex] as HTMLElement;
@@ -176,9 +174,6 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
           :root {
             --linear-ease: linear(0, 0.068, 0.19 2.7%, 0.804 8.1%, 1.037, 1.199 13.2%, 1.245, 1.27 15.8%, 1.274, 1.272 17.4%, 1.249 19.1%, 0.996 28%, 0.949, 0.928 33.3%, 0.926, 0.933 36.8%, 1.001 45.6%, 1.013, 1.019 50.8%, 1.018 54.4%, 1 63.1%, 0.995 68%, 1.001 85%, 1);
           }
-          .gooey-nav-container-${filterId} {
-            filter: drop-shadow(0 4px 20px rgba(124,58,237,0.15));
-          }
           .effect {
             position: absolute;
             opacity: 1;
@@ -188,24 +183,24 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
             z-index: 1;
           }
           .effect.text {
-            color: rgba(120,90,200,0.7);
+            color: white;
             transition: color 0.3s ease;
             white-space: nowrap;
           }
           .effect.text.active {
             color: white;
           }
-
+          
           /* Using SVG Filter instead of CSS filter so we can have gradients and transparent background */
-          .effect.filter-${filterId} {
-            filter: url(#gooey-toggle-${filterId});
+          .effect.filter {
+            filter: url(#gooey-toggle);
             mix-blend-mode: normal;
           }
-
-          .effect.filter-${filterId}::after {
+          
+          .effect.filter::after {
             content: "";
             position: absolute;
-            inset: -4px;
+            inset: 0;
             background: linear-gradient(to right, #7c3aed, #a855f7);
             transform: scale(0);
             opacity: 0;
@@ -222,7 +217,7 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
               opacity: 1;
             }
           }
-
+          
           .particle,
           .point {
             display: block;
@@ -290,16 +285,32 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
               opacity: 0;
             }
           }
-
+          
           /* Persistent background for the active list item */
           li.active {
             text-shadow: none;
+          }
+          li.active::after {
+            opacity: 1;
+            transform: scale(1);
+          }
+          li::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: linear-gradient(to right, #7c3aed, #a855f7);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+            z-index: -1;
+            box-shadow: 0 2px 10px rgba(124,58,237,0.4);
           }
         `}
       </style>
 
       <svg width="0" height="0" className="absolute hidden">
-        <filter id={`gooey-toggle-${filterId}`} x="-50%" y="-50%" width="200%" height="200%">
+        <filter id="gooey-toggle">
           <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
           <feColorMatrix
             in="blur"
@@ -311,10 +322,7 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
         </filter>
       </svg>
 
-      <div
-        className={`gooey-nav-container-${filterId} relative flex items-center select-none`}
-        ref={containerRef}
-      >
+      <div className="relative flex items-center select-none" ref={containerRef}>
         <nav
           className="flex relative items-center"
           style={{ transform: 'translate3d(0,0,0.01px)' }}
@@ -364,7 +372,7 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
             })}
           </ul>
         </nav>
-        <span ref={filterRef} className={`effect filter-${filterId}`} />
+        <span className="effect filter" ref={filterRef} />
         <span
           className={`effect text flex items-center justify-center ${
             variant === 'vertical'
@@ -378,4 +386,4 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
   );
 };
 
-export default GooeyToggle;
+export default DockToggle;

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAuthModalOpen } from '../stores/modals';
 import { playSound } from '../utils/sounds';
+import BorderGlow from './BorderGlow';
+import Strands from './Strands';
+import { SearchIcon } from 'lucide-react';
 
 // ── Mock featured collections ────────────────────────────────────────────────
 const FEATURED_COLLECTIONS = [
@@ -486,49 +489,71 @@ export default function CollectionsView({ isDark, setIsCommandPaletteOpen }: any
         {/* Search */}
         <div
           className="animate-fade-up"
-          style={{ maxWidth: '540px', margin: '0 auto', animationDelay: '100ms' }}
+          style={{ maxWidth: '800px', margin: '0 auto', animationDelay: '100ms' }}
         >
-          <button
-            onClick={() => setIsCommandPaletteOpen(true)}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '13px 18px',
-              borderRadius: '16px',
-              background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.75)',
-              border: isDark
-                ? '1px solid rgba(255,255,255,0.12)'
-                : '1px solid rgba(255,255,255,0.92)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.25)' : '0 4px 20px rgba(80,60,160,0.1)',
-              cursor: 'pointer',
-            }}
+          <BorderGlow
+            edgeSensitivity={40}
+            glowColor="252 48 74"
+            backgroundColor="transparent"
+            borderRadius={24}
+            glowRadius={35}
+            glowIntensity={1}
+            coneSpread={27}
+            animated={false}
+            colors={['#c084fc', '#f472b6', '#38bdf8']}
+            className="w-full shadow-[0_8px_32px_rgba(124,58,237,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={isDark ? 'rgba(180,160,255,0.45)' : 'rgba(100,80,180,0.45)'}
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <span
-              style={{
-                fontSize: '14px',
-                color: isDark ? 'rgba(180,165,255,0.45)' : 'rgba(100,80,160,0.5)',
-                fontWeight: 500,
-              }}
-            >
-              Search for spatial experiences, tools, and resources...
-            </span>
-          </button>
+            <div className="w-full flex flex-col bg-[rgba(255,255,255,0.15)] dark:bg-[rgba(18,16,40,0.25)] backdrop-blur-[32px] rounded-[21.5px] border border-[rgba(255,255,255,0.45)] dark:border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden">
+              <div className="flex flex-row w-full h-full relative">
+                <div className="hidden sm:flex items-center pl-2 shrink-0">
+                  <button
+                    disabled
+                    className="flex items-center justify-center w-[90px] h-[64px] rounded-[16px] bg-transparent opacity-90 cursor-not-allowed"
+                    title="Pronto"
+                  >
+                    <div style={{ width: '80px', height: '60px', position: 'relative' }}>
+                      <Strands
+                        colors={['#c5bdf0', '#96bbef', '#823fef']}
+                        count={4}
+                        speed={0.5}
+                        amplitude={0.9}
+                        waviness={1.4}
+                        thickness={0.9}
+                        glow={1.7}
+                        taper={3}
+                        spread={1}
+                        intensity={0.5}
+                        saturation={2}
+                        opacity={1}
+                        scale={1.8}
+                        glass={false}
+                        refraction={1}
+                        dispersion={1}
+                        glassSize={1}
+                        hueShift={0}
+                      />
+                    </div>
+                  </button>
+                  <div className="h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
+                </div>
+                <button
+                  onClick={() => setIsCommandPaletteOpen(true)}
+                  className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3 px-4 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
+                >
+                  <SearchIcon
+                    size={18}
+                    className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
+                  />
+                  <span className="flex-1 min-w-0 text-left text-[14px] sm:text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
+                    Search for spatial experiences, tools, and resources...
+                  </span>
+                  <kbd className="hidden md:inline-flex shrink-0 items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-md border-[rgba(200,190,240,0.6)] dark:border-[rgba(255,255,255,0.15)] border text-[rgba(120,90,200,0.6)] dark:text-[rgba(180,160,255,0.6)] bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(255,255,255,0.04)]">
+                    ⌘K
+                  </kbd>
+                </button>
+              </div>
+            </div>
+          </BorderGlow>
         </div>
       </section>
 
