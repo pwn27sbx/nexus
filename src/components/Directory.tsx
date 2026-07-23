@@ -303,74 +303,74 @@ const DirectoryContent: React.FC = () => {
   // Effect to process the audio data when recording stops
   useEffect(() => {
     const processVoiceSearch = async () => {
-      // 1. MODO NATIVO (Web Speech API) - Cero costo, cero límites
+      // 1. MODO NATIVO (Web Speech API) - Envía solo texto a Groq Llama-3
       if (!isListening && finalText && !isVoiceProcessing && mode === 'native') {
         setIsVoiceProcessing(true);
         try {
-          // Limpiamos el texto localmente para extraer las palabras clave
-          const stopwords = [
-            'quiero',
-            'busco',
-            'una',
-            'un',
-            'herramienta',
-            'que',
-            'me',
-            'sirva',
-            'para',
-            'crear',
-            'hacer',
-            'el',
-            'la',
-            'los',
-            'las',
-            'recomiéndame',
-            'recomiendame',
-            'por',
-            'favor',
-            'necesito',
-            'alguien',
-            'sabe',
-            'de',
-          ];
-          let cleaned = finalText.toLowerCase();
-          stopwords.forEach((word) => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            cleaned = cleaned.replace(regex, '');
+          console.log(
+            '%c[Native Voice Search]',
+            'color: #10b981; font-weight: bold;',
+            'Enviando texto a Groq Llama-3 para extraer palabras clave...'
+          );
+
+          const response = await fetch('/api/assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: finalText }),
           });
-          cleaned = cleaned.replace(/\s+/g, ' ').trim();
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to process voice search');
+          }
+
+          const data = await response.json();
 
           console.log(
             '%c[Native Voice Search]',
             'color: #10b981; font-weight: bold;',
             'Transcribió:',
-            finalText
+            data.transcripcion || finalText
           );
           console.log(
             '%c[Native Voice Search]',
             'color: #10b981; font-weight: bold;',
-            'Buscando:',
-            cleaned || finalText
+            'Buscando (Keywords IA):',
+            data.keywords || finalText
           );
 
-          handleSearchChange(cleaned || finalText);
+          handleSearchChange(data.keywords || finalText);
 
           if (activeNav !== 'discover') {
             setActiveNav('discover');
           }
+        } catch (error: any) {
+          console.error('Error processing native text with AI:', error);
+          // Fallback a búsqueda cruda si falla la API
+          handleSearchChange(finalText);
+          if (activeNav !== 'discover') setActiveNav('discover');
         } finally {
           setIsVoiceProcessing(false);
         }
       }
 
-      // 2. MODO RESPALDO (MediaRecorder + Gemini) - Para navegadores restrictivos
+      // 2. MODO RESPALDO (MediaRecorder) - Envía audio a Groq Whisper + Llama-3
       if (!isListening && audioData && !isVoiceProcessing && mode === 'audio') {
         setIsVoiceProcessing(true);
         try {
+          // DEBUG: Reproducir el audio localmente para saber si se grabó bien
           console.log(
             '%c[IA Voice Search]',
             'color: #3b82f6; font-weight: bold;',
-            'Enviando audio de respaldo a Gemini...'
+            'Reproduciendo audio grabado para depuración...'
+          );
+          const audio = new Audio(`data:${audioData.mimeType};base64,${audioData.base64}`);
+          audio.play().catch((e) => console.error('Error al reproducir debug:', e));
+
+          console.log(
+            '%c[IA Voice Search]',
+            'color: #3b82f6; font-weight: bold;',
+            'Enviando audio de respaldo a Groq Whisper...'
           );
           const response = await fetch('/api/assistant', {
             method: 'POST',
