@@ -56,14 +56,14 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
       style={{
         height: '100%',
         minHeight: '360px',
-        background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
+        background: isDark ? 'rgba(30,28,45,0.15)' : 'rgba(255,255,255,0.15)',
         border: isFocused
-          ? '1px solid rgba(124,58,237,0.6)'
+          ? '1px solid rgba(124,58,237,0.8)'
           : isDark
-            ? '1px solid rgba(255,255,255,0.09)'
-            : '1px solid rgba(255,255,255,0.62)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            ? '1px solid rgba(255,255,255,0.15)'
+            : '1px solid rgba(255,255,255,0.4)',
+        backdropFilter: 'blur(32px) saturate(200%)',
+        WebkitBackdropFilter: 'blur(32px) saturate(200%)',
         borderRadius: '2rem',
         cursor: 'pointer',
         position: 'relative',
@@ -71,11 +71,11 @@ const HeroBentoCard: React.FC<HeroBentoCardProps> = ({
         transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
         boxShadow: isHovered
           ? isDark
-            ? '0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15)'
-            : '0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)'
+            ? 'inset 0 1px 1px rgba(255,255,255,0.15), 0 20px 56px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,58,237,0.15)'
+            : 'inset 0 1px 1px rgba(255,255,255,0.6), 0 20px 56px rgba(80,60,180,0.14), 0 0 0 1px rgba(255,255,255,0.3)'
           : isDark
-            ? '0 4px 24px rgba(0,0,0,0.35)'
-            : '0 8px 30px rgba(0,0,0,0.04)',
+            ? 'inset 0 1px 1px rgba(255,255,255,0.1), 0 4px 24px rgba(0,0,0,0.35)'
+            : 'inset 0 1px 1px rgba(255,255,255,0.5), 0 8px 30px rgba(0,0,0,0.04)',
         display: 'flex',
         flexDirection: 'column',
         padding: '12px',

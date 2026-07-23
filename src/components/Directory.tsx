@@ -30,6 +30,7 @@ import CollectionsView from './CollectionsView';
 import HeroBentoCard from './HeroBentoCard';
 import { SearchIcon, UserIcon, PlusIcon } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
+import LiquidEther from './LiquidEther';
 
 // ── VIRTUALIZATION WRAPPERS ──
 const VirtualBentoWrapper = ({
@@ -214,6 +215,8 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 const SIDEBAR_CATEGORIES = ['All Tools', ...ALL_CATEGORIES];
+
+const LIQUID_ETHER_COLORS = ['#9bbded', '#FF9FFC', '#c5bdf0', '#c5bdf0'];
 
 const DirectoryContent: React.FC = () => {
   // ── Hydration ──
@@ -438,35 +441,29 @@ const DirectoryContent: React.FC = () => {
           body, button, input, select, textarea { font-family: var(--global-font); }
         `}</style>
 
-        {/* ══ ATMOSPHERIC ORBS ══════════════════════════════ */}
+        {/* ══ LIQUID ETHER BACKGROUND ══════════════════════════════ */}
         <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           <div
-            className="orb w-[800px] h-[800px] -top-32 -left-32 opacity-70"
             style={{
-              background: isDark
-                ? 'radial-gradient(circle, rgba(124,58,237,0.35) 0%, rgba(99,102,241,0.12) 70%, transparent 100%)'
-                : 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 40%, transparent 80%)',
-              animation: 'float 12s ease-in-out infinite',
+              width: '100vw',
+              height: '100vh',
+              position: 'relative',
+              opacity: isDark ? 0.3 : 0.6,
             }}
-          />
-          <div
-            className="orb w-[700px] h-[700px] top-1/4 -right-24 opacity-60"
-            style={{
-              background: isDark
-                ? 'radial-gradient(circle, rgba(147,51,234,0.30) 0%, rgba(124,58,237,0.08) 70%, transparent 100%)'
-                : 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 50%, transparent 80%)',
-              animation: 'float2 16s ease-in-out infinite 2s',
-            }}
-          />
-          <div
-            className="orb w-[900px] h-[900px] -bottom-32 left-1/4 opacity-70"
-            style={{
-              background: isDark
-                ? 'radial-gradient(circle, rgba(79,70,229,0.25) 0%, rgba(99,102,241,0.06) 70%, transparent 100%)'
-                : 'radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 50%, transparent 80%)',
-              animation: 'float 18s ease-in-out infinite 4s',
-            }}
-          />
+          >
+            <LiquidEther
+              mouseForce={23}
+              cursorSize={120}
+              isViscous={true}
+              viscous={70}
+              colors={LIQUID_ETHER_COLORS}
+              autoDemo
+              autoSpeed={0.7}
+              autoIntensity={2.5}
+              isBounce={false}
+              resolution={0.5}
+            />
+          </div>
         </div>
 
         {/* ══ TOP HEADER BAR ════════════════════════════════ */}
