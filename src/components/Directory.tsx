@@ -31,6 +31,9 @@ import HeroBentoCard from './HeroBentoCard';
 import { SearchIcon, UserIcon, PlusIcon } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import LiquidEther from './LiquidEther';
+import BlurText from './BlurText';
+import Magnet from './Magnet';
+import StarBorder from './StarBorder';
 
 // ── VIRTUALIZATION WRAPPERS ──
 const VirtualBentoWrapper = ({
@@ -487,22 +490,26 @@ const DirectoryContent: React.FC = () => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2 sm:gap-3 pointer-events-auto">
             {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDark ? <SunIcon size={14} /> : <MoonIcon size={14} />}
-            </button>
+            <Magnet padding={30} magnetStrength={3}>
+              <button
+                onClick={toggleTheme}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDark ? <SunIcon size={14} /> : <MoonIcon size={14} />}
+              </button>
+            </Magnet>
 
             {/* Leaderboard */}
-            <button
-              onClick={() => setIsLeaderboardOpen(true)}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
-              aria-label="Leaderboard"
-            >
-              <TrophyIcon size={14} />
-            </button>
+            <Magnet padding={30} magnetStrength={3}>
+              <button
+                onClick={() => setIsLeaderboardOpen(true)}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 backdrop-blur-md bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(30,25,50,0.6)] border border-[rgba(255,255,255,0.9)] dark:border-[rgba(255,255,255,0.08)] text-[rgba(80,60,140,0.8)] dark:text-[rgba(200,190,255,0.8)] shadow-[0_4px_12px_rgba(80,60,160,0.06)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                aria-label="Leaderboard"
+              >
+                <TrophyIcon size={14} />
+              </button>
+            </Magnet>
 
             {/* View toggle */}
             <button
@@ -537,46 +544,53 @@ const DirectoryContent: React.FC = () => {
                     </svg>
                   </button>
                 )}
+                <Magnet padding={40} magnetStrength={3}>
+                  <button
+                    onClick={() => setIsProfileOpen(true)}
+                    className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-2 backdrop-blur-md"
+                    style={{
+                      background: isDark ? 'rgba(124,58,237,0.25)' : 'rgba(124,58,237,0.1)',
+                      border: isDark
+                        ? '1px solid rgba(124,58,237,0.4)'
+                        : '1px solid rgba(124,58,237,0.3)',
+                      color: isDark ? '#d8b4fe' : '#7c3aed',
+                      boxShadow: isDark
+                        ? '0 4px 12px rgba(0,0,0,0.2)'
+                        : '0 4px 12px rgba(124,58,237,0.1)',
+                    }}
+                    aria-label="Open profile"
+                  >
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: accentColor }}
+                    />
+                    <span className="hidden sm:inline">
+                      {user.nickname || user.email.split('@')[0]}
+                    </span>
+                  </button>
+                </Magnet>
+              </>
+            ) : (
+              <Magnet padding={40} magnetStrength={3}>
                 <button
-                  onClick={() => setIsProfileOpen(true)}
-                  className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-2 backdrop-blur-md"
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-1.5 backdrop-blur-md"
                   style={{
-                    background: isDark ? 'rgba(124,58,237,0.25)' : 'rgba(124,58,237,0.1)',
+                    background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
                     border: isDark
-                      ? '1px solid rgba(124,58,237,0.4)'
-                      : '1px solid rgba(124,58,237,0.3)',
+                      ? '1px solid rgba(255,255,255,0.08)'
+                      : '1px solid rgba(255,255,255,0.9)',
                     color: isDark ? '#d8b4fe' : '#7c3aed',
                     boxShadow: isDark
                       ? '0 4px 12px rgba(0,0,0,0.2)'
-                      : '0 4px 12px rgba(124,58,237,0.1)',
+                      : '0 4px 12px rgba(80,60,160,0.06)',
                   }}
-                  aria-label="Open profile"
+                  aria-label="Sign in"
                 >
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: accentColor }} />
-                  <span className="hidden sm:inline">
-                    {user.nickname || user.email.split('@')[0]}
-                  </span>
+                  <UserIcon size={12} />
+                  <span className="hidden sm:inline">Sign in</span>
                 </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setIsAuthModalOpen(true)}
-                className="px-3 md:px-4 h-8 rounded-full text-[12px] font-semibold transition-all hover:scale-105 flex items-center gap-1.5 backdrop-blur-md"
-                style={{
-                  background: isDark ? 'rgba(30,25,50,0.6)' : 'rgba(255,255,255,0.8)',
-                  border: isDark
-                    ? '1px solid rgba(255,255,255,0.08)'
-                    : '1px solid rgba(255,255,255,0.9)',
-                  color: isDark ? '#d8b4fe' : '#7c3aed',
-                  boxShadow: isDark
-                    ? '0 4px 12px rgba(0,0,0,0.2)'
-                    : '0 4px 12px rgba(80,60,160,0.06)',
-                }}
-                aria-label="Sign in"
-              >
-                <UserIcon size={12} />
-                <span className="hidden sm:inline">Sign in</span>
-              </button>
+              </Magnet>
             )}
 
             {/* Sort tabs (Moved inside the right actions group for mobile layout harmony, but still hidden on small screens) */}
@@ -625,9 +639,14 @@ const DirectoryContent: React.FC = () => {
           {(activeNav === 'discover' || activeNav === 'categories' || activeNav === 'submit') && (
             <>
               {/* ── HERO SECTION ── */}
-              <section className="w-full flex flex-col items-center text-center px-4 pt-10 pb-8">
-                <h1 className="font-display text-[32px] sm:text-[42px] md:text-[50px] lg:text-[56px] font-black tracking-tight leading-[1.1] mb-3 animate-fade-up text-[rgba(10,8,30,0.90)] dark:text-[rgba(240,240,255,0.97)] tracking-[-0.025em]">
-                  Ultimate Spatial Gallery Directory
+              <section className="w-full flex flex-col items-center text-center px-4 pt-10 pb-8 overflow-visible">
+                <h1 className="font-display text-[32px] sm:text-[42px] md:text-[50px] lg:text-[56px] font-black tracking-tight leading-[1.1] mb-3 text-[rgba(10,8,30,0.90)] dark:text-[rgba(240,240,255,0.97)] tracking-[-0.025em]">
+                  <BlurText
+                    text="Ultimate Spatial Gallery Directory"
+                    delay={100}
+                    animateBy="words"
+                    direction="top"
+                  />
                 </h1>
 
                 <p
@@ -639,13 +658,17 @@ const DirectoryContent: React.FC = () => {
 
                 {/* Search bar */}
                 <div
-                  className="w-full max-w-[580px] animate-fade-up"
+                  className="w-full max-w-[580px] animate-fade-up mt-2"
                   style={{ animationDelay: '140ms' }}
                 >
-                  <div className="search-glow-container group cursor-pointer">
+                  <StarBorder
+                    color={isDark ? 'rgba(180,160,255,0.8)' : 'rgba(124,58,237,0.8)'}
+                    speed="4s"
+                    className="w-full text-left"
+                  >
                     <button
                       onClick={() => setIsCommandPaletteOpen(true)}
-                      className="w-full flex items-center gap-3 px-5 py-3 transition-all rounded-full bg-[rgba(255,255,255,0.4)] dark:bg-[rgba(0,0,0,0.3)] border border-[rgba(255,255,255,0.6)] dark:border-[rgba(255,255,255,0.05)] shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_5px_rgba(0,0,0,0.3)]"
+                      className="w-full flex items-center gap-3 px-5 py-3 transition-all rounded-[19px] bg-[rgba(255,255,255,0.85)] dark:bg-[rgba(18,16,40,0.85)] backdrop-blur-xl border-none shadow-[inset_0_1px_4px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_2px_5px_rgba(0,0,0,0.3)]"
                       id="hero-search-btn"
                       aria-label="Open search"
                     >
@@ -660,7 +683,7 @@ const DirectoryContent: React.FC = () => {
                         ⌘K
                       </kbd>
                     </button>
-                  </div>
+                  </StarBorder>
                 </div>
 
                 {/* Category pills */}

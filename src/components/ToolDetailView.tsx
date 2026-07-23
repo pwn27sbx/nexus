@@ -7,6 +7,8 @@ import BentoCard from './BentoCard';
 import type { Tool } from '../types';
 import { AuthProvider } from '../contexts/AuthContext';
 import { API_BASE_URL } from '../utils/constants';
+import DecryptedText from './DecryptedText';
+import Magnet from './Magnet';
 
 export function ToolDetailViewContent({ tool }: { tool: Tool }) {
   const { user } = useAuth();
@@ -208,7 +210,10 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
             {/* About Section */}
             <div className="px-2 pt-4">
               <h2 className="text-lg font-bold mb-2 font-sans">About</h2>
-              <h3 className="text-3xl font-serif mb-6">{`About ${tool.name}`}</h3>
+              <h3 className="text-3xl font-serif mb-6">
+                About{' '}
+                <DecryptedText text={tool.name} speed={35} maxIterations={12} animateOn="hover" />
+              </h3>
               <p className="text-[1.05rem] leading-relaxed opacity-80 font-medium">
                 {tool.description}
               </p>
@@ -227,7 +232,12 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
                 />
                 <div className="text-left">
                   <h1 className="text-[1.75rem] font-bold mb-0.5 leading-none text-black dark:text-white">
-                    {tool.name}
+                    <DecryptedText
+                      text={tool.name}
+                      speed={40}
+                      maxIterations={15}
+                      animateOn="view"
+                    />
                   </h1>
                   <p className="text-[0.95rem] opacity-60 font-medium text-black dark:text-white">
                     {getDomain(tool.url)}
@@ -235,16 +245,23 @@ export function ToolDetailViewContent({ tool }: { tool: Tool }) {
                 </div>
               </div>
 
-              <button
-                onClick={handleVisit}
-                className="w-full py-3.5 rounded-2xl text-[1.05rem] font-bold flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(168,85,247,0.39)]"
-                style={{
-                  background: 'linear-gradient(to right, #8b5cf6, #a855f7)',
-                  color: 'white',
-                }}
+              <Magnet
+                padding={40}
+                magnetStrength={2}
+                wrapperClassName="w-full"
+                innerClassName="w-full"
               >
-                Visit Website <ArrowUpRight size={18} />
-              </button>
+                <button
+                  onClick={handleVisit}
+                  className="w-full py-3.5 rounded-2xl text-[1.05rem] font-bold flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(168,85,247,0.39)]"
+                  style={{
+                    background: 'linear-gradient(to right, #8b5cf6, #a855f7)',
+                    color: 'white',
+                  }}
+                >
+                  Visit Website <ArrowUpRight size={18} />
+                </button>
+              </Magnet>
 
               <div className="pt-2 flex flex-col gap-5 text-black dark:text-white">
                 <div
