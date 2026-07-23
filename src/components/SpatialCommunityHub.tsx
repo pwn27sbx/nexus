@@ -44,13 +44,17 @@ const Avatar: React.FC<AvatarProps> = ({ name, size = 40, src = null, badge = nu
         }}
       >
         {src ? (
-          <img
-            loading="lazy"
-            decoding="async"
-            src={src}
-            alt={name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+          src.startsWith('data:image') || src.startsWith('http') ? (
+            <img
+              loading="lazy"
+              decoding="async"
+              src={src}
+              alt={name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span>{src}</span>
+          )
         ) : (
           <span>{initials}</span>
         )}
@@ -109,6 +113,7 @@ const UserOrb: React.FC<UserOrbProps> = ({ contributor, animClass, size = 160, i
       <Avatar
         name={contributor.name}
         size={contributor.isTop ? 52 : 42}
+        src={contributor.avatarUrl}
         badge={contributor.isTop ? '🏆' : null}
       />
       <div>
@@ -347,21 +352,21 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
             id: leaders[0].id,
             name: leaders[0].nickname || leaders[0].email?.split('@')[0] || 'Top Contributor',
             contribution: `${leaders[0].approvedCount || 23}k`,
-            avatarUrl: null,
+            avatarUrl: leaders[0].avatar || null,
             isTop: true,
           },
           {
             id: leaders[1].id,
             name: leaders[1].nickname || leaders[1].email?.split('@')[0] || 'Maria Caroan',
             contribution: `${leaders[1].approvedCount || 10}k`,
-            avatarUrl: null,
+            avatarUrl: leaders[1].avatar || null,
             isTop: false,
           },
           {
             id: leaders[2].id,
             name: leaders[2].nickname || leaders[2].email?.split('@')[0] || 'Marty Kenton',
             contribution: `${leaders[2].approvedCount || 142}k`,
-            avatarUrl: null,
+            avatarUrl: leaders[2].avatar || null,
             isTop: false,
           },
         ]

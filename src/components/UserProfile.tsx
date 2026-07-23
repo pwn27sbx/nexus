@@ -30,6 +30,7 @@ const UserProfile = ({
   const [submissions, setSubmissions] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [nickname, setNickname] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [activeFolder, setActiveFolder] = useState<UserCollection | 'all' | null>(null);
@@ -40,6 +41,7 @@ const UserProfile = ({
   useEffect(() => {
     if (!isOpen || !user) return;
     setNickname(user.nickname || '');
+    setAvatar(user.avatar || '');
     const fetchUserData = async () => {
       setIsLoading(true);
       const token = localStorage.getItem('payload-token');
@@ -66,8 +68,15 @@ const UserProfile = ({
     fetchUserData();
   }, [isOpen, user]);
 
-  const handleSaveNickname = async () => {
-    if (!user || nickname === user.nickname || nickname.length < 3) return;
+  const handleSaveProfile = async (newAvatar?: string) => {
+    if (!user) return;
+
+    const avatarToSave = newAvatar !== undefined ? newAvatar : avatar;
+    const isNicknameChanged = nickname !== user.nickname && nickname.length >= 3;
+    const isAvatarChanged = avatarToSave !== user.avatar;
+
+    if (!isNicknameChanged && !isAvatarChanged) return;
+
     const token = localStorage.getItem('payload-token');
     try {
       const response = await fetch(`${API_BASE_URL}/api/users/${user.id}`, {
@@ -76,9 +85,15 @@ const UserProfile = ({
           'Content-Type': 'application/json',
           Authorization: `JWT ${token}`,
         },
-        body: JSON.stringify({ nickname }),
+        body: JSON.stringify({
+          ...(isNicknameChanged && { nickname }),
+          ...(isAvatarChanged && { avatar: avatarToSave }),
+        }),
       });
-      if (response.ok && user) user.nickname = nickname;
+      if (response.ok && user) {
+        if (isNicknameChanged) user.nickname = nickname;
+        if (isAvatarChanged) user.avatar = avatarToSave;
+      }
     } catch {
       // Silently fail
     }
@@ -232,7 +247,9 @@ const UserProfile = ({
             user={user}
             nickname={nickname}
             setNickname={setNickname}
-            handleSaveNickname={handleSaveNickname}
+            avatar={avatar}
+            setAvatar={setAvatar}
+            handleSaveProfile={handleSaveProfile}
             isLoading={isLoading}
             accentColor={accentColor}
             setAccentColor={setAccentColor}

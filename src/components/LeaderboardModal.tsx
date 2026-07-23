@@ -290,7 +290,25 @@ const LeaderboardModal = () => {
                         flexShrink: 0,
                       }}
                     >
-                      {(leader.nickname || leader.email || 'U').charAt(0).toUpperCase()}
+                      {leader.avatar ? (
+                        leader.avatar.startsWith('data:image') ||
+                        leader.avatar.startsWith('http') ? (
+                          <img
+                            src={leader.avatar}
+                            alt={leader.nickname || ''}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: '50%',
+                            }}
+                          />
+                        ) : (
+                          <span>{leader.avatar}</span>
+                        )
+                      ) : (
+                        (leader.nickname || leader.email || 'U').charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -517,7 +535,19 @@ const LeaderPodiumCard: React.FC<LeaderRowProps> = ({
           marginBottom: '8px',
         }}
       >
-        {initials}
+        {leader.avatar ? (
+          leader.avatar.startsWith('data:image') || leader.avatar.startsWith('http') ? (
+            <img
+              src={leader.avatar}
+              alt={leader.nickname || ''}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+            />
+          ) : (
+            <span>{leader.avatar}</span>
+          )
+        ) : (
+          initials
+        )}
       </div>
       <span
         style={{

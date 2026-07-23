@@ -48,6 +48,14 @@ export const Users: CollectionConfig = {
         position: 'sidebar',
       }
     },
+    {
+      name: 'avatar',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        description: 'URL o base64 de la foto de perfil o icono.'
+      }
+    },
     // La Bóveda: Guarda las IDs de las herramientas favoritas
     {
       name: 'bookmarks',

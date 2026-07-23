@@ -1,7 +1,40 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { playSound } from '../../utils/sounds';
 import { ACCENTS } from '../../utils/constants';
 import type { User } from '../../types';
+
+const AVATAR_ICONS = [
+  '🧑‍🚀',
+  '🦊',
+  '🦄',
+  '🐼',
+  '🦸',
+  '🧙',
+  '🧛',
+  '🧝',
+  '🧟',
+  '🧞',
+  '🧜',
+  '🧚',
+  '👩‍🎤',
+  '🧑‍🏫',
+  '🧑‍🍳',
+  '🧑‍🌾',
+  '🧑‍🏭',
+  '🧑‍💻',
+  '🧑‍💼',
+  '🧑‍🔬',
+  '🧑‍🎨',
+  '🧑‍🚒',
+  '👮',
+  '🕵️',
+  '💂',
+  '👷',
+  '🤴',
+  '👳',
+  '👲',
+  '👽',
+];
 
 const availableFonts = [
   { id: 'inter', name: 'Inter', value: "'Inter', sans-serif" },
@@ -15,7 +48,9 @@ interface UserSettingsProps {
   user: User | null;
   nickname: string;
   setNickname: (name: string) => void;
-  handleSaveNickname: () => void;
+  avatar: string;
+  setAvatar: (avatar: string) => void;
+  handleSaveProfile: (newAvatar?: string) => void;
   isLoading: boolean;
   accentColor: string;
   setAccentColor: (color: string) => void;
@@ -29,7 +64,9 @@ const UserSettings: React.FC<UserSettingsProps> = ({
   user,
   nickname,
   setNickname,
-  handleSaveNickname,
+  avatar,
+  setAvatar,
+  handleSaveProfile,
   isLoading,
   accentColor,
   setAccentColor,
@@ -38,6 +75,8 @@ const UserSettings: React.FC<UserSettingsProps> = ({
   setShowLogoutConfirm,
   isDark,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const glassCard = {
     background: isDark ? 'rgba(18,16,40,0.72)' : 'rgba(255,255,255,0.42)',
     border: isDark ? '1px solid rgba(255,255,255,0.09)' : '1px solid rgba(255,255,255,0.62)',
@@ -93,53 +132,218 @@ const UserSettings: React.FC<UserSettingsProps> = ({
         ) : (
           <div>
             <div
-              style={{
-                width: '68px',
-                height: '68px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '26px',
-                fontWeight: 700,
-                color: 'white',
-                marginBottom: '20px',
-                border: isDark
-                  ? '3px solid rgba(255,255,255,0.15)'
-                  : '3px solid rgba(255,255,255,0.95)',
-                boxShadow: '0 4px 20px rgba(124,58,237,0.35)',
-              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}
             >
-              {(nickname || user?.email || 'U').charAt(0).toUpperCase()}
+              <div
+                onClick={() => setIsEditingAvatar(!isEditingAvatar)}
+                style={{
+                  width: '68px',
+                  height: '68px',
+                  borderRadius: '50%',
+                  background:
+                    avatar && avatar.startsWith('data:image')
+                      ? `url(${avatar}) center/cover no-repeat`
+                      : 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  color: 'white',
+                  border: isDark
+                    ? '3px solid rgba(255,255,255,0.15)'
+                    : '3px solid rgba(255,255,255,0.95)',
+                  boxShadow: '0 4px 20px rgba(124,58,237,0.35)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease',
+                  transform: isEditingAvatar ? 'scale(1.05)' : 'scale(1)',
+                }}
+                title="Change Avatar"
+              >
+                {!avatar || avatar.startsWith('data:image')
+                  ? !avatar
+                    ? (nickname || user?.email || 'U').charAt(0).toUpperCase()
+                    : null
+                  : avatar}
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) =>
+                    setNickname(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))
+                  }
+                  onBlur={() => handleSaveProfile()}
+                  placeholder="Set nickname..."
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    border: 'none',
+                    outline: 'none',
+                    fontSize: '26px',
+                    fontWeight: 800,
+                    letterSpacing: '-0.02em',
+                    color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)',
+                  }}
+                />
+                <p
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)',
+                    marginTop: '6px',
+                  }}
+                >
+                  {user?.email}
+                </p>
+              </div>
             </div>
-            <input
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-              onBlur={handleSaveNickname}
-              placeholder="Set nickname..."
-              style={{
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                fontSize: '26px',
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                color: isDark ? 'rgba(240,235,255,0.95)' : 'rgba(10,8,30,0.88)',
-              }}
-            />
-            <p
-              style={{
-                fontSize: '13px',
-                fontWeight: 500,
-                color: isDark ? 'rgba(180,165,235,0.6)' : 'rgba(80,60,140,0.55)',
-                marginTop: '6px',
-              }}
-            >
-              {user?.email}
-            </p>
+
+            {isEditingAvatar && (
+              <div
+                className="animate-fade-in"
+                style={{
+                  padding: '16px',
+                  background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.4)',
+                  borderRadius: '16px',
+                  marginTop: '16px',
+                  border: isDark
+                    ? '1px solid rgba(255,255,255,0.05)'
+                    : '1px solid rgba(255,255,255,0.5)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '12px',
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      color: isDark ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)',
+                    }}
+                  >
+                    Choose an Icon
+                  </h4>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Upload Photo
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                          const canvas = document.createElement('canvas');
+                          const ctx = canvas.getContext('2d');
+                          const size = 128;
+                          canvas.width = size;
+                          canvas.height = size;
+
+                          // Cover fit
+                          const scale = Math.max(size / img.width, size / img.height);
+                          const x = (size - img.width * scale) / 2;
+                          const y = (size - img.height * scale) / 2;
+
+                          if (ctx) {
+                            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            setAvatar(dataUrl);
+                            handleSaveProfile(dataUrl);
+                            playSound('success');
+                            setIsEditingAvatar(false);
+                          }
+                        };
+                        img.src = event.target?.result as string;
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    maxHeight: '160px',
+                    overflowY: 'auto',
+                    paddingRight: '8px',
+                  }}
+                >
+                  {AVATAR_ICONS.map((icon) => (
+                    <button
+                      key={icon}
+                      onClick={() => {
+                        setAvatar(icon);
+                        handleSaveProfile(icon);
+                        playSound('pop');
+                        setIsEditingAvatar(false);
+                      }}
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        fontSize: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background:
+                          avatar === icon
+                            ? isDark
+                              ? 'rgba(124,58,237,0.3)'
+                              : 'rgba(124,58,237,0.2)'
+                            : 'transparent',
+                        border: avatar === icon ? '1px solid #7c3aed' : '1px solid transparent',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                      className="hover:bg-white/10 dark:hover:bg-black/20"
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

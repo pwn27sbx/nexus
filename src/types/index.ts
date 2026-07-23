@@ -22,6 +22,7 @@ export interface User {
   id: number;
   email: string;
   nickname?: string;
+  avatar?: string;
   role?: 'user' | 'admin';
   bookmarks?: (number | Tool)[];
   level?: 'Explorer' | 'Contributor' | 'Expert Curator' | 'Master Curator';

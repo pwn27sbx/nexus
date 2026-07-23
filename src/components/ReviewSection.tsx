@@ -202,8 +202,31 @@ export default function ReviewSection({ toolId }: { toolId: string | number }) {
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center font-bold text-purple-500">
-                    {review.user?.nickname?.charAt(0).toUpperCase() || 'U'}
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-purple-500 overflow-hidden"
+                    style={{
+                      background:
+                        review.user?.avatar &&
+                        (review.user.avatar.startsWith('data:image') ||
+                          review.user.avatar.startsWith('http'))
+                          ? 'transparent'
+                          : 'rgba(168, 85, 247, 0.2)',
+                    }}
+                  >
+                    {review.user?.avatar ? (
+                      review.user.avatar.startsWith('data:image') ||
+                      review.user.avatar.startsWith('http') ? (
+                        <img
+                          src={review.user.avatar}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xl">{review.user.avatar}</span>
+                      )
+                    ) : (
+                      review.user?.nickname?.charAt(0).toUpperCase() || 'U'
+                    )}
                   </div>
                   <div>
                     <div className="font-bold">{review.user?.nickname || 'Anonymous'}</div>
