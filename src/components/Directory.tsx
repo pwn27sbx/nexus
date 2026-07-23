@@ -14,10 +14,12 @@ import {
 import { AppProvider } from '@/contexts/AppProvider';
 import { useToolsSearch } from '@/hooks/useToolsSearch';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { useVoiceCommand } from '@/hooks/useVoiceCommand';
 import BentoCard from './BentoCard';
 import ListCard from './ListCard';
 import SavePopover from './SavePopover';
 import SkeletonCard from './SkeletonCard';
+import VoiceAssistantOverlay from './VoiceAssistantOverlay';
 import ErrorBoundary from './ErrorBoundary';
 import HeroBentoCard from './HeroBentoCard';
 import { SearchIcon, UserIcon, PlusIcon } from 'lucide-react';
@@ -96,6 +98,26 @@ import type { SavePopoverConfig } from '@/types';
 
 // Nav items for bottom dock
 const NAV_ITEMS = [
+  {
+    id: 'assistant',
+    label: 'AI Search',
+    icon: (active: boolean) => (
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        <line x1="12" y1="19" x2="12" y2="22" />
+      </svg>
+    ),
+  },
   {
     id: 'discover',
     label: 'Discover',
@@ -250,6 +272,61 @@ const DirectoryContent: React.FC = () => {
 
   // ── Categories Wheel Position ──
   const categoriesBtnRef = useRef<HTMLButtonElement>(null);
+
+  // --- Voice Assistant State ---
+  const {
+    isListening,
+    transcript,
+    error: voiceError,
+    startListening,
+    stopListening,
+  } = useVoiceCommand();
+  const [isVoiceProcessing, setIsVoiceProcessing] = useState(false);
+
+  useEffect(() => {
+    // If voice error, maybe show toast (omitted for brevity, handled in UI)
+    if (voiceError) {
+      console.warn('Voice error:', voiceError);
+    }
+  }, [voiceError]);
+
+  // Effect to process the transcript when listening stops and we have text
+  useEffect(() => {
+    const processVoiceSearch = async () => {
+      if (!isListening && transcript && transcript.length > 3 && !isVoiceProcessing) {
+        setIsVoiceProcessing(true);
+        try {
+          const response = await fetch('/api/assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript }),
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to process voice search');
+          }
+
+          const data = await response.json();
+          // Put the AI keywords into the search bar
+          handleSearchChange(data.keywords);
+
+          // Switch to discover if we were somewhere else
+          if (activeNav !== 'discover') {
+            setActiveNav('discover');
+          }
+        } catch (error) {
+          console.error('Error processing voice command:', error);
+        } finally {
+          setIsVoiceProcessing(false);
+          // Small delay before clearing transcript logic is usually handled by the hook
+        }
+      }
+    };
+
+    processVoiceSearch();
+  }, [isListening, transcript]);
+
   const [wheelPos, setWheelPos] = useState({ top: 0, left: 0, bottom: 0, right: 0 });
 
   const handleCategoriesClick = () => {
@@ -957,6 +1034,11 @@ const DirectoryContent: React.FC = () => {
                 )
               )}
               onItemClick={(index, value) => {
+                if (value === 'assistant') {
+                  if (isListening) stopListening();
+                  else startListening();
+                  return; // Don't change active nav to assistant, it's just an action
+                }
                 setActiveNav(value);
                 playSound('pop');
                 if (value === 'submit') setIsModalOpen(true);
@@ -967,6 +1049,14 @@ const DirectoryContent: React.FC = () => {
             />
           </div>
         </nav>
+
+        {/* ══ VOICE ASSISTANT OVERLAY ════════════════════════ */}
+        <VoiceAssistantOverlay
+          isListening={isListening}
+          transcript={transcript}
+          onStop={stopListening}
+          isProcessing={isVoiceProcessing}
+        />
 
         {/* ══ MODALS ════════════════════════════════════════ */}
         {isOptionWheelOpen && (

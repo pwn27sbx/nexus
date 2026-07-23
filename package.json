@@ -19,6 +19,7 @@
   "dependencies": {
     "@astrojs/react": "^6.0.1",
     "@astrojs/vercel": "^11.0.3",
+    "@google/generative-ai": "^0.24.1",
     "@nanostores/react": "^1.1.0",
     "@tailwindcss/vite": "^4.3.2",
     "@tanstack/react-virtual": "^3.14.8",
