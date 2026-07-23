@@ -187,6 +187,10 @@ export interface Tool {
    */
   description?: string | null;
   /**
+   * Nota/Idea que el usuario dejó al enviar la herramienta (no visible al público).
+   */
+  submitterNote?: string | null;
+  /**
    * Etiquetas en formato JSON array (ej: ["diseño", "ui", "gratis"]). O también separado por comas: diseño, ui, gratis
    */
   tags?: string | null;
@@ -382,6 +386,7 @@ export interface ToolsSelect<T extends boolean = true> {
   slug?: T;
   url?: T;
   description?: T;
+  submitterNote?: T;
   tags?: T;
   category?: T;
   gridHeight?: T;
