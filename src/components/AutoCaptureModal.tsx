@@ -4,6 +4,7 @@ import { ALL_CATEGORIES, API_BASE_URL, APP_CONFIG, COMMON_TAGS } from '../utils/
 import { isValidUrl } from '../utils/helpers';
 import { playSound } from '../utils/sounds';
 import type { AutoCaptureModalProps } from '../types';
+import BubbleMenu from './BubbleMenu';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) => {
@@ -12,6 +13,8 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
   const [url, setUrl] = useState('');
   const [category, setCategory] = useState('Design');
   const [submitterNote, setSubmitterNote] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isTypingCustomTag, setIsTypingCustomTag] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle'
@@ -30,6 +33,17 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
       setPreviewUrl('');
     }
   }, [url]);
+
+  const addTag = (tag: string) => {
+    const clean = tag.toLowerCase().trim();
+    if (clean && !selectedTags.includes(clean) && selectedTags.length < 5) {
+      setSelectedTags([...selectedTags, clean]);
+    }
+  };
+
+  const removeTag = (tag: string) => {
+    setSelectedTags(selectedTags.filter((t) => t !== tag));
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -69,10 +83,13 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
           url,
           category,
           submitterNote,
-          tags: tagInput
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
+          tags: [
+            ...selectedTags,
+            ...tagInput
+              .split(',')
+              .map((t) => t.trim())
+              .filter(Boolean),
+          ],
           status: 'pending',
           submittedBy: user ? user.id : null,
         }),
@@ -86,6 +103,8 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
           setUrl('');
           setSubmitterNote('');
           setCategory('Design');
+          setSelectedTags([]);
+          setIsTypingCustomTag(false);
           setTagInput('');
           setSubmitStatus('idle');
           setUrlError('');
@@ -509,26 +528,129 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
                     display: 'flex',
                     alignItems: 'center',
                     gap: '10px',
-                    padding: '12px 18px',
+                    padding: '8px 18px',
+                    minHeight: '48px',
+                    flexWrap: 'wrap',
                   }}
                 >
-                  <input
-                    type="text"
-                    placeholder="Tags (comma separated, e.g. free, design)"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    disabled={submitStatus === 'loading'}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      width: '100%',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(20,15,50,0.85)',
-                    }}
-                    aria-label="Tags"
-                  />
+                  {selectedTags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '3px 10px',
+                        borderRadius: '100px',
+                        background:
+                          'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
+                        color: 'white',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeTag(tag);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'white',
+                          cursor: 'pointer',
+                          padding: 0,
+                        }}
+                        aria-label={`Remove ${tag}`}
+                      >
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                        >
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+
+                  {isTypingCustomTag ? (
+                    <input
+                      type="text"
+                      autoFocus
+                      placeholder="Type custom tag & press Enter..."
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onBlur={() => {
+                        if (tagInput.trim()) {
+                          addTag(tagInput);
+                          setTagInput('');
+                        }
+                        setIsTypingCustomTag(false);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (tagInput.trim()) {
+                            addTag(tagInput);
+                            setTagInput('');
+                          }
+                          setIsTypingCustomTag(false);
+                        } else if (e.key === 'Escape') {
+                          setIsTypingCustomTag(false);
+                          setTagInput('');
+                        }
+                      }}
+                      disabled={submitStatus === 'loading'}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        flex: 1,
+                        minWidth: '150px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        color: isDark ? 'rgba(235,230,255,0.9)' : 'rgba(20,15,50,0.85)',
+                      }}
+                    />
+                  ) : (
+                    <BubbleMenu
+                      className="!flex-1 !text-left !w-auto !h-auto !bg-transparent !border-none !shadow-none hover:!bg-transparent !p-0 !m-0 !font-medium !justify-start"
+                      style={{
+                        color:
+                          selectedTags.length === 0
+                            ? isDark
+                              ? 'rgba(235,230,255,0.5)'
+                              : 'rgba(20,15,50,0.5)'
+                            : isDark
+                              ? 'rgba(235,230,255,0.9)'
+                              : 'rgba(20,15,50,0.85)',
+                        minHeight: '24px',
+                      }}
+                      menuAriaLabel="Add tags"
+                      items={[
+                        ...COMMON_TAGS.filter((t) => !selectedTags.includes(t.id)).map((t, i) => ({
+                          label: t.label,
+                          onClick: () => addTag(t.id),
+                          rotation: (i % 2 === 0 ? 1 : -1) * (2 + Math.random() * 4),
+                        })),
+                        {
+                          label: '+ Custom Tag',
+                          onClick: () => setIsTypingCustomTag(true),
+                          rotation: 0,
+                          hoverStyles: { bgColor: '#10b981', textColor: '#ffffff' },
+                        },
+                      ]}
+                    >
+                      {selectedTags.length === 0 ? 'Select tags...' : 'Add more tags...'}
+                    </BubbleMenu>
+                  )}
                 </div>
                 <select
                   value={category}

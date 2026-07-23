@@ -16,6 +16,7 @@ type MenuItem = {
 };
 
 export type BubbleMenuProps = {
+  children?: React.ReactNode;
   onMenuClick?: (open: boolean) => void;
   className?: string;
   style?: CSSProperties;
@@ -41,6 +42,7 @@ export default function BubbleMenu({
   animationEase = 'back.out(1.5)',
   animationDuration = 0.5,
   staggerDelay = 0.12,
+  children,
 }: BubbleMenuProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
@@ -201,13 +203,19 @@ export default function BubbleMenu({
         aria-pressed={isMenuOpen}
         style={style}
       >
-        {/* En móvil se ve el ícono, en PC se oculta */}
-        <LayoutGrid
-          size={18}
-          className="sm:hidden transition-transform duration-300 hover:scale-110"
-        />
-        {/* En PC se ve el texto, en móvil se oculta */}
-        <span className="hidden sm:inline text-[14px]">Categories</span>
+        {children ? (
+          children
+        ) : (
+          <>
+            {/* En móvil se ve el ícono, en PC se oculta */}
+            <LayoutGrid
+              size={18}
+              className="sm:hidden transition-transform duration-300 hover:scale-110"
+            />
+            {/* En PC se ve el texto, en móvil se oculta */}
+            <span className="hidden sm:inline text-[14px]">Categories</span>
+          </>
+        )}
       </button>
 
       {/* Overlay del Menú Animado */}
