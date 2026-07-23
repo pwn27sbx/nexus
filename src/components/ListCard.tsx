@@ -12,7 +12,9 @@ const ListCard = memo(({ tool, isFocused, indexNumber, onSaveRequest, delay }: L
 
   const numericToolId = Number(tool.id);
   const [isHovered, setIsHovered] = useState(false);
-  const [isDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [isDark] = useState(() =>
+    typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false
+  );
 
   const isSavedAnywhere =
     user?.bookmarks?.some((b) => (typeof b === 'object' ? b.id : b) === numericToolId) ||
