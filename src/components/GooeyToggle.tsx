@@ -330,18 +330,21 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
               <li
                 key={index}
                 onClick={(e) => handleClick(e as any, index)}
-                className={`rounded-full relative cursor-pointer transition-[color] duration-300 ease text-[12.5px] font-bold ${
+                className={`rounded-xl relative cursor-pointer transition-[color] duration-300 ease text-[10.5px] font-semibold leading-none ${
                   activeIndex === index
                     ? 'active text-transparent'
-                    : 'text-[rgba(80,60,140,0.65)] dark:text-[rgba(200,190,240,0.6)] hover:text-[rgba(80,60,140,0.9)] dark:hover:text-white'
+                    : 'text-[rgba(100,100,120,0.55)] dark:text-[rgba(180,160,255,0.4)] hover:text-[#111111] dark:hover:text-white'
                 }`}
               >
                 <button
-                  className="outline-none py-1.5 px-4 min-w-[90px] flex items-center justify-center gap-1.5 capitalize"
+                  className="group outline-none py-2 px-2 sm:px-4 min-w-[60px] sm:min-w-[70px] flex flex-col items-center justify-center gap-1"
                   onClick={(e) => e.preventDefault()}
                   onKeyDown={(e) => handleKeyDown(e, index)}
                 >
-                  {item.icon} {item.label}
+                  <span className="flex items-center justify-center w-5 h-5 transition-transform duration-300 group-hover:scale-[1.15]">
+                    {item.icon}
+                  </span>
+                  <span className="mt-0.5">{item.label}</span>
                 </button>
               </li>
             ))}
@@ -349,7 +352,7 @@ const GooeyToggle: React.FC<GooeyToggleProps> = ({
         </nav>
         <span className="effect filter" ref={filterRef} />
         <span
-          className="effect text font-bold text-[12.5px] flex items-center justify-center gap-1.5 capitalize"
+          className="effect text font-semibold text-[10.5px] leading-none flex flex-col items-center justify-center gap-1 text-[#111111] dark:text-[#e2e0ff]"
           ref={textRef}
         />
       </div>
