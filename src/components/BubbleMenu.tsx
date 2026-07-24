@@ -145,14 +145,21 @@ export default function BubbleMenu({
   return (
     <>
       <style>{`
-        .bubble-menu-items .pill-list .pill-col:nth-child(4):nth-last-child(2) {
-          margin-left: calc(100% / 6);
-        }
-        .bubble-menu-items .pill-list .pill-col:nth-child(4):last-child {
-          margin-left: calc(100% / 3);
+        .bubble-menu-items .pill-list .pill-col {
+          flex: 0 0 auto !important;
+          margin-left: 0 !important;
+          overflow: visible;
         }
         @media (min-width: 900px) {
+          .bubble-menu-items .pill-list {
+            row-gap: 16px;
+            column-gap: 16px;
+            justify-content: center;
+          }
           .bubble-menu-items .pill-link {
+            font-size: clamp(1rem, 2vw, 1.3rem) !important;
+            padding: 12px 28px !important;
+            min-height: auto !important;
             transform: rotate(var(--item-rot));
           }
           .bubble-menu-items .pill-link:hover {
@@ -269,7 +276,6 @@ export default function BubbleMenu({
                     aria-label={item.ariaLabel || item.label}
                     className={[
                       'pill-link',
-                      'w-[90%]',
                       'rounded-[999px]',
                       'no-underline',
                       'text-inherit',

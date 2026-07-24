@@ -639,12 +639,13 @@ const AutoCaptureModal: React.FC<AutoCaptureModalProps> = ({ isOpen, onClose }) 
                           label: t.label,
                           onClick: () => addTag(t.id),
                           rotation: (i % 2 === 0 ? 1 : -1) * (2 + Math.random() * 4),
+                          hoverStyles: { bgColor: '#8070b0', textColor: '#ffffff' },
                         })),
                         {
                           label: '+ Custom Tag',
                           onClick: () => setIsTypingCustomTag(true),
                           rotation: 0,
-                          hoverStyles: { bgColor: '#10b981', textColor: '#ffffff' },
+                          hoverStyles: { bgColor: '#8070b0', textColor: '#ffffff' },
                         },
                       ]}
                     >
