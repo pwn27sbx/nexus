@@ -520,15 +520,16 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
             colors={['#c084fc', '#f472b6', '#38bdf8']}
             className="w-full shadow-[0_8px_32px_rgba(124,58,237,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
           >
-            <div className="w-full flex flex-col bg-[rgba(255,255,255,0.15)] dark:bg-[rgba(18,16,40,0.25)] backdrop-blur-[32px] rounded-[21.5px] border border-[rgba(255,255,255,0.45)] dark:border-[rgba(255,255,255,0.1)] shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] overflow-hidden">
-              <div className="flex flex-row w-full h-full relative">
-                <div className="hidden sm:flex items-center pl-2 shrink-0">
+            <div className="relative flex items-center bg-[rgba(255,255,255,0.7)] dark:bg-[rgba(15,12,32,0.6)] backdrop-blur-xl border border-[rgba(255,255,255,0.8)] dark:border-[rgba(255,255,255,0.05)] rounded-[22px] shadow-[0_8px_32px_rgba(100,80,180,0.08),inset_0_2px_4px_rgba(255,255,255,0.4)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.05)] h-12 sm:h-16 w-full max-w-[800px] overflow-hidden">
+              <div className="flex w-full h-full">
+                {/* Strands UI Animation at Start */}
+                <div className="hidden sm:flex shrink-0 items-center pl-3">
                   <button
                     disabled
-                    className="flex items-center justify-center w-[90px] h-[64px] rounded-[16px] bg-transparent opacity-90 cursor-not-allowed"
+                    className="relative w-12 h-12 flex items-center justify-center transition-transform active:scale-95 cursor-not-allowed opacity-90"
                     title="Pronto"
                   >
-                    <div style={{ width: '80px', height: '60px', position: 'relative' }}>
+                    <div className="w-10 h-10 overflow-hidden relative">
                       <Strands
                         colors={['#c5bdf0', '#96bbef', '#823fef']}
                         count={4}
@@ -551,15 +552,15 @@ const SpatialCommunityHub: React.FC<SpatialCommunityHubProps> = ({
                       />
                     </div>
                   </button>
-                  <div className="h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
+                  <div className="h-6 sm:h-10 w-[1px] bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.06)] mx-1" />
                 </div>
                 <button
                   onClick={() => setIsCommandPaletteOpen(true)}
-                  className="flex-1 min-w-0 flex items-center gap-2 sm:gap-3 px-4 py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
+                  className="flex-1 min-w-0 flex items-center gap-1.5 sm:gap-3 px-2 sm:px-4 py-3 sm:py-4 transition-all bg-transparent hover:bg-[rgba(0,0,0,0.02)] dark:hover:bg-[rgba(255,255,255,0.02)]"
                 >
                   <SearchIcon
-                    size={18}
-                    className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)]"
+                    size={16}
+                    className="shrink-0 text-[rgba(100,80,160,0.5)] dark:text-[rgba(180,160,255,0.5)] hidden sm:block"
                   />
                   <span className="flex-1 min-w-0 text-left text-[14px] sm:text-[15px] font-medium text-[rgba(100,80,160,0.7)] dark:text-[rgba(180,160,255,0.6)] truncate">
                     Search for spatial experiences, tools, and resources...
